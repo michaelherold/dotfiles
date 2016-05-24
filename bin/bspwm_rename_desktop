@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Launch a dmenu bar to rename the current desktop
+
+FONT="Droid Sans Mono:pixelsize=12"
+
+BASE_BG="#2b2b2b"
+BASE_FG="#f4f1ed"
+SELECTED_BG="#519f50"
+SELECTED_FG=$BASE_FG
+
+DESKTOP_NAME=`dmenu -b -fn "$FONT" -nf "$BASE_FG" -nb "$BASE_BG" -sf "$SELECTED_FG" -sb "$SELECTED_BG" -p 'Rename:'`
+if [ -z $DESKTOP_NAME ]; then
+  exit 0
+fi
+
+bspc desktop -n "$DESKTOP_NAME"

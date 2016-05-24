@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+
+# Launch a previous tmux session or a new one.
+
+[ "$TMUX" == "" ] || exit 0
+
+function launch_session() {
+  tmux attach-session -t $1
+}
+
+function list_sessions() {
+  tmux list-sessions -F "#S" 2>/dev/null
+}
+
+function new_session() {
+  read -p "New session name: " session_name
+  tmux new -s "${session_name}"
+}
+
+function show_header() {
+  echo "Available Sessions"
+  echo "------------------"
+  echo
+}
+
+PS3="Choose your session: "
+sessions=$(list_sessions)
+options=($sessions "New Session" "zsh")
+
+show_header
+
+select option in "${options[@]}"
+do
+  case $option in
+    "New Session")
+      new_session
+      break
+      ;;
+    "zsh")
+      zsh --login
+      break;;
+    *)
+      launch_session $option
+      break
+      ;;
+  esac
+done

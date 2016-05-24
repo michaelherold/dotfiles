@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Switch between the front and back stereo ports.
+
+CURRENT_MODE=$(amixer -c DG | grep -A3 "Analog Output" | grep Item0 | cut -d"'" -f2)
+
+case $CURRENT_MODE in
+  "Multichannel")
+    NEW_MODE="Stereo Headphones FP"
+    ;;
+  "Stereo Headphones FP")
+    NEW_MODE="Multichannel"
+    ;;
+  *)
+    echo "Unknown mode set"
+    notify-send "Unknown sound card mode!"
+    exit 1
+    ;;
+esac
+
+amixer -c DG sset "Analog Output" "$NEW_MODE"
+notify-send "Xonar Mode Switch" "Switching to: ${NEW_MODE}"

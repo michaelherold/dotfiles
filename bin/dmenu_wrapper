@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Launch a dmenu instance centered in the screen.
+
+FONT="Droid Sans Mono:pixelsize=12"
+
+BASE_BG="#2b2b2b"
+BASE_FG="#f4f1ed"
+SELECTED_BG="#519f50"
+SELECTED_FG=$BASE_FG
+
+WIDTH=520
+HEIGHT=20
+LINES=4
+
+read X Y <<< `xrandr | grep -v disconnected | grep connected | head -n1 | awk '{ print $3 }' | sed 's/\+.*//' | sed 's/x/\n/'`
+
+SHIFT_X=$((($X - $WIDTH) / 2))
+SHIFT_Y=$((($Y - $HEIGHT * $LINES) / 2))
+
+dmenu_run \
+  -i \
+  -x $SHIFT_X \
+  -y $SHIFT_Y \
+  -w $WIDTH \
+  -h $HEIGHT \
+  -l $LINES \
+  -fn "$FONT" \
+  -nb $BASE_BG \
+  -nf $BASE_FG \
+  -sb $SELECTED_BG \
+  -sf $SELECTED_FG
