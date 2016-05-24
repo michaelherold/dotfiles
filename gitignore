@@ -1,0 +1,31 @@
+.idea
+*.sublime-workspace
+*.sublime-project
+*~
+.vagrant
+tags
+!tags/
+tmp/**/*
+!tmp/cache/.keep
+
+# Node
+npm-debug.log
+
+# Python
+.egg[s]
+.tox
+*.pyc
+htmlcov
+
+# Ruby
+.bundle
+.byebug_history
+.env
+.inch
+.respec_failures
+custom_plan.rb
+db/*.sqlite3
+log/*.log
+rerun.txt
+zeus.json
+.respec_failures

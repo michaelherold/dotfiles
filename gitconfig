@@ -1,0 +1,78 @@
+[alias]
+  aa = add --all
+  ap = add --patch
+  amend = commit --amend
+  both = diff HEAD
+  branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
+  ci = commit -v
+  cleanup = "!git branch --merged | grep -v '\\*\\|master' | xargs -n 1 -r git branch -d"
+  co = checkout
+  lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  pf = push --force-with-lease
+  st = status
+  staged = diff --cached
+  undo-commit = reset --soft HEAD^
+  unstaged = diff
+
+[color]
+  ui = true
+
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+
+[color "diff"]
+  frag = magenta bold
+  meta = yellow bold
+  new = green bold
+  old = red bold
+
+[commit]
+  template = ~/.gitmessage
+
+[core]
+  attributesfile = ~/.gitattributes
+  excludesfile = ~/.gitignore
+
+[credential]
+  helper = cache --timeout=3600
+
+[fetch]
+  prune = true
+
+[help]
+  autocorrect = 1
+
+[init]
+  templatedir = ~/.git_template
+
+[push]
+  default = current
+
+[rebase]
+  autosquash = true
+
+# Rewrite github to SSH for aliases and when pushing
+[url "git@github.com:"]
+  insteadOf = "gh:"
+  insteadOf = "git://github.com"
+  pushInsteadOf = "github:"
+  pushInsteadOf = "git://github.com/"
+  pushInsteadOf = "https://github.com/"
+
+# Retwrite gists to SSH for aliases and when pushing
+[url "git@gist.github.com:"]
+  insteadOf = "gst:"
+  pushInsteadOf = "gist:"
+  pushInsteadOf = "git://gist.github.com/"
+  pushInsteadOf = "https://gist.github.com/"
+
+# Make sure we're using SSH for any of my repos
+[url "git@github.com:michaelherold/"]
+  insteadOf = "git://github.com/michaelherold/"
+
+[include]
+  path = ~/.gitconfig-local
+
+# vim:filetype=gitconfig

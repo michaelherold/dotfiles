@@ -1,0 +1,8 @@
+[github]
+  user = michaelherold
+
+[user]
+  name = Michael Herold
+  email = michael.j.herold@gmail.com
+
+# vim:filetype=gitconfig
