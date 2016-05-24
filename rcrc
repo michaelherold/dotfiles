@@ -1,0 +1,4 @@
+DOTFILES_DIR=$HOME/code/dotfiles
+EXCLUDES=""
+SYMLINK_DIRS=""
+TAGS="bspwm media"
