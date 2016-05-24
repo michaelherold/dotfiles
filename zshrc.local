@@ -1,0 +1,14 @@
+# => Version Managers {{{
+# ====================================================================
+
+  # nvm
+  export NVM_DIR="/home/herold/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# }}}
+
+
+HIGHLIGHT=/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ -f $HIGHLIGHT ]] && source $HIGHLIGHT
+
+# vim:foldmethod=marker:foldlevel=0
