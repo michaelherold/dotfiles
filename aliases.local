@@ -1,0 +1,61 @@
+# => Base Aliases {{{
+# ====================================================================
+  # => Disable Correction and Globbing {{{
+  # ==================================================================
+
+  alias cd='nocorrect cd'
+  alias cp='nocorrect cp'
+  alias gcc='nocorrect gcc'
+  alias gist='nocorrect gist'
+  alias grep='nocorrect grep'
+  alias ln='nocorrect ln'
+  alias man='nocorrect man'
+  alias mkdir='nocorrect mkdir'
+  alias mv='nocorrect mv'
+  alias rm='nocorrect rm'
+
+  alias bower='noglob bower'
+  alias rake='noglob rake'
+
+  # }}}
+  # => General Aliases {{{
+  # ==================================================================
+
+  alias cp="${aliases[cp]:-cp} -i"
+  alias e='${(z)VISUAL:-${(z)EDITOR}}'
+  alias grep="${aliases[grep]:-grep} --color=auto"
+  alias ln="${aliases[ln]:-ln} -i"
+  alias mkdir="${aliases[mkdir]:-mkdir} -p"
+  alias mv="${aliases[mv]:-mv} -i"
+  alias rm="${aliases[rm]:-rm} -i"
+  alias v="vim"
+
+  # }}}
+  # => ls Aliases {{{
+  # ==================================================================
+
+  alias ls="${aliases[ls]:-ls} --color=auto"
+  alias l="ls -1A"
+  alias ll="ls -lh"
+  alias la="ls -ah"
+  alias lal="ll -alh"
+
+  # }}}
+# }}}
+# => Program Aliases {{{
+# ====================================================================
+
+alias gs="git status"
+alias gpr="git --no-pager lg HEAD --not $1"
+
+alias rmig="rake db:migrate && rake db:migrate RAILS_ENV=test"
+alias rroll="rake db:rollback && rake db:rollback RAILS_ENV=test"
+
+alias tml="tmux list-sessions"
+alias tma="tmux -2 attach -t $1"
+alias tmk="tmux kill-session -t $1"
+
+alias vim="nvim"
+
+# }}}
+# vim: filetype=zsh:foldmethod=marker
