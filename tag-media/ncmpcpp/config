@@ -1,0 +1,57 @@
+# Playlist
+song_columns_list_format = "(6f)[cyan]{l} (35)[green]{t}|{f} (30)[blue]{a} (25)[cyan]{b} (4f)[green]{y}"
+now_playing_prefix = "$b$3"
+now_playing_suffix = "$/b"
+playlist_display_mode = "columns"
+autocenter_mode = "yes"
+centered_cursor = "yes"
+
+# Bars
+song_status_format = "$3%a $1• $3%t $1• $4%b {(Disc %d) }$1• $5%y$1"
+progressbar_look = "─╼"
+titles_visibility = "no"
+
+# Browser
+browser_playlist_prefix = "$2plist »$9 "
+browser_display_mode = "columns" (classic/columns)
+
+# Colors
+active_column_color = "green"
+active_window_border = "red"
+alternative_ui_separator_color = "green"
+color1 = "green"
+color2 = "cyan"
+colors_enabled = "yes"
+discard_colors_if_item_is_selected = "yes"
+empty_tag_color = "cyan"
+header_window_color = "green"
+main_window_color = "green"
+main_window_highlight_color = "cyan"
+progressbar_color = "green"
+progressbar_elapsed_color = "blue"
+state_flags_color = "green"
+state_line_color = "green"
+statusbar_color = "green"
+visualizer_color = "green"
+volume_color = "green"
+
+# Visualization
+visualizer_look = "●▋"
+visualizer_fifo_path = "/tmp/mpd.fifo"
+visualizer_output_name = "Visualization"
+visualizer_sync_interval = "30"
+visualizer_in_stereo = "yes"
+visualizer_type = "spectrum"
+
+# Others
+mpd_music_dir = "~/music"
+mpd_crossfade_time = "5"
+search_engine_display_mode = "columns"
+follow_now_playing_lyrics = "yes"
+user_interface = "alternative"
+incremental_seeking = "yes"
+external_editor = "vim"
+
+alternative_header_first_line_format = "$b$3$aqqu$/a {%t}|{%f} $atqq$/a$9$/b"
+alternative_header_second_line_format = "{{$3$b%a$/b}{ - %b}{ (%y)}}|{%D}"
+

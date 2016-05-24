@@ -1,0 +1,3 @@
+#!/bin/bash
+
+pkill not-stat ; ~/.config/bspwm/panel/not-stat Mu &
