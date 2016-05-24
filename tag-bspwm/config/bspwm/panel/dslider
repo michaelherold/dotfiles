@@ -1,0 +1,85 @@
+#!/bin/bash
+
+# Load settings (color, etc)
+source $(dirname $0)/panel.cfg
+
+# Close and clean if a dzen popup is ALREADY opened
+[[ -e $DSLIDER_PID ]] && previouspid=$(cat $DSLIDER_PID)
+previouspid="${previouspid:2}"
+
+if [[ -n "$previouspid" && "$(ps -p $previouspid -o comm=)" = "dzen2" ]]; then
+  pkill $previouspid
+  pkill -f "tail -f $DSLIDER_FIFO"
+  echo "" > $DSLIDER_PID
+  exit
+fi
+
+# Stop here, with everything closed and cleaned, if it was called with `dslider close`
+[ "$1" == "close" ] && exit
+
+# Clean when dzen closes
+# Executed when dzen is closed by right clicking on the popup.
+closing="pkill -f 'tail -f $DSLIDER_FIFO' & echo '' > $DSLIDER_PID"
+
+##################################################################
+
+#
+# Calculate where to draw the popup
+#
+Current=${1//[i]/}
+Current=${Current: -2}
+Opened=${1:0:2}
+
+xpos=$2
+
+if [ "$Opened" = "$Current" ]; then
+  Opened="NA"
+fi
+
+case $1 in
+  *i) # When you make the popup by clicking on the button
+    xpos=$(($xpos + 24)) #width of the main button
+    case $Opened in
+      Vl) xpos=$(($xpos - 54)) ;; # width of the already opened button label
+      Wm) xpos=$(($xpos - 90)) ;;
+      NA) ;;
+      *) exit ;;
+    esac
+    ;;
+  *) # When you make the popup by clicking on the arrow
+    case $Current in
+      Vl) xpos=$(($xpos - 42)) ;; # Distance between the arrow
+      Mu) xpos=$(($xpos - 60)) ;; # and the start of the label
+      *)  exit ;;
+    esac
+    ;;
+esac
+
+# Create the fifo
+[ -e $DSLIDER_FIFO ] && rm $DSLIDER_FIFO
+mkfifo $DSLIDER_FIFO
+
+# Create the dzen popup
+exec tail -f $DSLIDER_FIFO \
+  | dzen2 \
+  -p \
+  -w 156 \
+  -h 23 \
+  -y $PANEL_HEIGHT \
+  -x $xpos \
+  -fn "MonteCarlo-8" \
+  -e "button3=exit,exec:$closing" & dzenpid=$!
+
+#
+#  Save the PID of the dzen popup along with the nature of the opened popup (music,
+# volume, screen...) so that not-stat can update it depending on its nature.
+#
+#  eg: if the "screen backlight" popup is opened, changing the backlight with
+# keybinds should update the slider, but changing the volume should not.
+#
+echo $Current$dzenpid > $DSLIDER_PID
+
+#
+# Create content for the popup
+#
+$(dirname $0)/dslider-content $Current

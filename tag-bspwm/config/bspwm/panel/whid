@@ -1,0 +1,130 @@
+#!/bin/sh
+
+source $(dirname $0)/panel.cfg
+
+DZEN_CMD="dzen2 -p -m -y $PANEL_HEIGHT -x 1512 -w 408 -h 20"
+
+# Close the dzen popup if it's already opened
+pgrep -f "$DZEN_CMD"> /dev/null && pkill -f "$DZEN_CMD" && exit
+
+touch "$WHID_LIST"
+
+updatePanel() {
+  lines=$1
+
+  # Dirty trick to avoid race condition
+  sleep 0.1
+
+  if [ "$lines" -eq "0" ]
+  then
+    color=$WHID_BG_NONE
+  else
+    color=$WHID_BG_SOME
+  fi
+
+  echo "n%{A:$(dirname $0)/whid dzen &:}%{B$color} $lines %{B-}%{A}" > $PANEL_FIFO
+}
+
+lines=$(wc -l < $WHID_LIST)
+miniList=$(cat $WHID_LIST)
+
+case $1 in
+  hide)
+    if [[ $lines -ge 9 ]]; then ## Fight against bad practices
+      notify-send "Nine windows are already hidden" "You should consider closing some before hiding even more." -i warning
+    else
+      focusedDesktop=$(xdotool get_desktop)
+      focusedID=$(xdo id)
+      focusedName=$(xdotool getwindowname $focusedID)
+
+      echo "$focusedID $focusedDesktop $focusedName" >> $WHID_LIST && \
+        xdo hide $focusedID && \
+        updatePanel $(($lines + 1)) &&\
+        notify-send "A window has been hidden (${lines})." "$focusedName" -i warning
+    fi
+    ;;
+  init)
+    updatePanel $lines
+    ;;
+  dmenu)
+    if [[ $lines -gt 30 ]]; then
+      linesDisplayed=30
+    else
+      linesDisplayed=$lines
+    fi
+
+    # If the list is empty
+    if [ -z "$miniList" ]; then
+      miniList="  Nothing is hidden!"
+      linesDisplayed=1
+    fi
+
+    # Calculate where to draw the dmenu popup.
+    # Comment that line if you use vanilla dmenu.
+    yPos=$((490-$linesDisplayed*10))
+
+    # Launch dmenu
+    # Comment that line if you use vanilla dmenu, and not one patched with eye candy
+    lineNumber=$(echo "$miniList" \
+      | cut -d " " -f 3- \
+      | nl -w 3 -n rn \
+      | sed -r 's/^([ 0-9]+)[ \t]*(.*)$/\1 - \2/' \
+      | dmenu \
+              -b \
+              -i \
+              -x 700 \
+              -y $yPos \
+              -w 520 \
+              -l $linesDisplayed \
+              -h 20 \
+              -fn 'Droid Sans Mono:pixelsize=12' \
+              -nb "$WHID_BG_BASE" \
+              -nf "$WHID_FG_BASE" \
+              -sb "$WHID_BG_LIST" \
+              -sf "$WHID_FG_BASE" \
+              -p 'Hidden:' \
+      | cut -d '-' -f -1)
+
+    # If you exited dmenu without selecting anything or if the list was empty
+    [ -z "$lineNumber" -o "$miniList" = " Nothing is hidden!" ] && exit
+
+    # Show the selected hidden window
+    selectedID=$(sed -n "$lineNumber p" $WHID_LIST | cut -d ' ' -f 1)
+    selectedDesktop=$(sed -n "$lineNumber p" $WHID_LIST | cut -d ' ' -f 2)
+    xdotool set_desktop $selectedDesktop
+    xdo show $selectedID && sed -i "${lineNumber}d" $WHID_LIST && updatePanel $(($lines - 1))
+    ;;
+  last)
+    selectedID=$(tail -n 1 $WHID_LIST | cut -d ' ' -f 1)
+    xdo show $selectedID && sed -i "${lineNumber}d" $WHID_LIST && updatePanel $(($lines - 1))
+    ;;
+  dzen)
+    # Perform necessary checks
+    [ "$lines" -eq "0" ] && exit
+
+    # Dzen cannot draw more than 10 lines
+    if [[ $lines -gt 10 ]]; then
+      linesDisplayed=10
+    else
+      linesDisplayed=$lines
+    fi
+
+    (echo "^fg($WHID_FG_TITLE)Hidden^fg() windows:"
+    echo "$miniList" \
+      | cut -d " " -f 2- \
+      | nl -w 3 -n rn \
+      | sed -r "s/^([ 0-9]+)[ \t]*(.*)$/\^bg($WHID_BG_LIST)\1 \^bg() \2/") \
+      | $DZEN_CMD \
+          -fn "$DZEN_FONT" \
+          -fg "$DZEN_FG_BASE" \
+          -bg "$DZEN_BG_BASE" \
+          -l $lines \
+          -e "onstart=uncollapse;button1=menuprint,exit;button3=exit" \
+      | while read line; do
+    line=$(echo $line | cut -d ' ' -f 1)
+    selectedID=$(sed -n "$line p" $WHID_LIST | cut -d ' ' -f 1)
+
+    xdo show $selectedID && sed -i "${line}d" $WHID_LIST && updatePanel $(($lines - 1))
+  done
+  ;;
+esac

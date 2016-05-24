@@ -1,0 +1,105 @@
+#!/bin/sh
+#
+# not-stat OPTION ["STRING"]
+#
+# /!\ FOR THE COUNTDOWN TO WORK PROPERLY /!\
+#  Always use not-stat like this:
+#
+#     pkill not-stat ; not-stat <Xx> &
+#
+#  Else the countdown will keep going and the notification will get back to the
+# music before the latest countdown is finished
+#
+
+######## Settings: ########
+
+source $(dirname $0)/panel.cfg
+
+# Countdown in seconds
+countdown=3
+
+# Character used by the panel-skeleton script to know where to put the notification
+premessage="m"
+
+# What happens when you click on the icon or on its label
+## If you want only one command:
+# execute="your command"
+## If you want two commands (the second one is executed with a right click)
+# execute="command1 : command2"
+execute="$(dirname $0)/panel-monitor : $(dirname $0)/panel-music"
+text_execute="mpc toggle > /dev/null & : $(dirname $0)/run-or-raise ncmpcpp &"
+
+###########################
+
+bld=$'\e[1m'
+rst=$'\e[0m'
+
+case $1 in
+  Mu) ## Music ##
+    icon="$(mpc | grep -E 'playing|paused' | cut -d'[' -f2 | cut -d']' -f1 | sed 's/paused//g' | sed 's/playing//g')"
+    message=" $(mpc current)"
+    if [ "$message" = " " ];then
+      icon=""
+      message=" (Nothing!)"
+    fi
+    ;;
+  Me) ## Message ##
+    icon=""
+    message=$2
+    ;;
+  Vl) ## Master volume ##
+    # Check if the slider popup is opened and update its content
+    dzenstatus=$(cat $DSLIDER_PID)
+    dzenstatus="${dzenstatus:0:2}"
+    if [ "$dzenstatus" = "$1" ]; then
+      $(dirname $0)/dslider-content $1 &
+    fi
+
+    volumeValue="$(amixer -q | grep -A5 Master | grep '%' | cut -d'[' -f2 | cut -d'%' -f1)"
+    if [ "$(amixer -q | grep '\[on\]\|\[off\]' | head -n 1 | cut -sd'[' -f3 | cut -d']' -f1)" = "off" ]
+    then
+      icon=" "
+    elif [ $volumeValue -eq 0 ]
+    then
+      icon=" "
+    elif [ $volumeValue -eq 100 ]
+    then
+      icon=""
+    elif [ $(echo "$volumeValue > 49" | bc) == 1 ]
+    then
+      icon=""
+    else
+      icon=""
+    fi
+
+    message=" Volume ${volumeValue}"
+    ;;
+  Mt) ## Muted ##
+    icon="$(amixer -q | grep "\[on\]\|\[off\]" | head -n 1 | cut -sd'[' -f3 | cut -d']' -f1 | sed 's/on//g' | sed 's/off/ /g')"
+    message=" $(amixer -q | grep "\[on\]\|\[off\]" | head -n 1 | cut -sd'[' -f3 | cut -d']' -f1 | sed 's/on/Not /g' | sed 's/off//g')Muted"
+    ;;
+  *) ## Error message ##
+    icon="  "
+    message=" Wrong not-stat command."
+    countdown=10
+    ;;
+esac
+
+###########################
+
+#
+# Send the message to the panel.
+#
+
+echo -E "$premessage" "%{B$BG_ICON}%{F$FG_ICON}%{A:$execute:} $icon %{A}%{B$BG_NOTIFICATIONS}%{A:$text_execute:} $DIVIDER%{F$FG_NOTIFICATIONS}$message %{A}%{B-}%{F-}" > $PANEL_FIFO
+
+sleep $countdown
+
+icon="$(mpc | grep -E 'playing|paused' | cut -d'[' -f2 | cut -d']' -f1 | sed 's/paused//g' | sed 's/playing//g')"
+message=" $(mpc current)"
+if [ "$message" = " " ];then
+  icon=""
+  message=" (Nothing!)"
+fi
+
+echo "$premessage" "%{B$BG_ICON}%{F$FG_ICON}%{A:$execute:} $icon %{A}%{B$BG_NOTIFICATIONS}%{A:$text_execute:} $DIVIDER%{F$FG_NOTIFICATIONS}$message %{A}%{B-}%{F-}" > $PANEL_FIFO

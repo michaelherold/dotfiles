@@ -1,0 +1,24 @@
+#!/bin/bash
+
+HOSTNAME=$(hostname)
+XMODMAP=$HOME/.Xmodmap
+
+xsetroot -cursor_name left_ptr
+xset +fp /usr/share/fonts/local
+xset +fp $HOME/.fonts/panel
+xset fp rehash
+
+if [ -f "$XMODMAP" ] ; then
+  xmodmap "$XMODMAP"
+fi
+
+case "$HOSTNAME" in
+  zeromus)
+    # xrandr --output HDMI2 --auto --primary
+    # xrandr --output HDMI1 --auto --right-of HDMI2
+    # xrandr --output VIRTUAL1 --off
+    # xrandr --output VGA1 --off
+    ;;
+  *)
+    ;;
+esac

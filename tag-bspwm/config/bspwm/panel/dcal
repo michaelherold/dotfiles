@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# dzen2 pop-up calendar
+# (c) 2007, by Robert Manea
+#
+# Modified by tatou so it can be toggled when clicking on the panel.
+#
+
+source $(dirname $0)/panel.cfg
+
+BASE_CMD="dzen2 -x 1724 -y 20 -h 20 -tw 196 -w 196"
+
+# Close it if it's already opened
+pgrep -f "$BASE_CMD" > /dev/null && pkill -f "$BASE_CMD" && exit
+
+# Necessary info
+TODAY=$(expr `date +'%d'` + 0)
+MONTH=`date +'%m'`
+YEAR=`date +'%Y'`
+LINES=$(cal -m | wc -l)
+
+# Create the popup
+(date +'%A %d %B'
+  cal -m \
+    | sed -r -e "1,2 s/.*/^fg($DZEN_FG_DCAL)&^fg()/"  -e "s/(^| )($TODAY)($| )/\1^bg($DZEN_BG_SELECTED)^fg($DZEN_FG_SELECTED)\2^fg()^bg()\3/") \
+  | $BASE_CMD \
+              -l $LINES \
+              -sa c \
+              -ta c \
+              -p \
+              -e 'onstart=uncollapse;button1=exit;button3=exit' \
+              -fn "MonteCarlo-8" \
+              -fg "$DZEN_FG_BASE" \
+              -bg "$DZEN_BG_BASE" & new_calendarpid=$!

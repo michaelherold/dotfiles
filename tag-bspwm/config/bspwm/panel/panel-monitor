@@ -1,0 +1,89 @@
+#!/bin/sh
+
+source $(dirname $0)/panel.cfg
+
+### Close the dzen popup if it exists ###
+$(dirname $0)/dslider close
+
+### Create the menu ###
+# If there is no argument => Create just the pink buttons
+# If there is an argument => Create the pink buttons and expand the appropriate button
+
+monitor=""
+
+## Configure each button title (the name that will be displayed in the panel)
+#  If your button title is longer than two characters, you will have to do some
+# adjustments in dslider-content
+#  The button title can be as long as you want, but the button variable must
+# be *TWO CHARACTERS LONG*!
+#    Xx="<Button title>"
+Vl="Vl"
+Wm="Wm"
+
+## If the button has a slider, add the variable here
+sliderlist="Vl"
+
+## Create each button (to add a button, add the two characters variable here and some stuff in the case statement)
+for Button in Wm Vl; do
+  ## For the focused button ##
+  if [ "$1" == "$Button" ]
+  then
+    cmd_return="$(dirname $0)/panel-monitor"
+    arrow=""
+
+    case $Button in
+      Vl) # Master volume
+        mute="%{A:amixer set Master toggle ; pkill not-stat ; $(dirname $0)/not-stat Mt &:}M%{A} "
+        down="amixer set Master 1%- ; pkill not-stat ; $(dirname $0)/not-stat $Button &"
+        up="amixer set Master 1%+ ; pkill not-stat ; $(dirname $0)/not-stat $Button &"
+
+        message=" $mute%{A:$down:}%{A}%{A:$up:}%{A}%{AW:$(dirname $0)/dslider Vl:}$arrow%{A} "
+        ;;
+      Wm)
+        rotateLeft="%{A:bspc desktop -R -90:}%{A}"
+        rotateRight="%{A:bspc desktop -R 90:}%{A}"
+        flipHor="%{A:bspc desktop -F vertical:}%{A}"
+        flipVer="%{A:bspc desktop -F horizontal:}%{A}"
+        monocle="%{A:bspc desktop -l next:}%{A}"
+
+        message=" $rotateLeft $flipHor $flipVer $rotateRight $monocle "
+        ;;
+    esac
+
+    ## If a button is already opened, it's needed to be taken into account to calculate where to draw the popup
+    opened=$Button
+
+    ## Title of the *focused* button
+    #title="${!Button}"
+    title="" # Print an arrow instead of the button title if it's focused
+
+    ## Colors of the focused button
+    bg_button_final="$BG_BUTTON_SELECTED"
+    fg_button_final="$FG_BUTTON_SELECTED"
+
+  else
+    ## For normal, unfocused, buttons ##
+    title=${!Button}
+    message=" "
+    cmd_return="$(dirname $0)/panel-monitor "
+    cmd_return+="$Button"
+
+    # If the button has a slider, make the slider appear if you click on the button
+    if [[ $sliderlist == *$Button* ]]
+    then
+      cmd_return+="; $(dirname $0)/dslider $opened${Button}i"
+    fi
+
+    ## Colors of normal buttons
+    bg_button_final="$BG_BUTTON"
+    fg_button_final="$FG_BUTTON"
+  fi
+
+  monitor+="%{AW:$cmd_return:}%{B$bg_button_final}%{F$fg_button_final} $title %{A}%{B$BG_MONITOR}%{F$FG_MONITOR}$message%{B-}%{F-}"
+done
+
+### Add close button ###
+monitor+="%{B$BG_MONITOR}%{F$FG_CLOSE}%{A:echo c > $PANEL_FIFO ; $(dirname $0)/dslider close:}%{A} %{B-}%{F-}"
+
+### Send to panel ###
+echo "c" "$monitor" > $PANEL_FIFO

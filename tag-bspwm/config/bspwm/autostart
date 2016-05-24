@@ -1,0 +1,7 @@
+sxhkd -f 35 &
+feh --bg-fill ~/.config/fehbg &
+compton --config ~/.config/compton.conf &
+start-pulseaudio-x11 &
+dunst &
+mpdcron &
+${HOME}/.config/bspwm/panel/panel &

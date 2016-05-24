@@ -1,0 +1,28 @@
+#!/bin/sh
+
+HOSTNAME=`hostname`
+
+bspc config border_width        2
+bspc config window_gap          5
+bspc config apply_floating_atom true
+bspc config borderless_monocle  true
+bspc config gapless_monocle     true
+bspc config focus_by_distance   true
+
+bspc config focused_border_color "#519f50"
+bspc config presel_border_color "#da4939"
+
+if [ $HOSTNAME == "zeromus" ]; then
+  bspc monitor HDMI-0 -n L
+  bspc monitor DVI-I-1 -n R
+  bspc monitor L -d ""
+  bspc monitor R -d ""
+  bspc monitor L -s R
+fi
+
+bspc rule -a "crx_nckgahadagoaajjgafhacjanaoiihapd" floating=on center=false
+bspc rule -a Steam floating=true
+bspc rule -a \* center=true
+
+
+. ${HOME}/.config/bspwm/autostart

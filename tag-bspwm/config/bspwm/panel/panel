@@ -1,0 +1,41 @@
+#!/bin/sh
+
+if [ $(pgrep -cx panel) -gt 1 ] ; then
+  pkill -ox panel
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+source $(dirname $0)/panel.cfg
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+bspc config top_padding $PANEL_HEIGHT
+bspc subscribe report > "$PANEL_FIFO" &
+
+# Bar Contents
+clock -sf "S%{B$BG_CLOCK} $DIVIDER %{F$FG_CLOCKNUM}%d %{F$FG_CLOCK}%b $DIVIDER %{F$FG_CLOCK}%l:%M%P $CLEAR" > "$PANEL_FIFO" &
+xtitle -sf "T%s" > "$PANEL_FIFO" &
+
+# Notifications
+# $(dirname $0)/notify_mpd -d &
+
+# 1. Set up the listener to the panel FIFO
+# 2. Start up the panel reader
+# 3. Start bar with the configured options
+# 4. Listen to STDOUT for any commands that bar outputs (click handler)
+cat "$PANEL_FIFO" \
+  | $(dirname $0)/panel-skeleton \
+  | lemonbar \
+        -g "$PANEL_GEOMETRY" \
+        -f "$PANEL_FONT_FAMILY" \
+        -F "$FG_BASE" \
+        -B "$BG_BASE" \
+  | while read line; do eval "$line"; done &
+
+# $(dirname $0)/not-stat Mu &
+$(dirname $0)/whid init &
+stalonetray &
+
+wait

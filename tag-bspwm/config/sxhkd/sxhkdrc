@@ -1,0 +1,154 @@
+# => WM Hotkeys {{{
+# ===================================================================
+
+# Exit bspwm
+super + alt + Escape
+  pkill -x panel; pkill stalonetray; bspc quit
+
+# Close the current node
+super + c
+  bspc node -c
+
+# Cycle the layout of the desktop
+super + t
+  bspc desktop -l next
+
+# Balance the nodes so they occupy the same area
+super + b
+  bspc node @focused:/ -B
+
+# Rotate leaves in desktop 90 degrees
+super + {_,shift +} r
+  bspc node @focused:/ -R {_,-}90
+
+# Toggle floating and fullscreen modes
+super + {s,f}
+  bspc node -t \~{floating,fullscreen}
+
+# Switch to the last desktop
+super + {grave,Tab}
+  bspc {node,desktop} -f last
+
+# Swap node with the last one
+super + apostrophe
+  bspc node -s last
+
+# Move node to biggest split on desktop
+super + m
+  bspc node -s biggest
+
+# Shift node focus and swap nodes
+super + {_,shift + }{h,j,k,l}
+  bspc node -{f,s} {west,south,north,east}
+
+# Circulate leaves on the desktop
+super + {comma,period}
+  bspc node @focused:/ -C {backward,forward}
+
+# Next and previous desktop
+super + bracket{left,right}
+  bspc desktop -f {prev,next}
+
+# Preselect node for splitting
+super + ctrl + {h,j,k,l}
+  bspc node -p {west,south,north,east}
+
+# Cancel node preselection
+super + ctrl + p
+  bspc node -p cancel
+
+# Resize splits
+super + alt + {h,j,k,l}
+  bspc node -e {west -10,south +10,north -10,east +10}
+
+# Change node gap
+super + {minus,equal}
+  bspc config -n focused window_gap $((`bspc config -n focused window_gap` {+,-} 2))
+
+# Focus node on click
+~button1
+  bspc pointer -g focus
+
+# Move and resize node with mouse buttons
+super + button{1-3}
+  bspc pointer -g {move,resize_side,resize_corner}
+
+# Send coordinates to node when holding mouse buttons down
+super + !button{1-3}
+  bspc pointer -t %i %i
+
+# Stop action when releasing the buttons
+super + @button{1-3}
+  bspc pointer -u
+
+# Focus the left/right monitor
+super + {q,w}
+  bspc monitor -f {L,R}
+
+# Move the selected node/desktop to the west/east monitor
+super + {shift,alt} + {q,w}
+  bspc {node,desktop} -m {L,R}
+
+# Create/rename a desktop
+super + {_,ctrl} + d
+  ~/bin/bspwm_{_,re}name_desktop
+
+# Remove the focused desktop
+super + alt + d
+  bspc desktop focused -r
+
+# }}}
+# => Launchers {{{
+# ===================================================================
+
+super + Return
+  termite
+
+super + space
+  ~/bin/dmenu_wrapper
+
+super + z
+  $HOME/.config/bspwm/panel/whid dmenu
+
+super + shift + z
+  $HOME/.config/bspwm/panel/whid hide
+
+super + alt + z
+  $HOME/.config/bspwm/panel/whid last
+
+super + v
+  ~/bin/switch-headphones
+
+Print
+  zscreen
+
+# make sxhkd reload its configuration files:
+super + Escape
+  pkill -USR1 -x sxhkd
+
+# }}}
+# => Media Keys {{{
+# ===================================================================
+
+XF86AudioRaiseVolume
+  amixer set Master 5%+; pkill not-stat; $HOME/.config/bspwm/panel/not-stat Vl
+
+XF86AudioLowerVolume
+  amixer set Master 5%-; pkill not-stat; $HOME/.config/bspwm/panel/not-stat Vl
+
+XF86AudioMute
+  amixer set Master toggle; pkill not-stat; $HOME/.config/bspwm/panel/not-stat Mt
+
+XF86AudioPlay
+  mpc toggle
+
+XF86AudioNext
+  mpc next
+
+XF86AudioPrev
+  mpc prev
+
+XF86HomePage
+  chromium
+
+# }}}

@@ -1,0 +1,74 @@
+#!/bin/sh
+
+source $(dirname $0)/panel.cfg
+
+# Normal controls (prev, play/pause, next)
+normal() {
+  beginning="%{B$BG_BUTTON}%{F$FG_BUTTON}%{A:$(dirname $0)/panel-monitor:$(dirname $0)/panel-music 2:} Mu %{A}%{B$BG_MONITOR}%{F$FG_MONITOR}"
+  controls="%{A:mpc prev:}%{A} %{A:mpc toggle:}%{A} %{A:mpc next:}%{A} %{AW:$(dirname $0)/dslider Mu:}%{A}"
+  echo "$beginning $controls"
+}
+
+# Additional controls (repeat, random, single, consume)
+alternate() {
+  pgrep -x "mpd" > /dev/null && eval $(mpc | grep "volume:" | tail -n 1 | cut -d'%' -f 2 | sed 's/: /=/g') || mpdstate="OFFLINE"
+
+  updateCmd="$(dirname $0)/panel-music 2"
+
+  if [ "$mpdstate" != "OFFLINE" ]; then
+    # Repeat
+    icon=""
+    iconCmd="mpc repeat > /dev/null"
+    icon="%{A:$iconCmd ; $updateCmd:}$icon%{A}"
+    if [ "$repeat" = "on" ]; then
+      mpdstate="$icon "
+    else
+      mpdstate="%{F$FG_INACTIVE}$icon%{F$FG_MONITOR} "
+    fi
+
+    # Random
+    icon=""
+    iconCmd="mpc random > /dev/null"
+    icon="%{A:$iconCmd ; $updateCmd:}$icon%{A}"
+    if [ "$random" = "on" ]; then
+      mpdstate+="$icon "
+    else
+      mpdstate+="%{F$FG_INACTIVE}$icon%{F$FG_MONITOR} "
+    fi
+
+    # Single
+    icon=""
+    iconCmd="mpc single > /dev/null"
+    icon="%{A:$iconCmd ; $updateCmd:}$icon%{A}"
+    if [ "$single" = "on" ]; then
+      mpdstate+="$icon "
+    else
+      mpdstate+="%{F$FG_INACTIVE}$icon%{F$FG_MONITOR} "
+    fi
+
+    # Consume
+    icon=""
+    iconCmd="mpc consume > /dev/null"
+    icon="%{A:$iconCmd ; $updateCmd:}$icon%{A}"
+    if [ "$consume" = "on" ]; then
+      mpdstate+="$icon"
+    else
+      mpdstate+="%{F$FG_INACTIVE}$icon%{F$FG_MONITOR}"
+    fi
+  fi
+
+  beginning="%{B$BG_BUTTON}%{F$FG_BUTTON}%{A:$(dirname $0)/panel-music:} Mu %{A}%{B$BG_MONITOR}%{F$FG_MONITOR}"
+  echo "$beginning $mpdstate"
+}
+
+# Print the widget in the panel
+case $1 in
+  2)
+    message=$(alternate)
+    ;;
+  *)
+    message=$(normal)
+    ;;
+esac
+
+echo "y" "$message %{F$FG_CLOSE}%{A:echo y > $PANEL_FIFO ; $(dirname $0)/dslider close:}%{A} %{B-}%{F-}" > $PANEL_FIFO

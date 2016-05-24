@@ -1,0 +1,126 @@
+#!/bin/sh
+
+source $(dirname $0)/panel.cfg
+
+NUMBER_OF_MONITORS=$(bspc query -M | wc -l)
+WM_INFO_ARRAY=("" "" "" "" "")
+
+while read -r line ; do
+  case $line in
+    S*)
+      CLOCK="${line#?}"
+      ;;
+    T*)
+      TITLE="${line#?}"
+      ;;
+    m*)
+      NOTSTAT="${line#?}"
+      ;;
+    y*)
+      MUSIC="${line#?}"
+      ;;
+    n*)
+      UNMAPPED="${line#?}"
+      ;;
+    W*)
+      WM_INFO=""
+      CURRENT_MONITOR=-1
+      DESKTOP_NUMBER=1
+
+      IFS=':'
+      set -- ${line#?}
+
+      while [ $# -gt 0 ] ; do
+        item=$1
+        name=${item#?}
+        case $item in
+          M*)
+            # active monitor
+            CURRENT_MONITOR=$((CURRENT_MONITOR + 1))
+            WM_INFO=""
+            if [ $NUMBER_OF_MONITORS -gt 1 ] ; then
+              WM_INFO="$WM_INFO%{F$FG_ACTIVE}%{B$BG_ACTIVE} ${name} %{B-}%{F-}"
+            fi
+            ;;
+          m*)
+            # inactive monitor
+            CURRENT_MONITOR=$((CURRENT_MONITOR + 1))
+            WM_INFO=""
+            if [ $NUMBER_OF_MONITORS -gt 1 ] ; then
+              WM_INFO="$WM_INFO%{F$FG_INACTIVE}%{B$BG_INACTIVE} ${name} %{B-}%{F-}"
+            fi
+            ;;
+          O*)
+            # focused occupied desktop
+            WM_INFO="$WM_INFO%{F$FG_OCCUPIED}%{B$BG_FOCUSED} ${name} %{B-}%{F-}"
+            ;;
+          F*)
+            # focused free desktop
+            WM_INFO="$WM_INFO%{F$FG_EMPTY}%{B$BG_FOCUSED} ${name} %{B-}%{F-}"
+            ;;
+          U*)
+            # focused urgent desktop
+            WM_INFO="$WM_INFO%{F$FG_URGENT}%{B$BG_URGENT} ${name} %{B-}%{F-}"
+            ;;
+          o*)
+            # occupied desktop
+            WM_INFO="$WM_INFO%{A:bspc desktop -f ${name}:}%{F$FG_OCCUPIED}%{B$BG_UNFOCUSED} ${name} %{B-}%{F-}%{A}"
+            ;;
+          f*)
+            # free desktop
+            WM_INFO="$WM_INFO%{A:bspc desktop -f ${name}:}%{F$FG_EMPTY}%{B$BG_UNFOCUSED} ${name} %{B-}%{F-}%{A}"
+            ;;
+          u*)
+            # urgent desktop
+            WM_INFO="$WM_INFO%{A:bspc desktop -f ${name}:}%{F$FG_URGENT}%{B$BG_URGENT} ${name} %{B-}%{F-}%{A}"
+            ;;
+        esac
+        shift
+        WM_INFO_ARRAY[CURRENT_MONITOR]="$WM_INFO"
+        # O*)
+        #   # Focused, occupied desktop
+        #   WM_INFO="${WM_INFO}${ICON_OCCUPIED_FOCUSED}"
+        #   ;;
+      # F*)
+        #   # Focused, empty desktop
+        #   WM_INFO="${WM_INFO}${ICON_EMPTY_FOCUSED}"
+        #   ;;
+      # U*)
+        #   # Focused, urgent desktop
+        #   WM_INFO="${WM_INFO}%{B$BG_URGENT}%{F$FG_URGENT}${ICON_OCCUPIED_FOCUSED}%{B$BG_TAGS}%{F$FG_TAGS}"
+        #   ;;
+      # o*)
+        #   # Occupied desktop
+        #   WM_INFO="${WM_INFO}%{A:bspc desktop -f ${name}:}$ICON_OCCUPIED%{A}"
+        #   ;;
+      # f*)
+        #   # Empty desktop
+        #   WM_INFO="${WM_INFO}%{A:bspc desktop -f ${name}:}$ICON_EMPTY%{A}"
+        #   ;;
+      # u*)
+        #   # Urgent desktop
+        #   WM_INFO="${WM_INFO}%{A:bspc desktop -f ${name}:}%{B$BG_URGENT}$ICON_OCCUPIED%{B$BG_TAGS}%{F$FG_TAGS}%{A}"
+        #   ;;
+      # L*)
+        #   # Layout
+        #   LAYOUT="%{B$BG_MONOCLE}%{F$FG_MONOCLE}$(printf "%s" "$(echo ${name} | sed 's/T/g' | sed 's/M/%{A:bspc desktop -l next:} (Click to exit Monocle) %{A}/g')")%{B-}%{F-}"
+        #   WM_INFO="%{B$BG_LAUNCHER}%{F$FG_LAUNCHER}%{A:$CMD_LAUNCHER:}$ICON_LAUNCHER%{A}%{B$BG_TAGS}%{F$FG_TAGS}${WM_INFO} "
+        #   ;;
+        # esac
+        # shift
+      done
+      ;;
+  esac
+
+  if [ $NUMBER_OF_MONITORS -eq 1 ]; then
+    BAR="%{l}${WM_INFO_ARRAY[0]}${MUSIC}${NOTSTAT}%{c}${TITLE}%{r}${UNMAPPED}%{A:$(dirname $0)/dcal &:}${CLOCK}%{A}"
+  elif [ $NUMBER_OF_MONITORS -eq 2 ]; then
+    BAR="%{l}${WM_INFO_ARRAY[0]}${MUSIC}${NOTSTAT}%{c}${TITLE}%{r}${UNMAPPED}%{A:$(dirname $0)/dcal &:}${CLOCK}%{A}%{S+}%{l}${WM_INFO_ARRAY[1]}%{c}${TITLE}%{r}${UNMAPPED}%{A:$(dirname $0)/dcal &:}${CLOCK}%{A}"
+  else
+    # Same as 2 -- needs someone to test
+    BAR="%{l}${WM_INFO_ARRAY[0]}${MUSIC}${NOTSTAT}%{c}${TITLE}%{r}${UNMAPPED}%{A:$(dirname $0)/dcal &:}${CLOCK}%{A}%{S+}%{l}${WM_INFO_ARRAY[1]}%{c}${TITLE}%{r}${UNMAPPED}%{A:$(dirname $0)/dcal &:}${CLOCK}%{A}"
+  fi
+
+  printf "%s\n" "$BAR"
+  # printf "%s\n" "${WM_INFO}${MONITOR}${MUSIC}${NOTSTAT} %{c}${TITLE} %{r}${UNMAPPED}%{A:$(dirname $0)/dcal &:}${CLOCK}%{A}"
+done
