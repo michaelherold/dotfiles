@@ -627,6 +627,10 @@ let g:pymode_lint_write = 0
 " => Miscellaneous {{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" Don't use the cursor line in windows you aren't focused on
+autocmd InsertLeave,WinEnter * set cursorline
+autocmd InsertEnter,WinLeave * set nocursorline
+
 " Restore cursor position upon reopening files, except for gitcommits
 autocmd BufReadPost *
   \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
