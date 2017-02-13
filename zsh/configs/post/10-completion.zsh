@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 
-fpath=(~/.zsh/completion /usr/share/zsh/site-functions $fpath)
+[[ "$(uname)" == 'Linux' ]] && {
+  fpath=(~/.zsh/completion /usr/share/zsh/site-functions $fpath)
+}
 
 autoload -U compinit || exit
 
