@@ -29,6 +29,7 @@
   old = red bold
 
 [commit]
+  gpgsign = true
   template = ~/.gitmessage
 
 [core]
@@ -71,6 +72,9 @@
 # Make sure we're using SSH for any of my repos
 [url "git@github.com:michaelherold/"]
   insteadOf = "git://github.com/michaelherold/"
+
+[user]
+  signingkey = "1EA06F99"
 
 [include]
   path = ~/.gitconfig-local
