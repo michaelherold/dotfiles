@@ -5,7 +5,10 @@
 " Must be first, because it changes other options as a side effect
 set nocompatible
 
-set shell=/bin/bash
+" When we're running in fish shell, use bash because fish is ... fishy
+if &shell =~# 'fish$'
+  set shell=/bin/bash
+endif
 
 " Set leader to ' '
 let mapleader = " "
@@ -96,11 +99,17 @@ colorscheme base16-railscasts
 set autoindent              " always set autoindenting on
 set autowrite               " automatically :write before running commands
 set backspace=2             " allow backspacing over everything in insert mode
+set backup                  " enable backup files
+set backupdir=$HOME/.vim/files/backup/ " but keep them in a backups folder
+set backupext=-vimbackup    " and name them something easy to see
 set copyindent              " copy the previous indentation on autoindenting
 set cursorline              " underline the current line, for quick orientation
+set directory=$HOME/.vim/files/swap// " keep swapfiles here
+set display+=lastline       " show as much as possible of the last line
 set encoding=utf-8 nobomb   " UTF-8 by default without BOM
 set expandtab               " expand tabs by default (overloadable per file type)
 set fileformats=unix,dos,mac  " set the ordering for file formats
+set formatoptions=
 set formatoptions+=1        " when wrapping paragraphs, don't end lines with 1-letter words
 set formatoptions+=2        " use indent from 2nd line of a paragraph
 set formatoptions+=c        " format comments
@@ -109,7 +118,6 @@ set formatoptions+=n        " recognize numbered lines
 set formatoptions+=o        " make comment when using o or O from comment line
 set formatoptions+=q        " recognize comments with gq
 set formatoptions+=r        " continue comments by default
-set formatoptions=
 set gdefault                " search/replace 'globally' by default
 set hidden                  " hide buffers instead of closing them
 set history=50              " remember more commands and search history
@@ -118,20 +126,17 @@ set ignorecase              " ignore case when searching
 set incsearch               " show search matches as you type
 set laststatus=2            " tell vim to always put a status line in
 set lazyredraw              " don't update the display when running macros
-set listchars=tab:▸\ ,trail:·,extends:#,nbsp:· " set chars used for whitespace
 set magic                   " change the way backslahes are used in search patterns
 set modeline                " enable modelines
 set mouse=a                 " enable using the mouse if terminal emulator supports it
-set nobackup                " backup really acts weirdly ... disable it!
 set noerrorbells            " don't beep
 set nojoinspaces            " only insert space in join after punctuation
 set nolist                  " don't show invisible characters by default
 set noshowmode              " don't show the current mode since we have airline
 set nostartofline           " don't reset cursor to start of line when moving around
-set noswapfile
 set nowrap                  " don't wrap lines
-set nowritebackup
 set number                  " always show line numbers
+set report=0                " always report changed lines
 set ruler                   " show location on command line
 set scrolloff=4             " keep 4 lines off the edges of the screen when scrolling
 set shiftround              " use multiple of shiftwidth when indenting with '>' and '<'
@@ -142,12 +147,17 @@ set showmode                " always show what mode we're in
 set smartcase               " ignore case only if search pattern all lowercase
 set smarttab                " insert tabs on line start according to shiftwidth
 set softtabstop=2           " when hitting <BS>, pretend like tab is removed, even if spaces
+set splitbelow              " open horizontal window splits below current one
+set splitright              " open veritcal window splits to the right of the current one
 set switchbuf=useopen       " reveal already opened files from quickfix
 set tabstop=2               " a tab is two spaces
 set termencoding=utf-8
 set title                   " change the terminal's title
-set undofile                " keep a persistent backup file
+set ttyfast                 " always redraw on character change since we're on fast computers now
+set undofile                " try out undo files again for persistence across opens
+set undodir=$HOME/.vim/files/undo/ " but keep them in the vim folder instead in-folder
 set undolevels=1000         " use many mucho levels of undo
+set updatecount=100         " write swapfiles after 100 characters changed
 set viminfo=%,'9999,s512,n~/.vim/viminfo " Restore buffer links, remember 9999 files of marks, remember registers <= 512kb
 set virtualedit=block       " allow cursor to go in to 'invalid' places
 set visualbell              " don't beep
@@ -159,7 +169,14 @@ set wildignore+=coverage/*
 set wildignore+=tmp/**,*.rbc,*.rbx,*.scssc,*.sassc
 set wildmenu                " make tab completion for files/buffer bash-like
 set wildmode=list:longest   " complete only to the point of ambiguity
-set wrapscan
+set wrapscan                " searches wraps around end-of-line
+
+set list                    " show non-printable characters
+if has('multi_byte') && &encoding ==# 'utf-8'
+  let &listchars = 'tab:▸ ,extends:❯,precedes:❮,nbsp:±'
+else
+  let &listchars = 'tab:> ,extends:>,precedes:<,nbsp:.'
+endif
 
 " Sane regular expressions, via Steve Losh
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
