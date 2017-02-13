@@ -319,6 +319,13 @@ nnoremap <leader>a :Ag<Space>
 " Reselect text that was just pasted with ,v
 nnoremap <leader>v V`]
 
+" Use CtrlP's tag mode
+nnoremap <leader>F :CtrlPTag<CR>
+
+" Git bindings
+nnoremap <leader>gb :Gblame<CR>
+nnoremap <leader>gd :Gdiff<CR>
+
 " Gundo.vim
 nnoremap <leader>u :GundoToggle<CR>
 
@@ -335,6 +342,13 @@ nmap ga <Plug>(EasyAlign)
 
 " Writing mode
 noremap <leader>G :Goyo<CR>
+
+" Running tests
+nnoremap <silent> <leader>t :TestFile<CR>
+nnoremap <silent> <leader>s :TestNearest<CR>
+nnoremap <silent> <leader>l :TestLast<CR>
+nnoremap <silent> <leader>a :TestSuite<CR>
+nnoremap <silent> <leader>gt :TestVisit<CR>
 
 " }}}
 " => Plugin Configuration {{{
@@ -364,7 +378,18 @@ noremap <leader>G :Goyo<CR>
     let g:ctrlp_switch_buffer = 0
     let g:ctrlp_use_caching = 0
     let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
+    " let g:ctrlp_user_command = 'rg -F -l --color=never -g "" %s'
     let g:ctrlp_working_path_mode = 0
+  augroup END
+
+  " }}}
+  " => Elm Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup elm_config
+    autocmd!
+
+    let g:elm_format_autosave = 1
   augroup END
 
   " }}}
@@ -416,6 +441,13 @@ noremap <leader>G :Goyo<CR>
 
     let g:syntastic_python_checkers = ['flake8']
   augroup END
+
+  " }}}
+  " => Testing Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  let g:test#strategy = 'dispatch'
+  let g:test#ruby#minitest#executable = 'm'
 
   " }}}
   " => UltiSnips Settings {{{
@@ -483,7 +515,7 @@ if has("autocmd")
   augroup git_messages " {{{
     autocmd!
 
-    autocmd filetype gitcommit setlocal spell! spelllang=en_us
+    autocmd filetype gitcommit setlocal spell spelllang=en_us
   augroup end " }}}
   augroup html_files " {{{
     autocmd!
@@ -493,7 +525,6 @@ if has("autocmd")
     " Auto-closing of HTML/XML tags
     let g:closetag_default_xml=1
     autocmd filetype html,html.ruby let b:closetag_html_style=1
-    autocmd filetype html,html.ruby,xhtml,xml source ~/.vim/scripts/closetag.vim
   augroup end " }}}
   augroup javascript_files " {{{
     autocmd!
@@ -501,7 +532,7 @@ if has("autocmd")
     autocmd filetype javascript setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
     autocmd filetype javascript setlocal listchars=trail:·,extends:#,nbsp:·
     autocmd filetype javascript setlocal foldmethod=marker foldmarker={,}
-    autocmd filetype javascript call JavaScriptFold()
+    " autocmd filetype javascript call JavaScriptFold()
   augroup end " }}}
   augroup invisible_chars " {{{
     autocmd!
@@ -654,6 +685,10 @@ function! <SID>StripTrailingWhitespace()
   let @/=_s
   call cursor(l, c)
 endfunction
+
+hi link javaScriptTemplateDelim String
+hi link javaScriptTemplateVar Text
+hi link javaScriptTemplateString String
 
 " }}}
 " vim:foldmethod=marker:foldlevel=0
