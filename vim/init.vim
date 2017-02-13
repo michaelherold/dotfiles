@@ -16,25 +16,20 @@ let g:mapleader = " "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
 
+" Colorschemes
+Plug 'chriskempson/base16-vim'
+
+" Utilities
 Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'dag/vim-fish'
-Plug 'digitaltoad/vim-pug'
-Plug 'elixir-lang/vim-elixir'
-Plug 'elmcast/elm-vim'
-Plug 'gregsexton/MatchTag', { 'for': 'html' }
-Plug 'isRuslan/vim-es6'
-Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
-Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
+Plug 'editorconfig/editorconfig-vim'
+Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
-Plug 'nelstrom/vim-markdown-folding'
-Plug 'nicklasos/vim-jsx-riot'
-Plug 'othree/html5.vim'
 Plug 'rking/ag.vim'
-Plug 'rhysd/vim-crystal'
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'scrooloose/syntastic'
+Plug 'sickill/vim-pasta'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'sjl/gundo.vim'
 Plug 'tpope/vim-commentary'
@@ -42,16 +37,45 @@ Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-liquid'
-Plug 'tpope/vim-markdown'
-Plug 'tpope/vim-rails'
 Plug 'tpope/vim-ragtag'
 Plug 'tpope/vim-surround'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'vim-ruby/vim-ruby'
-Plug 'wavded/vim-stylus'
-Plug 'wting/rust.vim'
 Plug 'ryanoasis/vim-devicons'
+
+" JavaScript
+Plug 'kchmck/vim-coffee-script', { 'for': ['coffee'] }
+Plug 'nicklasos/vim-jsx-riot', { 'for': ['jsx', 'javascript', 'tag'] }
+Plug 'othree/yajs.vim', { 'for': ['javascript'] }
+Plug 'othree/es.next.syntax.vim', { 'for': ['javascript'] }
+
+" Markup
+Plug 'digitaltoad/vim-pug', { 'for': ['jade', 'pug'] }
+Plug 'gregsexton/MatchTag', { 'for': ['html'] }
+Plug 'othree/html5.vim', { 'for': ['html'] }
+Plug 'vim-scripts/closetag.vim', { 'for': ['html', 'eruby'] }
+
+" Miscellaneous Languages
+Plug 'elixir-lang/vim-elixir', { 'for': ['elixir'] }
+Plug 'elmcast/elm-vim', { 'for': ['elm'] }
+Plug 'rhysd/vim-crystal', { 'for': ['crystal'] }
+Plug 'wting/rust.vim', { 'for': ['rust'] }
+
+" Ruby
+Plug 'tpope/vim-rails', { 'for': ['ruby'] }
+Plug 'vim-ruby/vim-ruby', { 'for': ['ruby'] }
+
+" Styles
+Plug 'ap/vim-css-color', { 'for': ['css', 'stylus', 'scss'] }
+Plug 'hail2u/vim-css3-syntax', { 'for': ['css'] }
+Plug 'cakebaker/scss-syntax.vim', { 'for': ['scss'] }
+Plug 'wavded/vim-stylus', { 'for': ['stylus'] }
+
+" Writing
+Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
+Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
+Plug 'tpope/vim-markdown'
+Plug 'nelstrom/vim-markdown-folding', { 'for': ['markdown'] }
 
 call plug#end()
 " }}}
@@ -61,6 +85,7 @@ call plug#end()
 set t_Co=256
 set background=dark
 syntax on  " switch syntax highlighting on for color term
+
 let base16colorspace=256
 colorscheme base16-railscasts
 
