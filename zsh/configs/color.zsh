@@ -6,7 +6,7 @@ colors
 export CLICOLOR=1
 
 # Enable base16 colorschemes on MacOS
-[[ `uname` -eq 'Darwin' ]] && {
+[[ "$(uname)" == 'Darwin' ]] && {
   BASE16_SHELL=$HOME/.config/base16-shell/
   [ -n "${PS1}" ] && [ -s ${BASE16_SHELL}/profile_helper.sh ] && eval "$(${BASE16_SHELL}/profile_helper.sh)"
 }
