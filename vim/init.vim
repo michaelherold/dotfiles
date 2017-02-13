@@ -29,9 +29,9 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
+Plug 'neomake/neomake'
 Plug 'rking/ag.vim'
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'scrooloose/syntastic'
 Plug 'sickill/vim-pasta'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'sjl/gundo.vim'
@@ -362,8 +362,6 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     let g:airline_powerline_fonts = 1
     let g:airline_right_step=''
     let g:airline_theme = 'base16'
-
-    let g:airline#extensions#syntastic#enabled = 1
   augroup END
 
   " }}}
@@ -390,6 +388,18 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     let g:elm_format_autosave = 1
+  augroup END
+
+  " }}}
+  " => Neomake Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup neomake_config
+    autocmd!
+
+    let g:neomake_error_sign = {'text': '✗', 'texthl': 'NeomakeErrorSign'}
+
+    autocmd! BufWritePost * Neomake
   augroup END
 
   " }}}
@@ -424,22 +434,6 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     " Don't display these kinds of files
     let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.py\$class$', '\.obj$',
                         \ '\.o$', '\.so$', '\.egg$', '^\.git$' ]
-  augroup END
-
-  " }}}
-  " => Syntastic Settings {{{
-  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-  augroup syntastic_config
-    autocmd!
-
-    let g:syntastic_error_symbol = '✗'
-    let g:syntastic_warning_symbol = '⚠'
-
-    let g:syntastic_check_on_open = 1
-    let g:syntastic_check_on_wq = 0
-
-    let g:syntastic_python_checkers = ['flake8']
   augroup END
 
   " }}}
