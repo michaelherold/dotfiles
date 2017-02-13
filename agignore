@@ -1,6 +1,7 @@
 .git
 .puli/
 _build/
+/app/assets/images
 bower_components
 deps/
 log
