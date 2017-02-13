@@ -1,7 +1,11 @@
 #!/usr/bin/env zsh
 
-filename=/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ "$(uname)" == 'Darwin' ]] && DIRECTORY=/usr/local/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting
+[[ "$(uname)" == 'Linux' ]] && DIRECTORY=/usr/share/zsh/plugins/zsh-syntax-highlighting
 
-[[ -f $filename ]] && source $filename
+FILENAME=${DIRECTORY}/zsh-syntax-highlighting.zsh
 
-unset filename
+[[ -f $FILENAME ]] && source $FILENAME
+
+unset DIRECTORY
+unset FILENAME

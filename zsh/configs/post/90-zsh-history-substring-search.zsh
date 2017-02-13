@@ -1,15 +1,25 @@
 #!/usr/bin/env zsh
 
-filename=/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+[[ "$(uname)" == 'Darwin' ]] && DIRECTORY=/usr/local/opt/zsh-history-substring-search
+[[ "$(uname)" == 'Linux' ]] && DIRECTORY=/usr/share/zsh/plugins/zsh-history-substring-search
 
-[[ -f $filename ]] && {
-  source $filename
+FILENAME=${DIRECTORY}/zsh-history-substring-search.zsh
 
-  zmodload zsh/terminfo
+[[ -f $FILENAME ]] && {
+  source $FILENAME
 
-  # Bind up and down arrow keys
-  bindkey "$terminfo[kcuu1]" history-substring-search-up
-  bindkey "$terminfo[kcud1]" history-substring-search-down
+  # Bind up and down arrow keys with a hard-coded value
+  [[ "$(uname)" == 'Darwin' ]] && {
+    bindkey "^[[A" history-substring-search-up
+    bindkey "^[[B" history-substring-search-down
+  }
+
+  # Bind up and down dynamically, since it works here
+  [[ "$(uname)" == 'Linux' ]] && {
+    zmodload zsh/terminfo
+    bindkey "$terminfo[kcuu1]" history-substring-search-up
+    bindkey "$terminfo[kcud1]" history-substring-search-down
+  }
 
   # Bind P and N for emacs mode
   bindkey -M emacs '^P' history-substring-search-up
@@ -20,4 +30,5 @@ filename=/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substri
   bindkey -M vicmd 'j' history-substring-search-down
 }
 
-unset filename
+unset DIRECTORY
+unset FILENAME
