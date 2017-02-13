@@ -23,14 +23,13 @@ call plug#begin('~/.vim/plugged')
 Plug 'chriskempson/base16-vim'
 
 " Utilities
-Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
 Plug 'neomake/neomake'
-Plug 'rking/ag.vim'
+Plug 'rking/ag.vim', { 'on': ['Ag'] }
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'sickill/vim-pasta'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
@@ -42,9 +41,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-liquid'
 Plug 'tpope/vim-ragtag'
 Plug 'tpope/vim-surround'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'ryanoasis/vim-devicons'
 
 " JavaScript
 Plug 'kchmck/vim-coffee-script', { 'for': ['coffee'] }
@@ -68,6 +64,12 @@ Plug 'wting/rust.vim', { 'for': ['rust'] }
 Plug 'tpope/vim-rails', { 'for': ['ruby'] }
 Plug 'vim-ruby/vim-ruby', { 'for': ['ruby'] }
 
+" UI
+Plug 'airblade/vim-gitgutter'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'ryanoasis/vim-devicons'
+
 " Styles
 Plug 'ap/vim-css-color', { 'for': ['css', 'stylus', 'scss'] }
 Plug 'hail2u/vim-css3-syntax', { 'for': ['css'] }
@@ -76,7 +78,7 @@ Plug 'wavded/vim-stylus', { 'for': ['stylus'] }
 
 " Writing
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
-Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
+Plug 'junegunn/limelight.vim', { 'on': ['Limelight', 'Limelight!'] }
 Plug 'tpope/vim-markdown'
 Plug 'nelstrom/vim-markdown-folding', { 'for': ['markdown'] }
 
