@@ -23,6 +23,7 @@ htmlcov
 .env
 .inch
 .respec_failures
+.yardoc/
 custom_plan.rb
 db/*.sqlite3
 log/*.log
