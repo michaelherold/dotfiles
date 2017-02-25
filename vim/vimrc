@@ -28,6 +28,7 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
+Plug 'Konfekt/FastFold'
 Plug 'neomake/neomake'
 Plug 'rking/ag.vim', { 'on': ['Ag'] }
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
@@ -194,7 +195,7 @@ nnoremap <C-y> 2<C-y>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 set foldenable              " enable folding
-set foldlevelstart=10       " start out with everything folded
+set foldlevelstart=99       " start out with everything unfolded
 set foldmethod=syntax       " fold based on the syntax
 set foldminlines=0
 set foldnestmax=10          " set a max level of nested folding to 10
@@ -390,6 +391,16 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     let g:elm_format_autosave = 1
+  augroup END
+
+  " }}}
+  " => FastFold Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup fastfold_config
+    autocmd!
+
+    let g:fastfold_savehook = 0
   augroup END
 
   " }}}
