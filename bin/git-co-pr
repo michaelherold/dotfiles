@@ -2,5 +2,48 @@
 
 set -e
 
-git fetch origin "pull/$1/head:pr/$1"
-git checkout "pr/$1"
+usage() {
+  echo "usage: git-co-pr [-r remote] pr_number"
+  echo
+  echo "Options"
+  echo "  -r, --remote remote"
+  echo "         the name of the remote that holds the pull request"
+  exit 1
+}
+
+# Print usage instructions if there are no arguments given
+[ -z "$*" ] && usage
+
+# Default arguments
+PR_NUMBER=
+REMOTE=origin
+
+while [ "$#" -gt 0 ]; do
+  key="$1"
+
+  case $key in
+    -r|--remote)
+    REMOTE="$2"
+    # Remove the remote from the args list
+    shift
+    ;;
+  *)
+    [ -z "${PR_NUMBER}" ] || {
+      echo "fatal: 'pr_number' already set to ${PR_NUMBER} but found ${1}"
+      exit 1
+    }
+    PR_NUMBER="$1"
+  esac
+
+  # Remove the processed key from the args list
+  shift
+done
+
+# Fail if there is no PR given
+[ -z "${PR_NUMBER}" ] && {
+  echo "fatal: 'pr_number' is missing"
+  exit 1
+}
+
+git fetch ${REMOTE} "pull/${PR_NUMBER}/head:pr/${PR_NUMBER}"
+git checkout "pr/${PR_NUMBER}"
