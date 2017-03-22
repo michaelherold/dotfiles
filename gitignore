@@ -29,4 +29,5 @@ db/*.sqlite3
 log/*.log
 rerun.txt
 zeus.json
+Procfile.personal
 .respec_failures
