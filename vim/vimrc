@@ -77,6 +77,10 @@ Plug 'hail2u/vim-css3-syntax', { 'for': ['css'] }
 Plug 'cakebaker/scss-syntax.vim', { 'for': ['scss'] }
 Plug 'wavded/vim-stylus', { 'for': ['stylus'] }
 
+" TMux Integrations
+Plug 'blueyed/vim-diminactive'
+Plug 'tmux-plugins/vim-tmux-focus-events'
+
 " Writing
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 Plug 'junegunn/limelight.vim', { 'on': ['Limelight', 'Limelight!'] }
@@ -381,6 +385,16 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
     " let g:ctrlp_user_command = 'rg -F -l --color=never -g "" %s'
     let g:ctrlp_working_path_mode = 0
+  augroup END
+
+  " }}}
+  " => Dim-Inactive Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup diminactive_config
+    autocmd!
+
+    let g:diminactive_enable_focus = 1
   augroup END
 
   " }}}
