@@ -58,6 +58,8 @@
   )
 (setq make-backup-file-name-function 'backup-to-directory)
 
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; Packages
 (require 'init-evil)
 (require 'init-flycheck)
