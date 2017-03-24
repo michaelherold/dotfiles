@@ -1,3 +1,6 @@
+emacs.d/elpa/
+emacs.d/files/backups/*~
+emacs.d/recentf
 vim/.netrwhist
 vim/files/backups/
 vim/files/swaps/
