@@ -233,13 +233,6 @@ nnoremap ; :
 " Avoid accidentally hitting F1
 noremap! <F1> <Esc>
 
-" Quick closing of current window
-nnoremap <leader>q :q<CR>
-
-" Use Q for formatting the current paragraph (or visual selection)
-vnoremap Q gq
-nnoremap Q gqap
-
 " Make p in visual mode replace the selected text with the yank register
 vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
 
@@ -263,22 +256,8 @@ noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
-nnoremap <leader>w <C-w>v<C-w>l
 
-" Tab configuration
-noremap <leader>tn :tabnew<cr>
-noremap <leader>te :tabedit<cr>
-noremap <leader>tc :tabclose<cr>
-noremap <leader>tm :tabmove
-
-" Complete whole filenames/lines with a quicker shortcut key in insert mode
-inoremap <C-f> <C-x><C-f>
-inoremap <C-l> <C-x><C-l>
-
-" Quick yanking to the end of the line
-nnoremap Y y$
-
-" Yank/paste to the OS clipboard with ,y and ,p
+" Yank/paste to the OS clipboard
 noremap <leader>y "+y
 noremap <leader>Y "+yy
 noremap <leader>p "+p
@@ -302,31 +281,14 @@ nnoremap N N:call PulseCursorLine()<CR>
 " Quickly get out of insert mode without moving your fingers
 inoremap jk <Esc>
 
-" Quick alignment of text
-nnoremap <leader>al :left<CR>
-nnoremap <leader>ar :right<CR>
-nnoremap <leader>ac :center<CR>
-
 " Scratch
 nnoremap <leader><tab> :Sscratch<CR><C-W>x<C-J>
 
-" Sudo to write
-cnoremap w!! w !sudo tee % >/dev/null
-
-" Jump to matching pairs easily, with Tab
-nnoremap <Tab> %
-vnoremap <Tab> %
-
-" Strip all trailing whitespace from a file, using ,W
-nnoremap <leader>W :%s/\s\+$//<CR>:let @/=''<CR>
-
-" Run ack fast
-nnoremap <leader>a :Ag<Space>
-
-" Reselect text that was just pasted with ,v
+" Reselect text that was just pasted
 nnoremap <leader>v V`]
 
 " Use CtrlP's tag mode
+nnoremap <leader>f :CtrlP<CR>
 nnoremap <leader>F :CtrlPTag<CR>
 
 " Git bindings
@@ -378,7 +340,6 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
   augroup ctrlp_config
     autocmd!
 
-    let g:ctrlp_map = '<leader>f'
     let g:ctrlp_match_window = 'top,order:ttb'
     let g:ctrlp_switch_buffer = 0
     let g:ctrlp_use_caching = 0
