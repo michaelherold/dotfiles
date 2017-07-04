@@ -388,6 +388,7 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     let g:neomake_error_sign = {'text': '✗', 'texthl': 'NeomakeErrorSign'}
+    let g:neomake_elixir_enabled_makers = ['mix', 'dogma']
 
     autocmd! BufWritePost * Neomake
   augroup END
