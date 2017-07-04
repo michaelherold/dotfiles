@@ -59,6 +59,7 @@ Plug 'vim-scripts/closetag.vim', { 'for': ['html', 'eruby'] }
 Plug 'elixir-lang/vim-elixir', { 'for': ['elixir'] }
 Plug 'elmcast/elm-vim', { 'for': ['elm'] }
 Plug 'rhysd/vim-crystal', { 'for': ['crystal'] }
+Plug 'vim-scripts/bats.vim', { 'for': ['bats'] }
 Plug 'wting/rust.vim', { 'for': ['rust'] }
 
 " Ruby
@@ -484,6 +485,11 @@ noremap <leader>s? z=
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has("autocmd")
+  augroup c_files " {{{
+    autocmd!
+
+    autocmd filetype c,cpp setlocal expandtab tabstop=4 softtabstop=4 foldmethod=marker foldmarker={,}
+  augroup end " }}}
   augroup css_files " {{{
     autocmd!
 
