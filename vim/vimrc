@@ -30,6 +30,7 @@ Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
 Plug 'Konfekt/FastFold'
 Plug 'neomake/neomake'
+Plug 'reedes/vim-textobj-quote' | Plug 'kana/vim-textobj-user'
 Plug 'rking/ag.vim', { 'on': ['Ag'] }
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'sickill/vim-pasta'
@@ -431,6 +432,21 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
 
   let g:test#strategy = 'dispatch'
   let g:test#ruby#minitest#executable = 'm'
+
+  " }}}
+  " => Textobj Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup textobj_quote
+    autocmd!
+
+    map <silent> <leader>qc <Plug>ReplaceWithCurly
+    map <silent> <leader>qs <Plug>ReplaceWithStraight
+
+    autocmd FileType markdown call textobj#quote#init()
+    autocmd FileType textile call textobj#quote#init()
+    autocmd FileType text call textobj#quote#init({'educate': 0})
+  augroup END
 
   " }}}
   " => UltiSnips Settings {{{
