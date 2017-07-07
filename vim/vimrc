@@ -35,6 +35,7 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 
 Plug 'sickill/vim-pasta'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'sjl/gundo.vim'
+Plug 'skwp/greplace.vim'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-endwise'
@@ -391,6 +392,18 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     let g:fastfold_savehook = 0
+  augroup END
+
+  " }}}
+  " => GReplace Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup greplace_config
+    autocmd!
+
+    set grepprg=ag
+
+    let g:grep_cmd_opts = '--line-numbers --noheading'
   augroup END
 
   " }}}
