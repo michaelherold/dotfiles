@@ -29,7 +29,6 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
 Plug 'Konfekt/FastFold'
-Plug 'neomake/neomake'
 Plug 'reedes/vim-textobj-quote' | Plug 'kana/vim-textobj-user'
 Plug 'rking/ag.vim', { 'on': ['Ag'] }
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
@@ -43,6 +42,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-liquid'
 Plug 'tpope/vim-ragtag'
 Plug 'tpope/vim-surround'
+Plug 'w0rp/ale'
 
 " JavaScript
 Plug 'kchmck/vim-coffee-script', { 'for': ['coffee'] }
@@ -323,6 +323,18 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
 
 " }}}
 " => Plugin Configuration {{{
+  " => ALE Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup ale_config
+    autocmd!
+
+    let g:ale_sign_column_always = 1
+    let g:ale_sign_error = '✗'
+    let g:ale_sign_warning = '⚠'
+  augroup END
+
+  " }}}
   " => Airline Settings {{{
   """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -333,6 +345,7 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     let g:airline_powerline_fonts = 1
     let g:airline_right_step=''
     let g:airline_theme = 'base16'
+    let g:airline#extensions#ale#enabled = 1
   augroup END
 
   " }}}
@@ -378,19 +391,6 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     let g:fastfold_savehook = 0
-  augroup END
-
-  " }}}
-  " => Neomake Settings {{{
-  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-  augroup neomake_config
-    autocmd!
-
-    let g:neomake_error_sign = {'text': '✗', 'texthl': 'NeomakeErrorSign'}
-    let g:neomake_elixir_enabled_makers = ['mix', 'dogma']
-
-    autocmd! BufWritePost * Neomake
   augroup END
 
   " }}}
