@@ -10,4 +10,4 @@
   source /usr/local/share/chruby/auto.sh
 }
 
-which chruby >/dev/null && chruby ruby-2.4.0
+which chruby >/dev/null && chruby ruby-2.4.1
