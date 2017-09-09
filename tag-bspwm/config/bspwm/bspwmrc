@@ -13,11 +13,10 @@ bspc config focused_border_color "#519f50"
 bspc config presel_border_color "#da4939"
 
 if [ $HOSTNAME == "zeromus" ]; then
-  bspc monitor HDMI-0 -n L
-  bspc monitor DVI-I-1 -n R
-  bspc monitor L -d ""
-  bspc monitor R -d ""
-  bspc monitor L -s R
+  bspc monitor HDMI-0 -n R
+  bspc monitor DVI-I-1 -n L
+  bspc monitor L -d "main"
+  bspc monitor R -d "web"
 fi
 
 bspc rule -a "crx_nckgahadagoaajjgafhacjanaoiihapd" floating=on center=false
