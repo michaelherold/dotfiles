@@ -34,7 +34,11 @@
   # => ls Aliases {{{
   # ==================================================================
 
-  alias ls="${aliases[ls]:-ls}"
+  [[ "$(uname)" == 'Darwin' ]] && {
+    alias ls="${aliases[ls]:-ls}"
+  } || {
+    alias ls="${aliases[ls]:-ls} --color=auto"
+  }
   alias l="ls -1A"
   alias ll="ls -lh"
   alias la="ls -ah"
