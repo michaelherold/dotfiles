@@ -415,6 +415,7 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     nnoremap <leader>n :NERDTreeToggle<CR>
+    nnoremap <leader>N :NERDTreeFind<CR>
 
     " Store the bookmarks file
     let NERDTreeBookmarksFile=expand("$HOME/.vim/NERDTreeBookmarks")
