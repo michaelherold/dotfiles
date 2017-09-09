@@ -26,6 +26,7 @@ Plug 'chriskempson/base16-vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'ervandew/supertab'
 Plug 'janko-m/vim-test'
 Plug 'junegunn/vim-easy-align'
 Plug 'Konfekt/FastFold'
@@ -469,8 +470,9 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
   augroup ultisnips_config
     autocmd!
 
-    " Work around YouCompleteMe
-    let g:UltiSnipsExpandTrigger='<c-j>'
+    let g:UltiSnipsSnippetDirectories='~/.vim/UltiSnips'
+    let g:UltiSnipsEditSplit='context'
+
   augroup END
 
   " }}}
@@ -601,6 +603,11 @@ if has("autocmd")
     autocmd!
 
     autocmd filetype ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+  augroup end " }}}
+  augroup snippet_files " {{{
+    autocmd!
+
+    autocmd filetype snippet setlocal shiftwidth=8 tabstop=8 softtabstop=8
   augroup end " }}}
   augroup textile_files " {{{
     autocmd!
