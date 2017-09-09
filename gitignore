@@ -1,7 +1,9 @@
+.DS_Store
 .idea
 *.sublime-workspace
 *.sublime-project
 *~
+.pairs
 .vagrant
 tags
 !tags/
