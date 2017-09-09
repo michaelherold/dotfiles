@@ -425,6 +425,8 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     " Show hidden files too
     let NERDTreeShowFiles=1
     let NERDTreeShowHidden=1
+    let NERDTreeDirArrowExpandable = '▸'
+    let NERDTreeDirArrowCollapsible = '▼'
 
     " Quit on opening files from the tree
     let NERDTreeQuitOnOpen=1
