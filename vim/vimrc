@@ -198,6 +198,13 @@ vnoremap / /\v
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
 
+" Allow vim to set the window title in tmux
+if exists('$TMUX')
+  autocmd BufEnter * call system("tmux rename-window " . expand("%:t"))
+  autocmd VimLeave * call system("tmux setw automatic-rename")
+  autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
+end
+
 " }}}
 " => Folding Rules {{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
