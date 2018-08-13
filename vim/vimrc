@@ -46,6 +46,7 @@ Plug 'tpope/vim-liquid'
 Plug 'tpope/vim-ragtag'
 Plug 'tpope/vim-surround'
 Plug 'w0rp/ale'
+Plug 'wakatime/vim-wakatime'
 
 " Markup
 Plug 'gregsexton/MatchTag', { 'for': ['html'] }
