@@ -58,14 +58,24 @@
   )
 (setq make-backup-file-name-function 'backup-to-directory)
 
+;; Stop asking whether to follow symbolic links
+(setq vc-follow-symlinks nil)
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Packages
 (require 'init-evil)
 (require 'init-flycheck)
+(require 'init-gtags)
 
 (use-package alchemist
   :ensure t
+  )
+
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1)
   )
 
 (use-package neotree
@@ -82,9 +92,28 @@
   (helm-mode 1)
   )
 
+(use-package helm-projectile
+  :commands (helm-projectile helm-projectile-switch-project)
+  :ensure t
+  )
+
 (use-package magit
   :ensure t
   :defer t
+  )
+
+(use-package projectile
+  :ensure t
+  :defer t
+  :config
+  (projectile-mode)
+  (setq projectile-enable-caching t)
+  (setq projectile-completion-system 'helm)
+  (helm-projectile-on)
+
+  (use-package projectile-rails
+    :ensure t
+    )
   )
 
 (use-package base16-theme :ensure t :defer t)

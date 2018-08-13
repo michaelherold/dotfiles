@@ -32,31 +32,46 @@
   (use-package evil-indent-textobject
     :ensure t)
 
-  (evil-define-key 'normal global-map
-    (kbd "SPC b") 'helm-mini
-    (kbd "SPC f") 'helm-find-files
-    (kbd "SPC g") 'magit-status
-    (kbd "SPC n") 'neotree-toggle
-    (kbd "SPC p") 'helm-show-kill-ring
-    (kbd "SPC x") 'helm-M-x
-    (kbd "SPC y") 'yank-to-x-clipboard
-    (kbd "SPC B") 'magit-blame-toggle
-    )
+  (use-package general
+    :ensure t)
 
-  (evil-define-key 'normal neotree-mode-map
-    (kbd "RET") 'neotree-enter
-    (kbd "d") 'neotree-delete-node
-    (kbd "r") 'neotree-refresh
-    )
+  (general-evil-setup)
 
-  (evil-define-key 'normal alchemist-mode-map
-    (kbd "SPC s") 'alchemist-mix-test-at-point
-    (kbd "SPC t") 'alchemist-mix-test-this-buffer
-    (kbd "SPC T") 'alchemist-mix-test
-    )
+  (general-nmap "C-j" 'evil-window-down
+                "C-k" 'evil-window-up
+                )
 
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+  (general-nmap :prefix "SPC"
+                "b" 'helm-mini
+                "f" 'helm-projectile-find-file
+                "g" 'magit-statu
+                "n" 'neotree-toggle
+                "p" 'helm-show-kill-ring
+                "x" 'helm-M-x
+                "y" 'yank-to-x-clipboard
+                "B" 'magit-blame-toggle
+                "F" 'helm-gtags
+                "P" 'helm-projectile-switch-project
+                )
+
+  (general-nmap :prefix "SPC"
+                :keymaps 'neotree-mode-map
+                "RET" 'neotree-enter
+                "d" 'neotree-delete-node
+                "r" 'neotree-refresh
+                )
+
+  (general-nmap :prefix "SPC"
+                :keymaps 'alchemist-mode-map
+                "s" 'alchemist-mix-test-at-point
+                "t" 'alchemist-mix-test-this-buffer
+                "T" 'alchemist-mix-test
+                )
+
+  (general-nmap :prefix "SPC"
+                :keymaps 'alchemist-test-report-mode
+                "r" 'alchemist-mix-rerun-last-test
+                )
   )
 
 (provide 'init-evil)
