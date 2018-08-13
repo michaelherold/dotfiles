@@ -43,6 +43,9 @@
 [credential]
   helper = cache --timeout=3600
 
+[diff]
+  colorMoved = zebra
+
 [fetch]
   prune = true
 
