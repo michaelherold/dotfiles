@@ -1,3 +1,4 @@
+COPY_ALWAYS="gitconfig-local"
 DOTFILES_DIRS="$HOME/code/dotfiles"
 EXCLUDES=""
 SYMLINK_DIRS=""
