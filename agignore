@@ -3,6 +3,7 @@
 _build/
 /app/assets/images
 bower_components
+coverage/
 deps/
 log
 node_modules
