@@ -1,6 +1,6 @@
-emacs.d/elpa/
-emacs.d/files/backups/*~
-emacs.d/recentf
+tag-emacs-old/emacs.d/elpa/
+tag-emacs-old/emacs.d/files/backups/*~
+tag-emacs-old/emacs.d/recentf
 vim/.netrwhist
 vim/files/backups/
 vim/files/swaps/
