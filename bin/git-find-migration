@@ -1,0 +1,113 @@
+#!/bin/sh
+
+usage() {
+    echo "usage: git-find-migration [options] [timestamp]"
+    echo
+    echo "  Options:"
+    echo
+    echo "    -h, --help         - show this message"
+    echo "    -e, --exact        - finds only exact matches for the timestamp"
+    echo "    -l, --list-unknown - lists all unknown migration timestamps"
+    echo
+    echo "  Arguments:"
+    echo
+    echo "    timestamp - a full or partial Rails-generated timestamp identifier"
+}
+
+assert_timestamp_set() {
+    if [ -z "$TIMESTAMP" ]; then
+        echo "You did not specify a timestamp or the --list-unknown option."
+        echo
+
+        usage
+
+        exit 1
+    fi
+}
+
+# Checks that we only set a single timestamp
+assert_timestamp_not_set() {
+    if [ ! -z "$TIMESTAMP" ]; then
+        echo "You specified more than one timestamp. This script only expects one."
+        echo
+        echo "  Your first timestamp was: $TIMESTAMP"
+        echo "  Your second one was:      $1"
+        echo
+        echo "Try again with only one timestamp."
+
+        exit 1
+    fi
+}
+
+# Checks that we sent either a full timestamp or a partial one, based on the -e flag
+assert_timestamp_or_partial() {
+    if [ "$EXACT" -eq 1 ]; then
+        REGEX="^[[:digit:]]{14}$"
+    else
+        REGEX="^[[:digit:]]+$"
+    fi
+
+    if ! echo "$1" | grep -E "$REGEX" 2>&2 >/dev/null; then
+        echo "Your timestamp looks malformed. Rails timestamps come in the form of 14 digits."
+        echo
+        echo "  The pattern: YYYYMMDDhhmmss"
+        echo "  You entered: $1"
+        echo
+
+        if [ "$EXACT" -eq 1 ]; then
+            echo "Try again with a timestamp."
+        else
+            echo "Try again with a timestamp or partial timestamp."
+        fi
+
+        exit 1
+    fi
+}
+
+if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+fi
+
+TIMESTAMP=""
+EXACT=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -l|--list-unknown)
+        shift
+
+        echo "Listing unknown migrations ..."
+        echo
+
+        rake db:migrate:status 2>&1 | grep -E '^\s+up.*NO FILE' | awk '{ print $2 }'
+
+        exit 0
+        ;;
+    -e|--exact)
+        shift
+
+        EXACT=1
+        ;;
+    -h|--help)
+        shift
+
+        usage
+        exit 0
+        ;;
+    *)
+        assert_timestamp_not_set "$1"
+        assert_timestamp_or_partial "$1"
+
+        TIMESTAMP="$1"
+
+        shift
+        ;;
+    esac
+done
+
+assert_timestamp_set
+
+git log --all --name-only --pretty=format: -- "db/migrate/${TIMESTAMP}*" | \
+    sed '/^\s*$/d' | \
+    sort -u
