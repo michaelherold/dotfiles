@@ -1,9 +1,12 @@
+\#*\#
+.\#*
 .DS_Store
 .idea
 *.sublime-workspace
 *.sublime-project
 *~
 .pairs
+.projectile
 .vagrant
 tags
 !tags/
@@ -12,6 +15,7 @@ tmp/**/*
 
 # Node
 npm-debug.log
+yarn-error.log
 
 # Python
 .egg[s]
