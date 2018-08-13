@@ -9,6 +9,7 @@
   co = checkout
   cpr = co-pr
   fm = find-migration
+  fw = !git config user.email "michael.herold@getflywheel.com" && git config user.signingkey "1B00EE61"
   lc = "diff HEAD^1..HEAD"
   lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
   pf = push --force-with-lease
