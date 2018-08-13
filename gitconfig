@@ -77,7 +77,7 @@
   insteadOf = "git://github.com/michaelherold/"
 
 [user]
-  signingkey = "1EA06F99"
+  signingkey = "3DE2F014"
 
 [include]
   path = ~/.gitconfig-local
