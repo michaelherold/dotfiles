@@ -137,6 +137,7 @@ set noshowmode              " don't show the current mode since we have airline
 set nostartofline           " don't reset cursor to start of line when moving around
 set nowrap                  " don't wrap lines
 set number                  " always show line numbers
+set relativenumber          " show relative line numbers (having both is a hybrid approach)
 set report=0                " always report changed lines
 set ruler                   " show location on command line
 set scrolloff=4             " keep 4 lines off the edges of the screen when scrolling
