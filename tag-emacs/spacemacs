@@ -58,14 +58,14 @@ values."
      javascript
      (markdown :variables
                markdown-live-preview-engine 'vmd)
+     (mjh-ruby :variables ruby-version-manager 'chruby)
+     mjh-ruby-on-rails
      nginx
      org
      osx
      pdf-tools
      php
      python
-     (mjh-ruby :variables ruby-version-manager 'chruby)
-     ;; ruby-on-rails
      rust
      (shell :variables
             shell-default-height 30
