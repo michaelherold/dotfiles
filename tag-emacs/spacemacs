@@ -1353,7 +1353,7 @@ Late deadlines first, then scheduled, then non-late deadlines"
   (setq enh-ruby-add-encoding-comment-on-save nil)
   (setq ruby-insert-encoding-magic-comment nil)
 
-  (add-hook 'php-mode-hook, 'php-enable-wordpress-coding-style)
+  (add-hook 'php-mode-hook 'php-enable-wordpress-coding-style)
 
   ;;; Fira code
   (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")
