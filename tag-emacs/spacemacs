@@ -64,8 +64,8 @@ values."
      pdf-tools
      php
      python
-     (ruby :variables ruby-version-manager 'chruby)
-     ruby-on-rails
+     (mjh-ruby :variables ruby-version-manager 'chruby)
+     ;; ruby-on-rails
      rust
      (shell :variables
             shell-default-height 30
@@ -76,6 +76,7 @@ values."
      systemd
      tmux
      typescript
+     vue
      (wakatime :variables
                wakatime-cli-path "/usr/local/bin/wakatime")
      yaml
