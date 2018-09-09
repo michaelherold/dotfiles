@@ -45,7 +45,8 @@ values."
      dash
      docker
      elixir
-     elm
+     (elm :variables
+          elm-sort-imports-on-save t)
      emacs-lisp
      emoji
      evil-commentary
