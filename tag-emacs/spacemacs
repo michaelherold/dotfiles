@@ -44,7 +44,6 @@ values."
      csv
      dash
      docker
-     elfeed
      elixir
      elm
      emacs-lisp
@@ -58,8 +57,6 @@ values."
      javascript
      (markdown :variables
                markdown-live-preview-engine 'vmd)
-     (mu4e :variables
-           mu4e-account-alist t)
      nginx
      org
      osx
@@ -1045,32 +1042,6 @@ Late deadlines first, then scheduled, then non-late deadlines"
         calendar-latitude 41.26
         calendar-longitude -96.06)
 
-  ;; Setup mail environment
-  (setq mu4e-maildir "~/.mail"
-        mu4e-get-mail-command "mbsync -a"
-        mu4e-update-interval nil
-        mu4e-compose-signature-auto-include nil
-        mu4e-view-show-images t
-        mu4e-view-show-addresses t)
-
-  ;; Define all mail accounts and their settings
-  (setq mu4e-account-alist
-        '(("gmail"
-           (mu4e-sent-messages-behavior sent)
-           (mu4e-sent-folder "/gmail/[Gmail]/.Sent Mail")
-           (mu4e-drafts-folder "/gmail/[Gmail]/.Drafts")
-           (user-mail-address "michael.j.herold@gmail.com")
-           (user-full-name "Michael Herold"))
-          )
-        )
-
-  ;; Mail directory shortcuts
-  (setq mu4e-maildir-shortcuts
-        '(("/gmail/Inbox" . ?g)))
-
-  ;; Initialize the accounts in 'mu4e-account-alist
-  (mu4e/mail-account-reset)
-
   ;; Follow symlinks for dotfiles (and other Git-versioned files)
   (setq vc-follow-symlinks nil)
 
@@ -1528,9 +1499,6 @@ Late deadlines first, then scheduled, then non-late deadlines"
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
- '(elfeed-feeds
-   (quote
-    ("http://bethanyhaubert.github.io/feed.xml" "http://www.kalzumeus.com/feed/" "http://katemats.com/feed/" "http://www.randsinrepose.com/index.xml" "http://feeds.feedburner.com/bfgreen" "http://feeds.feedburner.com/FrontierBushcraftBlog" "http://feeds.feedburner.com/Sectionhikercom" "http://feeds.feedburner.com/sticksblog/ubvj" "http://woodtrekker.blogspot.com/feeds/posts/default" "http://xkcd.com/rss.xml" "http://rss1.smashingmagazine.com/feed/" "http://backloggedgaming.blogspot.com/feeds/posts/default" "http://gastography.com/feed" "http://heroesofcapitalism.blogspot.com/feeds/posts/default?alt=rss" "http://notanothernycfoodblog.wordpress.com/feed/" "http://feeds.feedburner.com/20somethingfinancecom" "http://www.ocremix.org/feeds/ten20/" "http://stonehearth.net/feed/" "https://weworkremotely.com/categories/2-programming/jobs.rss" "http://feeds.feedburner.com/NerdFitnessBlog" "http://feeds.feedburner.com/OneProjectCloser?format=xml" "http://feeds2.feedburner.com/TheArtOfManliness" "http://www.archlinux.org/feeds/news/" "https://github.com/brigade/haml-lint/releases.atom" "https://github.com/fluent/fluent-bit/releases.atom" "https://github.com/sasstools/sass-lint/releases.atom" "http://www.iwillteachyoutoberich.com/blog/feed" "http://blog.8thlight.com/feed/atom.xml" "http://blog.jessitron.com/feeds/posts/default" "https://www.sandimetz.com/blog?format=RSS" "http://feeds.feedburner.com/codinghorror" "http://feeds.feedburner.com/GiantRobotsSmashingIntoOtherGiantRobots" "http://greenruby.org/feed.rss" "http://www.jsharkey.org/blog/feed/" "https://michaelfeathers.silvrback.com/feed" "http://rubyweekly.com/rss" "http://www.rubyletter.com/blog/feed.xml" "http://www.schneems.com/feed.xml" "http://tenderlovemaking.com/atom.xml" "http://devblog.avdi.org/feed/" "http://brandonsanderson.com/feed/" "http://www.fearfulsymmetry.net/?feed=rss2" "http://www.writingexcuses.com/?feed=podcast")))
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f")
  '(gud-gdb-command-name "gdb --annotate=1")
