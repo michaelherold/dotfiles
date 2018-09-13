@@ -354,6 +354,6 @@
         (add-hook hook 'seeing-is-believing))
       (dolist (mode '(ruby-mode enh-ruby-mode))
         (spacemacs/set-leader-keys-for-major-mode mode
-          "@@" 'seeing-is-believing-run
+          "@@" 'seeing-is-believing-run-as-xmpfilter
           "@c" 'seeing-is-believing-clear
-          "@x" 'seeing-is-believing-run-as-xmpfilter)))))
+          "@r" 'seeing-is-believing-run)))))
