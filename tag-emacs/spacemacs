@@ -343,6 +343,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
   (setq exec-path-from-shell-check-startup-files nil)
+  (setq-default git-magit-status-fullscreen t)
   )
 
 (defun dotspacemacs/user-config ()
@@ -1039,6 +1040,9 @@ Late deadlines first, then scheduled, then non-late deadlines"
     :config
     (editorconfig-mode 1))
 
+  (setq git-commit-summary-max-length 50)
+  (setq git-commit-fill-column 72)
+
   ;; Set up automatic calendar configuration
   (setq calendar-location-name "Omaha, Nebraska, USA"
         calendar-latitude 41.26
@@ -1502,7 +1506,7 @@ Late deadlines first, then scheduled, then non-late deadlines"
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-color "#37474f")
+ '(fci-rule-color "#37474f" t)
  '(gud-gdb-command-name "gdb --annotate=1")
  '(hl-sexp-background-color "#1c1f26")
  '(large-file-warning-threshold nil)
