@@ -9,7 +9,7 @@
 ;;
 ;;; License: GPLv3
 
-(setq mjh-ruby-packages
+(setq ruby-packages
       '(
         bundler
         chruby
@@ -38,7 +38,7 @@
         rake
         ))
 
-(defun mjh-ruby/init-bundler ()
+(defun ruby/init-bundler ()
   (use-package bundler
     :defer t
     :init (dolist (mode '(ruby-mode enh-ruby-mode))
@@ -51,7 +51,7 @@
               "bx" 'bundle-exec
               "bo" 'bundle-open))))
 
-(defun mjh-ruby/post-init-company ()
+(defun ruby/post-init-company ()
   (when (configuration-layer/package-usedp 'robe)
     (spacemacs|add-company-hook ruby-mode)
     (spacemacs|add-company-hook enh-ruby-mode))
@@ -59,7 +59,7 @@
     (dolist (mode '(ruby-mode enh-ruby-mode))
       (add-to-list 'company-dabbrev-code-modes mode))))
 
-(defun mjh-ruby/init-chruby ()
+(defun ruby/init-chruby ()
   (use-package chruby
     :if (equal ruby-version-manager 'chruby)
     :commands chruby-use-corresponding
@@ -67,7 +67,7 @@
     :init (spacemacs/add-to-hooks 'chruby-use-corresponding
                                   '(ruby-mode-hook enh-ruby-mode-hook))))
 
-(defun mjh-ruby/init-enh-ruby-mode ()
+(defun ruby/init-enh-ruby-mode ()
   (use-package enh-ruby-mode
     :mode (("Appraisals\\'" . enh-ruby-mode)
            ("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
@@ -84,27 +84,27 @@
     (spacemacs/set-leader-keys-for-major-mode 'enh-ruby-mode
       "T{" 'enh-ruby-toggle-block)))
 
-(defun mjh-ruby/post-init-evil-matchit ()
+(defun ruby/post-init-evil-matchit ()
   (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
     (add-hook hook `turn-on-evil-matchit-mode)))
 
-(defun mjh-ruby/post-init-flycheck ()
+(defun ruby/post-init-flycheck ()
   (spacemacs/add-flycheck-hook 'ruby-mode)
   (spacemacs/add-flycheck-hook 'enh-ruby-mode))
 
-(defun mjh-ruby/post-init-ggtags ()
+(defun ruby/post-init-ggtags ()
   (spacemacs/add-to-hooks 'spacemacs/ggtags-mode-enable
                           '(ruby-mode-local-vars-hook
                             enh-ruby-mode-local-vars-hook)))
 
-(defun mjh-ruby/post-init-counsel-gtags ()
+(defun ruby/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'ruby-mode))
 
-(defun mjh-ruby/post-init-helm-gtags ()
+(defun ruby/post-init-helm-gtags ()
   (dolist (mode '(ruby-mode enh-ruby-mode))
     (spacemacs/helm-gtags-define-keys-for-mode mode)))
 
-(defun mjh-ruby/init-minitest ()
+(defun ruby/init-minitest ()
   (use-package minitest
     :defer t
     :init
@@ -125,11 +125,11 @@
           "tr" 'minitest-rerun
           "ts" 'minitest-verify-single)))))
 
-(defun mjh-ruby/pre-init-org ()
+(defun ruby/pre-init-org ()
   (spacemacs|use-package-add-hook org
     :post-config (add-to-list 'org-babel-load-languages '(ruby . t))))
 
-(defun mjh-ruby/post-init-popwin ()
+(defun ruby/post-init-popwin ()
   (push '("*Bundler*" :dedicated t :position bottom :stick t :noselect t :height 0.4)
         popwin:special-display-config)
   (push '("*projectile-rails-compilation*" :dedicated t :position bottom :stick t :noselect t :height 0.4)
@@ -143,14 +143,14 @@
   (push '("^\\*RuboCop.+\\*$" :regexp t :dedicated t :position bottom :stick t :noselect t :height 0.4)
         popwin:special-display-config))
 
-(defun mjh-ruby/init-rbenv ()
+(defun ruby/init-rbenv ()
   (use-package rbenv
     :if (equal ruby-version-manager 'rbenv)
     :defer t
     :init (spacemacs/add-to-hooks 'spacemacs//enable-rbenv
                                   '(ruby-mode-hook enh-ruby-mode-hook))))
 
-(defun mjh-ruby/init-robe ()
+(defun ruby/init-robe ()
   (use-package robe
     :defer t
     :init
@@ -186,7 +186,7 @@
           "sR" 'ruby-send-region-and-go
           "ss" 'ruby-switch-to-inf)))))
 
-(defun mjh-ruby/init-rspec-mode ()
+(defun ruby/init-rspec-mode ()
   (use-package rspec-mode
     :defer t
     :init
@@ -218,7 +218,7 @@
           "t~"    'rspec-toggle-spec-and-target-find-example
           "t TAB" 'rspec-toggle-spec-and-target)))))
 
-(defun mjh-ruby/init-rubocop ()
+(defun ruby/init-rubocop ()
   (use-package rubocop
     :defer t
     :init (spacemacs/add-to-hooks 'rubocop-mode '(ruby-mode-hook
@@ -233,7 +233,7 @@
                 "rrp" 'rubocop-check-project
                 "rrP" 'rubocop-autocorrect-project))))
 
-(defun mjh-ruby/init-ruby-mode ()
+(defun ruby/init-ruby-mode ()
   (use-package ruby-mode
     :defer t
     :mode (("Appraisals\\'" . ruby-mode)
@@ -250,7 +250,7 @@
               "T'" 'ruby-toggle-string-quotes
               "T{" 'ruby-toggle-block)))
 
-(defun mjh-ruby/init-ruby-hash-syntax ()
+(defun ruby/init-ruby-hash-syntax ()
   (use-package ruby-hash-syntax
     :defer t
     :init
@@ -258,7 +258,7 @@
       (spacemacs/set-leader-keys-for-major-mode mode
         "xh" 'ruby-hash-syntax-toggle))))
 
-(defun mjh-ruby/init-ruby-refactor ()
+(defun ruby/init-ruby-refactor ()
   (use-package ruby-refactor
     :defer t
     :init (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
@@ -273,7 +273,7 @@
           "rRc" 'ruby-refactor-extract-constant
           "rRl" 'ruby-refactor-extract-to-let)))))
 
-(defun mjh-ruby/init-ruby-tools ()
+(defun ruby/init-ruby-tools ()
   (use-package ruby-tools
     :defer t
     :init (dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
@@ -288,7 +288,7 @@
           "x\"" 'ruby-tools-to-double-quote-string
           "x:" 'ruby-tools-to-symbol)))))
 
-(defun mjh-ruby/init-ruby-test-mode ()
+(defun ruby/init-ruby-test-mode ()
   "Define keybindings for ruby test mode"
   (use-package ruby-test-mode)
     :defer t
@@ -307,7 +307,7 @@
           "tb" 'ruby-test-run
           "tt" 'ruby-test-run-at-point))))
 
-(defun mjh-ruby/init-rvm ()
+(defun ruby/init-rvm ()
   (use-package rvm
     :if (equal ruby-version-manager 'rvm)
     :defer t
@@ -317,7 +317,7 @@
       (spacemacs/add-to-hooks 'rvm-activate-corresponding-ruby
                               '(ruby-mode-hook enh-ruby-mode-hook)))))
 
-(defun mjh-ruby/pre-init-smartparens ()
+(defun ruby/pre-init-smartparens ()
   (spacemacs|use-package-add-hook smartparens
     :post-config
     (sp-with-modes (if ruby-enable-enh-ruby-mode 'enh-ruby-mode 'ruby-mode)
@@ -328,7 +328,7 @@
                         (spacemacs/smartparens-pair-newline-and-indent "RET"))
        :suffix ""))))
 
-(defun mjh-ruby/init-rake ()
+(defun ruby/init-rake ()
   (use-package rake
     :defer t
     :init (setq rake-cache-file (concat spacemacs-cache-directory "rake.cache"))
@@ -340,7 +340,7 @@
                 "kR"    'rake-regenerate-cache
                 "kf"    'rake-find-task))))
 
-(defun mjh-ruby/init-seeing-is-believing ()
+(defun ruby/init-seeing-is-believing ()
   (use-package seeing-is-believing
     :defer t
     :commands (seeing-is-believing seeing-is-believing-run seeing-is-believing-clear)
