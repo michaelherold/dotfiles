@@ -12,9 +12,15 @@ URxvt.externalBorder:   3
 URxvt*scrollBar:        false
 URxvt*scrollBar_right:  true
 URxvt*scrollstyle:      rxvt
- 
+
 URxvt.transparent:  false
 URxvt.shading:      30
+
+! }}}
+! => Cursor configuration {{{
+! =====================================================================
+
+Xcursor.theme: dmz
 
 ! }}}
 ! => Font configuration {{{
