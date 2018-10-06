@@ -7,3 +7,5 @@ vim/files/swaps/
 vim/files/undo/
 vim/plugged/
 vim/viminfo
+*.journal
+*.log

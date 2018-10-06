@@ -1,0 +1,21 @@
+log = ~/.cache/mpdscribble/mpdscribble.log
+
+# How verbose mpdscribble's logging should be.  Default is 1.
+verbose = 2
+
+# How often should mpdscribble save the journal file? [seconds]
+journal_interval = 600
+
+# The host running MPD, possibly protected by a password
+# ([PASSWORD@]HOSTNAME).  Defaults to $MPD_HOST or localhost.
+host = localhost
+
+# The port that the MPD listens on and mpdscribble should try to
+# connect to.  Defaults to $MPD_PORT or 6600.
+port = 6600
+
+[last.fm]
+url = http://post.audioscrobbler.com/
+username = metatinara
+password =
+journal = ~/.cache/mpdscribble/lastfm.journal
