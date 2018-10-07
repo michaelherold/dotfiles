@@ -1,0 +1,45 @@
+directory: /mnt/aeternalis/music
+library: /mnt/aeternalis/music/beets.db
+
+import:
+  copy: yes
+  languages:
+    - en
+  log: beets.log
+  write: yes
+
+paths:
+  default: "$genre/$albumartist/$album%aunique{}/$track - $title"
+  singleton: "$genre/$artist/Non-Album/$title"
+  comp: "$genre/Compilations/$album%aunique{}/$track - $title"
+
+ui:
+  color: true
+
+plugins:
+  - absubmit
+  - acousticbrainz
+  - bpm
+  - chroma
+  - duplicates
+  - edit
+  - ftintitle
+  - lastgenre
+  - lastimport
+  - mbsubmit
+  - mbsync
+  - mpdstats
+  - mpdupdate
+  - plexupdate
+  - scrub
+  - the
+
+lastfm:
+  user: metatinara
+
+lastgenre:
+  canonical: yes
+  fallback: Unknown
+
+include:
+  - secrets.yml
