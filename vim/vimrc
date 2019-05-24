@@ -106,6 +106,8 @@ set backupdir=$HOME/.vim/files/backup/ " but keep them in a backups folder
 set backupext=-vimbackup    " and name them something easy to see
 set copyindent              " copy the previous indentation on autoindenting
 set cursorline              " underline the current line, for quick orientation
+set diffopt+=algorithm:patience " use the patient algorithm for diffing
+set diffopt+=indent-heuristic   " use heuristics for intelligent diffing
 set directory=$HOME/.vim/files/swap// " keep swapfiles here
 set display+=lastline       " show as much as possible of the last line
 set encoding=utf-8 nobomb   " UTF-8 by default without BOM
