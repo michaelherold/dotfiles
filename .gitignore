@@ -6,6 +6,7 @@ vim/files/backups/
 vim/files/swaps/
 vim/files/undo/
 vim/plugged/
+vim/spell/*.spl
 vim/viminfo
 *.journal
 *.log
