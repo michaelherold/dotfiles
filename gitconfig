@@ -14,7 +14,7 @@
   fw = !git config user.email "michael.herold@getflywheel.com" && git config user.signingkey "1B00EE61"
   lc = "diff HEAD^1..HEAD"
   lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
-  merged-remote = !git branch -vv | grep ': gone]'
+  merged-remote = !git branch -vv | grep ': gone]' | awk '{ print $1 }'
   pf = push --force-with-lease
   rbm = rebase master
   st = status
