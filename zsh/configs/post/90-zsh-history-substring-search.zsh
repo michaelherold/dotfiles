@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+[ "$TERM" = "dumb" ] && return
+
 [[ "$(uname)" == 'Darwin' ]] && DIRECTORY=/usr/local/opt/zsh-history-substring-search/share/zsh-history-substring-search
 [[ "$(uname)" == 'Linux' ]] && DIRECTORY=/usr/share/zsh/plugins/zsh-history-substring-search
 

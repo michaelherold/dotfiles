@@ -27,3 +27,8 @@ MSG
 fi
 
 unset _old_path
+
+[ "$TERM" = "dumb" ] && {
+  unsetopt zle
+  PS1="> "
+}
