@@ -93,6 +93,11 @@ colorscheme base16-railscasts
 " => Editing Behavior {{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+if !has('nvim')
+ " Restore buffer links, remember 9999 files of marks, remember registers <= 512kb
+  set viminfo=%,'9999,s512,n~/.vim/viminfo
+endif
+
 set autoindent              " always set autoindenting on
 set autowrite               " automatically :write before running commands
 set backspace=2             " allow backspacing over everything in insert mode
@@ -158,7 +163,6 @@ set undofile                " try out undo files again for persistence across op
 set undodir=$HOME/.vim/files/undo/ " but keep them in the vim folder instead in-folder
 set undolevels=1000         " use many mucho levels of undo
 set updatecount=100         " write swapfiles after 100 characters changed
-set viminfo=%,'9999,s512,n~/.vim/viminfo " Restore buffer links, remember 9999 files of marks, remember registers <= 512kb
 set virtualedit=block       " allow cursor to go in to 'invalid' places
 set visualbell              " don't beep
 set wildignore+=*.swp,*.bak,*.pyc,*.class
