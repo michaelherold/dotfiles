@@ -34,7 +34,6 @@ Plug 'rking/ag.vim', { 'on': ['Ag'] }
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'sheerun/vim-polyglot'
 Plug 'sickill/vim-pasta'
-Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'sjl/gundo.vim'
 Plug 'skwp/greplace.vim'
 Plug 'tpope/vim-commentary'
