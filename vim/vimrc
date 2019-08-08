@@ -55,9 +55,6 @@ Plug 'vim-scripts/closetag.vim', { 'for': ['html', 'eruby'] }
 " Miscellaneous Languages
 Plug 'vim-scripts/bats.vim', { 'for': ['bats'] }
 
-" Ruby
-Plug 'tpope/vim-rails', { 'for': ['ruby'] }
-
 " UI
 Plug 'airblade/vim-gitgutter'
 Plug 'vim-airline/vim-airline'
