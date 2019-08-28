@@ -1,0 +1,111 @@
+#compdef asdf
+
+__asdf_available_plugins() {
+  echo "$((asdf plugin-list 2>/dev/null && asdf plugin-list-all 2>/dev/null | cut -f1 -d' ') | sort | uniq -u))"
+}
+
+__asdf_installed_plugins() {
+  echo "$(asdf plugin-list 2>/dev/null)"
+}
+
+__asdf_in_array() {
+  local plugin="$1" && shift
+  local -a array=($@)
+
+  if [[ -n "$plugin" && ${array[(ie)$plugin]} -le ${#array} ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_asdf() {
+  local ret=1
+
+
+  _arguments -C \
+    '1:cmd:->cmds' \
+    '*:: :->args' \
+  && ret=0
+
+  case "$state" in
+    cmds)
+      local -a commands=(
+        'current:Display current version set or being used'
+        'global:Set the package global version'
+        'install:Install a specific version of a package or, with no arguments, install all the package versions listed in the .tool-versions file'
+        'list:List installed versions of a package'
+        'list-all:List all versions of a package'
+        'local:Set the package local version'
+        'plugin-add:Add a plugin from the plugin repo OR add a Git repo as a plugin by specifying the name and repo url'
+        'plugin-list:List installed plugins'
+        'plugin-list-all:List plugins registered on asdf-plugins repository with URLs'
+        'plugin-remove:Remove plugin and package versions'
+        'plugin-update:Update plugin'
+        'reshim:Recreate shims for version of a package'
+        'update:Update asdf'
+        'uninstall:Remove a specific version of a package'
+        'where:Display install path for an installed version'
+        'which:Display install path for current version'
+      )
+
+      _describe -t commands 'commands' commands && ret=0
+      ;;
+    args)
+      case ${line[1]} in
+        (current|list|list-all|plugin-remove|which)
+          _values 'plugins' $(__asdf_installed_plugins) && ret=0
+          ;;
+        (global|local|reshim|shell|uninstall|where)
+          local installedPlugins=($(__asdf_installed_plugins))
+          local plugin="${line[2]}"
+
+          if (__asdf_in_array $plugin $installedPlugins); then
+            local -a versions=($(asdf list $plugin 2>/dev/null))
+
+            _values 'versions' $versions && ret=0
+          else
+            _values 'plugins' $installedPlugins && ret=0
+          fi
+          ;;
+        install)
+          local installedPlugins=($(__asdf_installed_plugins))
+          local plugin="${line[2]}"
+
+          if (__asdf_in_array $plugin $installedPlugins); then
+            local -a versions=($(asdf list-all $plugin 2>/dev/null))
+
+            _values 'versions' $versions && ret=0
+          else
+            _values 'plugins' $installedPlugins && ret=0
+          fi
+          ;;
+        plugin-add)
+          _values 'plugins' $(__asdf_available_plugins) && ret=0
+          ;;
+        plugin-list)
+          local -a options=(
+            '--urls:List installed plugins with repository URLs'
+          )
+
+          _describe -t options 'options' options && ret=0
+          ;;
+        plugin-update)
+          local -a options=($(__asdf_installed_plugins) --all)
+
+          _values 'options' $options && ret=0
+          ;;
+        update)
+          local -a options=(
+            '--head:Update asdf to the latest on the master branch'
+          )
+
+          _describe -t options 'options' options && ret=0
+          ;;
+      esac
+  esac
+
+  return $ret
+}
+
+_asdf
