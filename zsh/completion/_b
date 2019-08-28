@@ -1,0 +1,3 @@
+#compdef b
+
+compdef b=bundle
