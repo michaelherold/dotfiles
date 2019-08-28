@@ -43,17 +43,18 @@ This function should only modify configuration layer settings."
      better-defaults
      colors
      csv
+     darkroom
      dash
      docker
      elixir
      (elm :variables
           elm-sort-imports-on-save t)
      emacs-lisp
-     emoji
      evil-commentary
      git
      github
      go
+     graphviz
      helm
      html
      javascript
@@ -61,13 +62,19 @@ This function should only modify configuration layer settings."
      lua
      (markdown :variables
                markdown-live-preview-engine 'vmd)
-     (ruby :variables ruby-version-manager 'chruby)
+     (ruby :variables
+           ruby-highlight-debugger-keywords nil
+           ruby-version-manager 'chruby)
      ruby-on-rails
+     mjh-org
      nginx
      org
      osx
      pdf
      php
+     (plantuml :variables
+               plantuml-exec-mode 'jar
+               plantuml-jar-path "/usr/local/Cellar/plantuml/1.2019.8/libexec/plantuml.jar")
      python
      rust
      (shell :variables
@@ -81,7 +88,8 @@ This function should only modify configuration layer settings."
      terraform
      tmux
      typescript
-     vue
+     visibility
+     (vue :variables vue-backend 'lsp)
      (wakatime :variables
                wakatime-cli-path "/usr/local/bin/wakatime")
      yaml
@@ -214,6 +222,11 @@ It should only modify the values of Spacemacs settings."
 
    ;; True if the home buffer should respond to resize events. (default t)
    dotspacemacs-startup-buffer-responsive t
+
+   ;; Default major mode for a new empty buffer. Possible values are mode
+   ;; names such as `text-mode'; and `nil' to use Fundamental mode.
+   ;; (default `text-mode')
+   dotspacemacs-new-empty-buffer-major-mode 'text-mode
 
    ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'text-mode
@@ -381,10 +394,14 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-smooth-scrolling t
 
    ;; Control line numbers activation.
-   ;; If set to `t' or `relative' line numbers are turned on in all `prog-mode' and
-   ;; `text-mode' derivatives. If set to `relative', line numbers are relative.
+   ;; If set to `t', `relative' or `visual' then line numbers are enabled in all
+   ;; `prog-mode' and `text-mode' derivatives. If set to `relative', line
+   ;; numbers are relative. If set to `visual', line numbers are also relative,
+   ;; but lines are only visual lines are counted. For example, folded lines
+   ;; will not be counted and wrapped lines are counted as multiple lines.
    ;; This variable can also be set to a property list for finer control:
    ;; '(:relative nil
+   ;;   :visual nil
    ;;   :disabled-for-modes dired-mode
    ;;                       doc-view-mode
    ;;                       markdown-mode
@@ -392,8 +409,9 @@ It should only modify the values of Spacemacs settings."
    ;;                       pdf-view-mode
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
+   ;; When used in a plist, `visual' takes precedence over `relative'.
    ;; (default nil)
-   dotspacemacs-line-numbers 'relative
+   dotspacemacs-line-numbers '(:relative t :size-limit-kb 1000)
 
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
@@ -488,6 +506,7 @@ It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
 
   (setq exec-path-from-shell-check-startup-files nil)
+  (setq-default flycheck-reekrc ".reek.yml")
   (setq-default git-magit-status-fullscreen t)
   )
 
@@ -504,6 +523,29 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
+  ;;
+  ;; Functions
+  ;;
+
+  (defun mjh/nullify-recentf-save-list (orig-fun &rest args)
+    "Advice to disable the saving of recentf files to work around a bug in Spacemacs.
+
+    See: https://github.com/syl20bnr/spacemacs/issues/5186
+    See: https://github.com/syl20bnr/spacemacs/issues/5554"
+    t)
+  (advice-add 'recentf-save-list :around #'mjh/nullify-recentf-save-list)
+
+  (defun mjh/toggle-recentf-save-list-advice ()
+    "Toggles the disabling of recentf auto saving."
+    (if (advice-member-p #'mjh/nullify-recentf-save-list 'recentf-save-list)
+        (advice-remove 'recentf-save-list #'mjh/nullify-recentf-save-list)
+      (advice-add 'recentf-save-list :around #'nullify-recentf-save-list)))
+
+  ;;
+  ;; Bindings
+  ;;
+  (spacemacs/set-leader-keys "or" 'mjh/toggle-recentf-save-list-advice)
 
   ;;
   ;; Configuration
@@ -536,6 +578,8 @@ before packages are loaded."
                               (concat (locate-dominating-file buffer-file-name ".formatter.exs") ".formatter.exs")))
                 (setq elixir-format-arguments nil))))
   (add-hook 'php-mode-hook 'php-enable-wordpress-coding-style)
+
+  (add-hook 'markdown-mode-hook 'auto-fill-mode)
 
   ;;; Fira code
   (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")
@@ -666,7 +710,7 @@ before packages are loaded."
   (defun add-fira-code-symbol-keywords ()
     (font-lock-add-keywords nil fira-code-font-lock-keywords-alist))
 
-  (add-hook 'prog-mode-hook #'add-fira-code-symbol-keywords)
+  ;; (add-hook 'prog-mode-hook #'add-fira-code-symbol-keywords)
   (set-language-environment "UTF-8")
   (set-default-coding-systems 'utf-8)
 
@@ -742,7 +786,7 @@ This function is called at the very end of Spacemacs initialization."
  '(nrepl-message-colors
    '("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3"))
  '(package-selected-packages
-   '(lsp-ui lsp-treemacs helm-lsp company-lsp lsp-mode vue-mode treepy graphql seeing-is-believing ruby-refactor ruby-hash-syntax lua-mode sql-indent rainbow-mode rainbow-identifiers color-identifiers-mode interleave org-pdfview pdf-tools org-mime org-trello crystal-mode org-gcal request-deferred deferred mu4e-maildirs-extension mu4e-alert subatomic-theme jazz-theme flatland-theme darktooth-theme autothemer apropospriate-theme ample-zen-theme zenburn-theme solarized-theme material-theme badger-theme base16-theme elfeed-web elfeed-org elfeed-goodies ace-jump-mode noflet elfeed phpunit phpcbf php-extras php-auto-yasnippets insert-shebang go-guru go-eldoc fish-mode drupal-mode php-mode company-shell company-go go-mode wakatime-mode xterm-color systemd shell-pop nginx-mode multi-term eshell-z eshell-prompt-extras esh-help helm-dash dash-at-point yaml-mode theme-changer sunshine rase osx-location evil-commentary dockerfile-mode docker tablist docker-tramp editorconfig yapfify web-mode web-beautify vmd-mode unfill toml-mode tide typescript-mode tagedit smeargle slim-mode scss-mode sass-mode reveal-in-osx-finder racer pyvenv pytest pyenv-mode py-isort pug-mode projectile-rails inflections pip-requirements pbcopy osx-trash osx-dictionary orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download ob-elixir mwim mmm-mode markdown-toc markdown-mode magit-gitflow magit-gh-pulls livid-mode skewer-mode simple-httpd live-py-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc hy-mode htmlize helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh marshal logito pcache ht gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-rust flycheck-pos-tip pos-tip flycheck-mix flycheck-elm flycheck-credo feature-mode evil-magit magit magit-popup git-commit ghub with-editor emoji-cheat-sheet-plus emmet-mode elm-mode cython-mode csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-emoji company-anaconda coffee-mode cargo rust-mode auto-yasnippet yasnippet auto-dictionary anaconda-mode pythonic alchemist elixir-mode ac-ispell auto-complete rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv rake minitest flycheck company chruby bundler inf-ruby winum ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async quelpa package-build spacemacs-theme))
+   '(plantuml-mode vue-mode treepy graphql seeing-is-believing ruby-refactor ruby-hash-syntax lua-mode sql-indent rainbow-mode rainbow-identifiers color-identifiers-mode interleave org-pdfview pdf-tools org-mime org-trello crystal-mode org-gcal request-deferred deferred mu4e-maildirs-extension mu4e-alert subatomic-theme jazz-theme flatland-theme darktooth-theme autothemer apropospriate-theme ample-zen-theme zenburn-theme solarized-theme material-theme badger-theme base16-theme elfeed-web elfeed-org elfeed-goodies ace-jump-mode noflet elfeed phpunit phpcbf php-extras php-auto-yasnippets insert-shebang go-guru go-eldoc fish-mode drupal-mode php-mode company-shell company-go go-mode wakatime-mode xterm-color systemd shell-pop nginx-mode multi-term eshell-z eshell-prompt-extras esh-help helm-dash dash-at-point yaml-mode theme-changer sunshine rase osx-location evil-commentary dockerfile-mode docker tablist docker-tramp editorconfig yapfify web-mode web-beautify vmd-mode unfill toml-mode tide typescript-mode tagedit smeargle slim-mode scss-mode sass-mode reveal-in-osx-finder racer pyvenv pytest pyenv-mode py-isort pug-mode projectile-rails inflections pip-requirements pbcopy osx-trash osx-dictionary orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download ob-elixir mwim mmm-mode markdown-toc markdown-mode magit-gitflow magit-gh-pulls livid-mode skewer-mode simple-httpd live-py-mode launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc hy-mode htmlize helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh marshal logito pcache ht gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-rust flycheck-pos-tip pos-tip flycheck-mix flycheck-elm flycheck-credo feature-mode evil-magit magit magit-popup git-commit ghub with-editor emoji-cheat-sheet-plus emmet-mode elm-mode cython-mode csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-emoji company-anaconda coffee-mode cargo rust-mode auto-yasnippet yasnippet auto-dictionary anaconda-mode pythonic alchemist elixir-mode ac-ispell auto-complete rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv rake minitest flycheck company chruby bundler inf-ruby winum ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async quelpa package-build spacemacs-theme))
  '(pdf-view-midnight-colors '("#DCDCCC" . "#383838"))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
