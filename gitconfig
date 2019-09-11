@@ -17,7 +17,7 @@
   merged-to-master = !git branch --merged | grep -v '\\*\\|master'
   merged-remote = !git branch -vv | grep ': gone]' | awk '{ print $1 }'
   pf = push --force-with-lease
-  rbm = rebase master
+  rbm = rebase master --committer-date-is-author-date
   st = status
   staged = diff --cached
   swap-origin = !git remote rename origin upstream && git remote rename michaelherold origin
