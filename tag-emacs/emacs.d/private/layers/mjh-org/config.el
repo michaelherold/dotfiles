@@ -67,6 +67,9 @@
   subtree, use a COOKIE_DATA property and include the word \"recursive\" into the
   value.")
 
+(defvar org-roam-directory "~/org/roam"
+  "Default path to org-roam files.")
+
 (defvar org-refile-targets '(("~/org/gtd.org" :maxlevel . 3)
                              ("~/org/someday.org" :level . 1)
                              ("~/org/tickler.org" :maxlevel . 2))
