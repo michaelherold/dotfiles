@@ -44,6 +44,8 @@
         "nf" 'org-roam-find-file
         "ng" 'org-roam-show-graph
         "ni" 'org-roam-insert)
+
+      (evil-define-key 'insert org-mode-map (kbd "C-c n i") 'org-roam-insert)
       )
     )
   )
