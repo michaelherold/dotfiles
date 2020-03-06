@@ -1,4 +1,6 @@
 .git
+*.enc
+*.svg
 .puli/
 _build/
 bower_components
@@ -6,6 +8,8 @@ coverage/
 deps/
 log
 node_modules
+public/fonts
+spec/vcr
 /tags
 tmp
 vendor
