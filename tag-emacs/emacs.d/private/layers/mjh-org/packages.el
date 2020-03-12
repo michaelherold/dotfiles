@@ -39,16 +39,19 @@
       (spacemacs/declare-prefix-for-mode 'org-mode "n" "org-roam")
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "nn" 'org-roam
-        "nt" 'org-roam-today
+        "nt" 'org-journal-new-entry
         "nb" 'org-roam-switch-to-buffer
         "nf" 'org-roam-find-file
         "ng" 'org-roam-show-graph
         "ni" 'org-roam-insert)
-
-      (evil-define-key 'insert org-mode-map (kbd "C-c n i") 'org-roam-insert)
       )
     )
   )
 
 (with-eval-after-load 'org
-  (add-to-list 'org-modules 'org-habit t))
+  (add-to-list 'org-modules 'org-habit t)
+
+  (evil-define-key* '(insert normal) org-mode-map
+                    (kbd "C-c n i") 'org-roam-insert
+                    (kbd "C-c n j") 'org-journal-new-entry)
+  )

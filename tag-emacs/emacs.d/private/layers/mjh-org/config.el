@@ -44,7 +44,10 @@
          "* %i%? \n %U")
         ("h" "Habit" entry
          (file+headline "~/org/habits.org" "Habits")
-         "* TODO %?\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE:    habit\n:END:\n")))
+         "* TODO %?\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE:    habit\n:END:\n")
+        ("j" "Journal entry" entry
+         (function mjh-org/org-journal-find-location)
+         "* %(format-time-string org-journal-time-format)%^{Title}\n%i%?")))
 
 (defvar org-habit-following-days 1
   "Number of days after today to appear in consistency graphs.")

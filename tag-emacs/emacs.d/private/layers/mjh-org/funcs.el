@@ -25,3 +25,9 @@
   (push '("#+END_SRC"   . "λ") prettify-symbols-alist)
 
   (prettify-symbols-mode))
+
+(defun mjh-org/org-journal-find-location ()
+  "Open today's journal without inserting a heading."
+
+  (org-journal-new-entry t)
+  (goto-char (point-min)))
