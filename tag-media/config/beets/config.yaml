@@ -1,5 +1,5 @@
-directory: /mnt/aeternalis/music
-library: /mnt/aeternalis/music/beets.db
+directory: /mnt/media/music
+library: /mnt/media/music/beets.db
 
 import:
   copy: yes
@@ -33,6 +33,7 @@ plugins:
   - plexupdate
   - scrub
   - the
+  - web
 
 lastfm:
   user: metatinara
@@ -40,6 +41,10 @@ lastfm:
 lastgenre:
   canonical: yes
   fallback: Unknown
+
+web:
+  host: 0.0.0.0
+  port: 8337
 
 include:
   - secrets.yml
