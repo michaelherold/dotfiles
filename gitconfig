@@ -62,6 +62,9 @@
 [init]
   templatedir = ~/.git_template
 
+[pull]
+  ff = only
+
 [push]
   default = current
 
