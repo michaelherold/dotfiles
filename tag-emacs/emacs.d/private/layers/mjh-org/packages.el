@@ -12,7 +12,10 @@
 (defconst mjh-org-packages
   '(
     org
-    (org-roam :location (recipe :fetcher github :repo "jethrokuan/org-roam" :branch "develop"))
+    org-roam
+    (company-org-roam
+     :location (recipe :fetcher github :repo "jethrokuan/company-org-roam")
+     :requires company)
     ))
 
 (defun mjh-org/post-init-org ()
@@ -23,6 +26,14 @@
    'org-mode '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)"
                 1 'font-lock-org-checkbox-done prepend)))
   )
+
+(defun mjh-org/init-company-org-roam ()
+  (use-package company-org-roam
+    :defer t
+    :init
+    (spacemacs|add-company-backends
+      :backends company-org-roam
+      :modes org-roam-mode)))
 
 (defun mjh-org/init-org-roam ()
   (use-package org-roam
