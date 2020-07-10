@@ -49,6 +49,8 @@
 # => Program Aliases {{{
 # ====================================================================
 
+alias dcr="docker-compose run --rm"
+
 alias gs="git status"
 alias gpr="git --no-pager lg HEAD --not $1"
 
