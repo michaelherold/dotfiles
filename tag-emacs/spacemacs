@@ -76,7 +76,9 @@ This function should only modify configuration layer settings."
      php
      (plantuml :variables
                plantuml-exec-mode 'jar
-               plantuml-jar-path "/usr/local/Cellar/plantuml/1.2019.8/libexec/plantuml.jar")
+               plantuml-jar-path "/usr/local/Cellar/plantuml/1.2020.10/libexec/plantuml.jar"
+               plantuml-indent-level 4
+               )
      python
      rust
      (shell :variables
