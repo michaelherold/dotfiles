@@ -94,8 +94,7 @@ This function should only modify configuration layer settings."
      typescript
      visibility
      (vue :variables vue-backend 'lsp)
-     (wakatime :variables
-               wakatime-cli-path "/usr/local/bin/wakatime")
+     wakatime
      yaml
      )
 
