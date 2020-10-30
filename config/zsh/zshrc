@@ -1,9 +1,9 @@
 # load custom executable functions
-for function in ~/.zsh/functions/*; do
+for function in $ZDOTDIR/functions/*; do
   source $function
 done
 
-# extra files in ~/.zsh/configs/pre , ~/.zsh/configs , and ~/.zsh/configs/post
+# extra files in $ZDOTDIR/configs/pre , $ZDOTDIR/configs , and $ZDOTDIR/configs/post
 # these are loaded first, second, and third, respectively.
 _load_settings() {
   _dir="$1"
@@ -37,10 +37,10 @@ _load_settings() {
     fi
   fi
 }
-_load_settings "$HOME/.zsh/configs"
+_load_settings "$ZDOTDIR/configs"
 
 # aliases
-[[ -f ~/.aliases ]] && source ~/.aliases
+[[ -f $ZDOTDIR/aliases ]] && source $ZDOTDIR/aliases
 
 # Local config
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+[[ -f $ZDOTDIR/zshrc.local ]] && source $ZDOTDIR/zshrc.local

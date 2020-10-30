@@ -1,0 +1,3 @@
+#/bin/sh
+
+[ -f ~/.config/zsh/zshrc ] && mv ~/.config/zsh/zshrc ~/.config/zsh/.zshrc

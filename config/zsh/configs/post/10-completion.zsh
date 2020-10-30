@@ -4,7 +4,7 @@
   fpath=(/usr/share/zsh/site-functions $fpath)
 }
 
-fpath=(~/.zsh/completion $fpath)
+fpath=($ZDOTDIR/completion $fpath)
 
 autoload -U compinit || exit
 
