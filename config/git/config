@@ -40,12 +40,12 @@
 
 [commit]
   gpgsign = true
-  template = ~/.gitmessage
+  template = ~/.config/git/message
   verbose = true
 
 [core]
-  attributesfile = ~/.gitattributes
-  excludesfile = ~/.gitignore
+  attributesfile = ~/.config/git/attributes
+  excludesfile = ~/.config/git/ignore
 
 [credential]
   helper = cache --timeout=3600
@@ -60,7 +60,7 @@
   autocorrect = 1
 
 [init]
-  templatedir = ~/.git_template
+  templatedir = ~/.config/git/template
 
 [pull]
   ff = only
@@ -94,6 +94,6 @@
   signingkey = "3DE2F014"
 
 [include]
-  path = ~/.gitconfig-local
+  path = ~/.config/git/config-local
 
 # vim:filetype=gitconfig

@@ -1,4 +1,4 @@
-COPY_ALWAYS="gitconfig-local"
+COPY_ALWAYS="config/git/config-local config/git/template/**/*"
 DOTFILES_DIRS="$HOME/code/dotfiles"
 EXCLUDES=""
 SYMLINK_DIRS=""
