@@ -610,6 +610,10 @@ before packages are loaded."
   (setq enh-ruby-add-encoding-comment-on-save nil)
   (setq ruby-insert-encoding-magic-comment nil)
 
+  (add-hook 'git-commit-mode-hook
+            #'(lambda ()
+                (yas-activate-extra-mode 'git-commit-mode)))
+
   (add-hook 'elixir-format-hook
             (lambda ()
               (if (projectile-project-p)
