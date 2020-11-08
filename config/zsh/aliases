@@ -17,6 +17,6 @@ alias s="rspec"
 alias path='echo $PATH | tr -s ":" "\n"'
 
 # Include custom aliases
-[[ -f ~/.aliases.local ]] && source ~/.aliases.local
+[[ -f $ZDOTDIR/aliases.local ]] && source $ZDOTDIR/aliases.local
 
 # vim: filetype=zsh:foldmethod=marker

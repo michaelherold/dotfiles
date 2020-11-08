@@ -65,6 +65,6 @@ alias tmk="tmux kill-session -t $1"
 
 # }}}
 
-[[ "$(uname)" == 'Linux' ]] && source ~/.aliases.linux
+[[ "$(uname)" == 'Linux' ]] && source $ZDOTDIR/aliases.linux
 
 # vim: filetype=zsh:foldmethod=marker
