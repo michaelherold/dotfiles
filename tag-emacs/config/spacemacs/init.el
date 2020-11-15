@@ -112,8 +112,6 @@ This function should only modify configuration layer settings."
 
      crystal-mode
      editorconfig
-     interleave
-     org-pdfview
      )
 
    ;; A list of packages that cannot be updated.
