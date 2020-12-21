@@ -74,8 +74,7 @@ This function should only modify configuration layer settings."
      pdf
      php
      (plantuml :variables
-               plantuml-exec-mode 'jar
-               plantuml-jar-path "/usr/local/Cellar/plantuml/1.2020.10/libexec/plantuml.jar"
+               plantuml-exec-mode 'executable
                plantuml-indent-level 4
                )
      python
