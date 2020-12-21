@@ -621,6 +621,13 @@ before packages are loaded."
 
   (add-hook 'markdown-mode-hook 'auto-fill-mode)
 
+  (add-to-list 'hs-special-modes-alist
+               `(ruby-mode
+                 ,(rx (or "def" "class" "module" "do"))
+                 ,(rx (or "end"))
+                 ,(rx (or "#" "=begin"))
+                 ruby-forward-sexp nil))
+
   ;;; Fira code
   (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")
   (add-hook 'after-make-frame-functions
