@@ -71,7 +71,8 @@ This function should only modify configuration layer settings."
      mjh-org
      nginx
      (org :variables
-          org-enable-org-journal-support t)
+          org-enable-org-journal-support t
+          org-enable-roam-support t)
      osx
      pdf
      php
