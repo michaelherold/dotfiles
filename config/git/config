@@ -53,6 +53,18 @@
 [diff]
   colorMoved = zebra
 
+[diff "orgmode"]
+  xfuncname = "^(\\*+.*)$"
+
+[diff "rlang"]
+  xfuncname = "^([a-zA-z.]+ <- function.*)$"
+
+[diff "rspec"]
+  xfuncname = "^[ \t]*((RSpec|describe|context|it|before|after|around|feature|scenario|background)[ \t].*)$"
+
+[diff "texinfo"]
+  xfuncname = "^@node[ \t][ \t]*\\([^,][^,]*\\)"
+
 [fetch]
   prune = true
 
