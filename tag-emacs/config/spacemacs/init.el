@@ -547,7 +547,6 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
 
   (setq exec-path-from-shell-check-startup-files nil)
   (setq-default flycheck-reekrc ".reek.yml")
-  (setq-default git-magit-status-fullscreen t)
   )
 
 (defun dotspacemacs/user-load ()
