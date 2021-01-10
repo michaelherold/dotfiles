@@ -87,4 +87,5 @@
        yaml
 
        :config
-       (default +bindings +smartparens))
+       (default +bindings +smartparens)
+       literate)

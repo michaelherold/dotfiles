@@ -1,0 +1,200 @@
+#+title: Literate Doom Configuration
+
+* Introduction
+
+In the interest of teaching myself to better understand Emacs and its configuration, I chose to make my Doom configuration a literate program using Doom's built-in ~:config literate~ module.
+
+The basic idea of this is that you represent your configuration as an ~org-mode~ file that then gets [[https://orgmode.org/manual/Extracting-Source-Code.html][tangled (also known as extracted)]] whenever it updates or you call ~doom sync~.
+
+I have never done something like this before, so if you're reading this in the hopes of learning something /caveat emptor/. If you have a question about something you see, please feel free to [[https://github.com/michaelherold/dotfiles/issues/new][file an issue]] and I will do my best to answer your question. After all, part of the reason for doing this is to teach myself, so I would like to teach you as well.
+
+* Preamble
+
+The first thing that I want to exist in the ~config.el~ file is the preamble that tells Emacs to use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lexical-Binding.html][lexical binding]] for everything in the file. My understanding, from reading [[https://github.com/hlissner/doom-emacs/blob/f2035811dbda21c3ae6a1de115f508bdef8abccb/docs/faq.org#use-lexical-binding-everywhere][the Doom FAQ]], is that this helps the Emacs Lisp compiler optimize its compilation by turning off dynamic variable assignment.
+
+That seems well and good, so here's what it looks like:
+
+#+begin_src elisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+#+end_src
+
+A similar preamble needs set for the ~packages.el~ file as well:
+
+#+begin_src elisp :tangle packages.el
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+#+end_src
+
+* Personal information
+
+Various features within Emacs use your name and email address to configure themselves. This is the configuration around those fields, as I discover them. I use a general email address here instead of my usual open source one because I intend the open source email to only be for receiving email, not sending it.
+
+At this time, I don't generally use my middle initial when I write my name, although I do use it in my domain name. I choose to elide it here for unclear reasons.
+
+#+begin_src elisp
+(setq user-full-name "Michael Herold"
+      user-mail-address "michael@michaeljherold.com")
+#+end_src
+
+* Look and Feel
+
+There isn't much more personal to a computing professional than their text editor. You spend much of your time looking at it, so it behooves you to have it look in a way that is easy to read in all conditions and have a general aesthetic that aligns with yours. It's also a great way to share a little bit of personality with your coworkers when you're pairing!
+
+Anyway, my preferred theme right now is:
+
+#+begin_src elisp
+(setq doom-theme 'apropospriate-dark)
+#+end_src
+
+This theme is not included by default in Doom, so I need to install it like so:
+
+#+begin_src elisp :tangle packages.el
+(package! apropospriate-theme)
+#+end_src
+
+On my Linux machines, I have been trying to fight with ~fontconfig~ to ensure that it aliases my [[https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/FiraCode][Nerd Font version of Fira Code]] as Fira Code to match my macOS machine. That is proving frustrating, so I think what I will do is rely for now on mapping ~monospace~ correctly. Right now it's set to Droid Sans Mono on this machine, which is okay, but I find Fira Code to be a little more readable.
+
+I landed at 16pt for the font size because it works reasonably well on my HiDPI laptop and my work-issued LG 4K monitor. It's not as great on my older 1080p displays, but that's okay.
+
+#+begin_src elisp
+(setq doom-font (font-spec :family "monospace" :size 16))
+#+end_src
+
+I have been testing Doom's ~:ui zen~ module for writing. It uses the built-in font zooming that Doom uses and I prefer a 2x zoom, which looks like:
+
+#+begin_src elisp
+(setq doom-big-font-increment 2)
+#+end_src
+
+Since I am an ex-Vim user, I prefer to use Vim motions for moving around files. Jumping lines in large blocks with accuracy is easier with relative line numbers. Supposedly, relative line numbers can introduce some slowdown in Emacs, but so far I haven't noticed any slowdown from using this setting.
+
+#+begin_src elisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+** TODO Add the ability to toggle to a light theme
+:PROPERTIES:
+:CREATED: <2021-01-09 Sat>
+:END:
+
+When I'm in daylight, I switch to ~apropospriate-light~. In [[https://spacemacs.org][Spacemacs]], they have a nice [[https://github.com/syl20bnr/spacemacs/blob/82ba73a1c0fdf055e9c062beb5ba669c52a19e7f/core/core-themes-support.el#L399-L415][function for cycling themes]] that you configure, but Doom doesn't have the same sort of functionality.
+
+** TODO Consider adding a ~fontconfig~ tangle here
+:PROPERTIES:
+:CREATED: <2021-01-09 Sat>
+:END:
+
+It could be interesting to tangle a ~fontconfig~ configuration for that here, but since I'm new to this, I will consider that at a later date.
+
+* Evil customization
+
+Firstly, let's take a moment to giggle at the name of Emacs' Vim emulation: ~evil-mode~. I know that there's a faux war that has been waging since the 70s or 80s between the two editors, but that it's still called this is hilarious to me.
+
+Anyway, the author of Doom was a heavy Vim user for a long time so he tries his best to honor all Vim motions and common plugins in Doom. Thus far, this has meant that I have had little to customize to my liking, which is great!
+
+When I split a window, I always want to switch to that window instead of remaining on the origin. These two variables accomplish that goal, though you wouldn't know it by looking at them.
+
+#+begin_src elisp
+(setq evil-split-window-below t
+      evil-vsplit-window-right t)
+#+end_src
+
+I used ~vim-surround~ for years when I was in Vim but never internalized how it worked. The first thing that really clicked with me was Spacemacs' mapping for ~evil-surround-region~. ~evil-snipe~ is not something that I use enough so I override its default assignment here to the one that I prefer for ~evil-surround-region~.
+
+#+begin_src elisp
+(map! :v "s" #'evil-surround-region)
+#+end_src
+
+* Spell-check configuration
+
+Instead of relying on the heavyweight ~flyspell~, I am trying out ~spell-fu~, which only sends the visible words for the buffer to the spell-checker. It requires you to set the ~ispell-dictionary~ variable instead of trying to infer it from your locale. Since I primarily speak English, I set it as such here:
+
+#+begin_src elisp
+(setq ispell-dictionary "en")
+#+end_src
+
+** TODO Consider submitting a patch to Doom to infer your dictionary when unset
+:PROPERTIES:
+:CREATED:  <2021-01-09 Sat>
+:END:
+
+I wasn't able to use ~z =~ initially because it was complaining about this variable being unset. Perhaps we can infer from the ~$LANG~ environment variable what it should be, by default?
+
+It [[https://stackoverflow.com/questions/1610337/how-can-i-find-the-current-windows-language-from-cmd][seems hard in Windows]] but we could easily gate the behavior using the ~IS-LINUX~ constant and use ~setq-default~.
+
+* Org mode
+
+Hoo boy, Org mode. This is the make-or-break feature for Emacs for many people. I'm giving it another try this year and am starting slowly. I expect this configuration to grow more than any other bit of configuration in this file. I also expect it to be the highest-churn part of my dotfile configuration for a while yet.
+
+All helper functions live in ~autoload/mjh-org.el~, which I initialize with a preamble here:
+
+#+begin_src elisp :tangle autoload/mjh-org.el
+;;; autoload/mjh-org.el  -*- lexical-binding: t; -*-
+#+end_src
+
+I have been on a crusade lately to rid my ~$HOME~ directory of configuration files so that the only things that are there are the [[https://wiki.archlinux.org/index.php/XDG_Base_Directory][XDG Base Directories]]. Since Org files are content, though, I am happy to have my Org folder live there, so I set it as such:
+
+#+begin_src elisp
+(setq org-directory "~/org/")
+#+end_src
+
+I saw a nice ellipsis configuration in [[https://github.com/jethrokuan/dots/blob/8b8bd2239a17ed8dcdb11c9b6b81a2d759be2661/.doom.d/config.el#L1][Jethro Kuan's dotfiles]] using the "down-pointing triangle" Unicode character, so I cribbed it:
+
+#+begin_src elisp
+(setq org-ellipsis " ▼ ")
+#+end_src
+
+I enjoy using ~org-habit~ to track my habits that I am trying to build. It is not enabled by default in Doom's configuration, so I do that here. I feel like there should be a cleaner way of doing this, but I haven't figured out how.
+
+#+begin_src elisp
+(after! org
+  (require 'org-habit)
+
+  (add-to-list 'org-modules 'org-habit t))
+#+end_src
+
+Doom has an interesting setup for ~org-todo-keywords~ where he also includes checklist items in Org agendas. I don't really want to use that functionality and I want to start off with a simple setup. So far, this is as follows:
+
+- Items that need doing, whether I have started them or not, exist in the ~TODO~ status.
+- If I am waiting on someone else to do a task, I put the task in the ~WAITING~ status. I use ~@~ because I want to make sure I notate who I am waiting on and what I am waiting for. I also use ~!~ because I want to note the time that I put the task into ~WAITING~ status.
+- When I finish a task, I mark it as ~DONE~. When I do so, I want to note the time that I finished it, so I added the ~!~ flag.
+- When I or someone else cancels a task, I don't want to delete it; I want to mark it as ~CANCELLED~ with the reason for cancellation (~@~) and the time (~!~).
+- Both ~DONE~ and ~CANCELLED~ are terminal states.
+
+#+begin_src elisp
+(setq org-todo-keywords
+      '((sequence
+         "TODO(t)"
+         "WAITING(w@/!)"
+         "|"
+         "DONE(d!)"
+         "CANCELLED(c@/!)")))
+#+end_src
+
+In the cases where I use [[https://orgmode.org/manual/Breaking-Down-Tasks.html][summary statistics]] to track progress on a task, I don't want to have to mark the task as ~DONE~ manually when I finish the last of the sub-entries. I accomplish this through a simple function that I cribbed from the Org mode manual. I made a slight modification; I do want to log the time the change happened, so I dropped that line.
+
+#+begin_src elisp
+(after! org
+  (add-hook! #'org-after-todo-statistics-hook #'mjh/org-summary-todo-h))
+#+end_src
+
+#+begin_src elisp :tangle autoload/mjh-org.el
+;;;###autoload
+(defun mjh/org-summary-todo-h (_n-done n-not-done)
+  "Switch entry to DONE when all sub-entries are done, to TODO otherwise.
+
+Since this is a hook, it takes N-DONE and N-NOT-DONE to conform to the
+interface."
+
+  (org-todo (if (= n-not-done 0) "DONE" "TODO")))
+#+end_src
+
+** Roam
+
+As a knowledge management solution, I settled on trying the ~org-roam~ package, which brings some of the behavior of [[https://roamresearch.com/][Roam Research]] into Org mode. I intend to build a Zettelkasten, or "slip box", using it. As of yet, I have not made a lot of progress on this.
+
+My Zettelkasten is, for now, set as below. It lives in a separate Git repository than this configuration.
+
+#+begin_src elisp
+(setq org-roam-directory (concat org-directory "roam/")
+#+end_src
