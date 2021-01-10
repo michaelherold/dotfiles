@@ -138,7 +138,7 @@ I have been on a crusade lately to rid my ~$HOME~ directory of configuration fil
 (setq org-directory "~/org/")
 #+end_src
 
-I saw a nice ellipsis configuration in [[https://github.com/jethrokuan/dots/blob/8b8bd2239a17ed8dcdb11c9b6b81a2d759be2661/.doom.d/config.el#L1][Jethro Kuan's dotfiles]] using the "down-pointing triangle" Unicode character, so I cribbed it:
+I saw a nice ellipsis configuration in [[https://github.com/jethrokuan/dots/blob/8b8bd2239a17ed8dcdb11c9b6b81a2d759be2661/.doom.d/config.el#L18][Jethro Kuan's dotfiles]] using the "down-pointing triangle" Unicode character, so I cribbed it:
 
 #+begin_src elisp
 (setq org-ellipsis " ▼ ")
@@ -196,5 +196,5 @@ As a knowledge management solution, I settled on trying the ~org-roam~ package, 
 My Zettelkasten is, for now, set as below. It lives in a separate Git repository than this configuration.
 
 #+begin_src elisp
-(setq org-roam-directory (concat org-directory "roam/")
+(setq org-roam-directory (concat org-directory "roam/"))
 #+end_src
