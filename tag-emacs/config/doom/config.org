@@ -161,14 +161,19 @@ Doom has an interesting setup for ~org-todo-keywords~ where he also includes che
 - When I or someone else cancels a task, I don't want to delete it; I want to mark it as ~CANCELLED~ with the reason for cancellation (~@~) and the time (~!~).
 - Both ~DONE~ and ~CANCELLED~ are terminal states.
 
+I set these as advice to a Doom method because Doom initializes all of these things when Org loads for the first time.
+
 #+begin_src elisp
-(setq org-todo-keywords
-      '((sequence
-         "TODO(t)"
-         "WAITING(w@/!)"
-         "|"
-         "DONE(d!)"
-         "CANCELLED(c@/!)")))
+(defun +mjh-org-init-appearance-h ()
+  (setq org-todo-keywords
+        '((sequence
+           "TODO(t)"
+           "WAITING(w@/!)"
+           "|"
+           "DONE(d!)"
+           "CANCELLED(c@/!)"))))
+
+(advice-add '+org-init-appearance-h :after #'+mjh-org-init-appearance-h)
 #+end_src
 
 In the cases where I use [[https://orgmode.org/manual/Breaking-Down-Tasks.html][summary statistics]] to track progress on a task, I don't want to have to mark the task as ~DONE~ manually when I finish the last of the sub-entries. I accomplish this through a simple function that I cribbed from the Org mode manual. I made a slight modification; I do want to log the time the change happened, so I dropped that line.
