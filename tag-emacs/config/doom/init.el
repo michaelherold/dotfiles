@@ -50,7 +50,7 @@
 
        :checkers
        grammar
-       spell
+       (spell +aspell +everywhere)
        syntax
 
        :tools
