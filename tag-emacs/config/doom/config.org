@@ -161,6 +161,15 @@ Doom has an interesting setup for ~org-todo-keywords~ where he also includes che
 - When I or someone else cancels a task, I don't want to delete it; I want to mark it as ~CANCELLED~ with the reason for cancellation (~@~) and the time (~!~).
 - Both ~DONE~ and ~CANCELLED~ are terminal states.
 
+Meetings have a separate lifecycle from tasks.
+
+- A meeting starts in the ~MEETING~ state when I get a notice for it.
+- I transition to ~AGENDA~ once I have notes on what the meeting is about and my role in it.
+- During the meeting, I take ~MINUTES~ on the task, which is the terminal state for meetings.
+- Meetings may also be ~CANCELLED~ like a task.
+
+As a miscellaneous task, I also have a ~PHONE~ terminal state that I use for taking notes during phone calls.
+
 I set these as advice to a Doom method because Doom initializes all of these things when Org loads for the first time.
 
 #+begin_src elisp
@@ -171,7 +180,13 @@ I set these as advice to a Doom method because Doom initializes all of these thi
            "WAITING(w@/!)"
            "|"
            "DONE(d!)"
-           "CANCELLED(c@/!)"))))
+           "CANCELLED(c@/!)")
+          (sequence
+           "MEETING"
+           "AGENDA(a@/!)"
+           "|"
+           "MINUTES(m@/!)")
+          (type "PHONE"))))
 
 (advice-add '+org-init-appearance-h :after #'+mjh-org-init-appearance-h)
 #+end_src
@@ -194,6 +209,48 @@ interface."
   (org-todo (if (= n-not-done 0) "DONE" "TODO")))
 #+end_src
 
+When finishing tasks, I want to note when I finished them. However, I don't want the state change information to go into the body of the note; I want it in the ~LOGBOOK~ property:
+
+#+begin_src elisp
+(setq org-log-into-drawer t)
+#+end_src
+
+** Agenda
+
+When showing tasks for the day, I want to make sure I'm including notes from my dailies, so this adds advice to the appropriate Doom hook for working with ~org-agenda-files~.
+
+#+begin_src elisp
+(defun +mjh-org-init-agenda-h ()
+  (setq org-agenda-files (list "~/org/" "~/org/roam/daily/")))
+
+(advice-add '+org-init-agenda-h :after #'+mjh-org-init-agenda-h)
+#+end_src
+
+Org mode's agenda is powerful, with myriad bells and whistles. To cut down on my setup costs, I am starting with a simple agenda configuration using the [[https://github.com/alphapapa/org-super-agenda][org-super-agenda package]].
+
+#+begin_src elisp :tangle packages.el
+(package! org-super-agenda)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-super-agenda
+  :hook (org-load . org-super-agenda-mode)
+  :config
+  (setq org-super-agenda-groups
+        '((:log t)
+          (:habit t)
+          (:name "Standup" :tag "@standup")
+          (:name "Schedule" :time-grid t :todo ("TODO" "MEETING" "AGENDA"))
+          (:name "Overdue" :deadline past)
+          (:name "Waiting …" :todo "WAITING" :order 99))))
+#+end_src
+
+~org-super-agenda~ has a separate map for its header lines that I don't really understand the purpose of. It gets in the way of my Vim bindings, so I override it with a blank map here, based on a suggestion [[https://github.com/alphapapa/org-super-agenda/issues/50#issuecomment-446272744][from StackOverflow]]:
+
+#+begin_src elisp
+(setq org-super-agenda-header-map (make-sparse-keymap))
+#+end_src
+
 ** Roam
 
 As a knowledge management solution, I settled on trying the ~org-roam~ package, which brings some of the behavior of [[https://roamresearch.com/][Roam Research]] into Org mode. I intend to build a Zettelkasten, or "slip box", using it. As of yet, I have not made a lot of progress on this.
@@ -202,4 +259,47 @@ My Zettelkasten is, for now, set as below. It lives in a separate Git repository
 
 #+begin_src elisp
 (setq org-roam-directory (concat org-directory "roam/"))
+#+end_src
+
+I am using ~org-roam~'s dailies instead of ~org-journal~ right now. To log to today is too many key presses, so I want to make it easier to get to today:
+
+#+begin_src elisp
+(map! :after org-roam
+      :leader
+      (:prefix ("r" . "roam")
+       :desc "Capture today" "t" #'org-roam-dailies-capture-today))
+#+end_src
+
+In an attempt to make my Roam database more like a Zettelkasten, I have Roam notes that I consider fleeting. These will be when I am working through writing a permanent note but don't have them to a point where I'm happy with them yet.
+
+Also, bibliographic notes are an important accompanying artifact for a Zettelkasten. These belong in the bibliographic section of my ~org-roam~ database. This idea was originally cribbed from [[https://takeonrules.com/2020/12/18/directory-structure-for-my-org-instance/][Jeremy Friesen's writings on his ~org-roam~ usage]].
+
+#+begin_src elisp
+(setq org-roam-capture-templates
+      '(("f" "Fleeting" plain (function org-roam-capture--get-point)
+         "%?"
+         :file-name "fleeting/%<%Y%m%d>---${slug}"
+         :head "#+title: ${title}\n#+roam_tags:\n\n* ${title}\n\n"
+         :unnarrowed t)
+
+        ("p" "Templates for permanent notes")
+        ("pb" "Permanent > Bibliographic" plain (function org-roam-capture--get-point)
+         "%?"
+         :file-name "bibliographies/%<%Y%m%d>---${slug}"
+         :head "#+title: ${title}\n#+roam_key:\n#+roam_tags:\n\n* ${title}\n\n"
+         :unnarrowed t)))
+#+end_src
+
+* Wakatime
+
+I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here:
+
+#+begin_src elisp :tangle packages.el
+(package! wakatime-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package! wakatime-mode
+  :config
+  (global-wakatime-mode +1))
 #+end_src
