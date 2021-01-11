@@ -118,6 +118,17 @@ I used ~vim-surround~ for years when I was in Vim but never internalized how it 
 (map! :v "s" #'evil-surround-region)
 #+end_src
 
+Doom tries to be helpful by autofilling paragraphs of comments using ~fill-region-as-paragraph~. This means that if your line will wrap at the fill column, the join does not happen as expected. This behavior is more irritating than the joining of comments for me. As such, I am disabling this functionality until I can come back to it.
+
+#+begin_src elisp
+(advice-remove 'evil-join #+'evil-join-a)
+#+end_src
+
+** TODO File a bug about ~+evil-join-a~ :@computer:
+<2021-01-11 Mon>
+
+I believe that to be a bug in [[https://github.com/hlissner/doom-emacs/blob/fc184852d0236769c971e94ec5ec220d8cd24fd1/modules/editor/evil/autoload/advice.el#L181-L203][the way that Doom implements ~+evil-join-a~]], but I don't see where the bug is.
+
 * Spell-check configuration
 
 Instead of relying on the heavyweight ~flyspell~, I am trying out ~spell-fu~, which only sends the visible words for the buffer to the spell-checker. It requires you to set the ~ispell-dictionary~ variable instead of trying to infer it from your locale. Since I primarily speak English, I set it as such here:
