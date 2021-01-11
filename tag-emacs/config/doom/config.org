@@ -25,6 +25,19 @@ A similar preamble needs set for the ~packages.el~ file as well:
 ;;; $DOOMDIR/packages.el
 #+end_src
 
+Because I use [[https://github.com/thoughtbot/rcm][RCM]] to manage my dotfiles and they exist as symlinks within my ~XDG_CONFIG_HOME~ directory, it appears that the symlink for ~config.org~ does not cause an auto-rebuild upon edit. To work around this issue, I'm directly specifying the location of the link.
+
+This file /must/ exist in the same place on every computer on which I use Emacs.
+
+#+begin_src elisp
+(setq +literate-config-file "~/code/dotfiles/tag-emacs/config/doom/config.org")
+#+end_src
+
+** TODO File a bug with Doom about this
+<2021-01-10 Sun>
+
+I can't imagine this is intentional and it feels like a bug.
+
 * Personal information
 
 Various features within Emacs use your name and email address to configure themselves. This is the configuration around those fields, as I discover them. I use a general email address here instead of my usual open source one because I intend the open source email to only be for receiving email, not sending it.
