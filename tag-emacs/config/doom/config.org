@@ -141,7 +141,7 @@ Hoo boy, Org mode. This is the make-or-break feature for Emacs for many people. 
 
 All helper functions live in ~autoload/mjh-org.el~, which I initialize with a preamble here:
 
-#+begin_src elisp :tangle autoload/mjh-org.el
+#+begin_src elisp :tangle autoload/mjh-org.el :mkdirp yes
 ;;; autoload/mjh-org.el  -*- lexical-binding: t; -*-
 #+end_src
 
