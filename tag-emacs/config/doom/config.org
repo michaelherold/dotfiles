@@ -241,11 +241,13 @@ When finishing tasks, I want to note when I finished them. However, I don't want
 
 ** Agenda
 
-When showing tasks for the day, I want to make sure I'm including notes from my dailies, so this adds advice to the appropriate Doom hook for working with ~org-agenda-files~.
+When showing tasks for the day, I want to make sure I'm including notes from my dailies, so this adds advice to the appropriate Doom hook for working with ~org-agenda-files~. I also really only care about today's agenda when I open it initially, so I override the span and start date from Doom's defaults.
 
 #+begin_src elisp
 (defun +mjh-org-init-agenda-h ()
-  (setq org-agenda-files (list "~/org/" "~/org/roam/daily/" "~/.config/doom/config.org")))
+  (setq org-agenda-files (list "~/org/" "~/org/roam/daily/" "~/.config/doom/config.org")
+        org-agenda-span 1
+        org-agenda-start-day nil))
 
 (advice-add '+org-init-agenda-h :after #'+mjh-org-init-agenda-h)
 #+end_src
@@ -273,6 +275,18 @@ Org mode's agenda is powerful, with myriad bells and whistles. To cut down on my
 
 #+begin_src elisp
 (setq org-super-agenda-header-map (make-sparse-keymap))
+#+end_src
+
+I find the weekly view of my agenda to be a little overwhelming, so I want to toggle between time spans easily. This allows me to do that:
+
+#+begin_src elisp
+(map! :after org-agenda
+      :map org-agenda-mode-map
+      :localleader
+      (:prefix ("@" . "timespan")
+       "d" #'org-agenda-day-view
+       "m" #'org-agenda-month-view
+       "w" #'org-agenda-week-view))
 #+end_src
 
 ** Roam
