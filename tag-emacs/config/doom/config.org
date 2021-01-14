@@ -170,11 +170,33 @@ I saw a nice ellipsis configuration in [[https://github.com/jethrokuan/dots/blob
 
 I enjoy using ~org-habit~ to track my habits that I am trying to build. It is not enabled by default in Doom's configuration, so I do that here. I feel like there should be a cleaner way of doing this, but I haven't figured out how.
 
+My preferred theme does not stylize the habit tracker out-of-the-box, so I also define some faces here to match.
+
 #+begin_src elisp
 (after! org
   (require 'org-habit)
 
-  (add-to-list 'org-modules 'org-habit t))
+  (add-to-list 'org-modules 'org-habit t)
+
+  (custom-theme-set-faces! 'apropospriate-dark
+    '(org-habit-alert-face :foreground "#424242" :background "#FFEE9D")
+    '(org-habit-alert-future-face :background "#FFEE58")
+    '(org-habit-clear-face :background "#E1BEE7")
+    '(org-habit-clear-future-face :background "#9575CD")
+    '(org-habit-overdue-face :background "#E57373")
+    '(org-habit-overdue-future-face :background "#EF9A9A")
+    '(org-habit-ready-face :foreground "#424242" :background "#C5E1A5")
+    '(org-habit-ready-future-face :background "#F4FF81"))
+
+  (custom-theme-set-faces! 'apropospriate-light
+    '(org-habit-alert-face :foreground "#424242" :background "#F9A725")
+    '(org-habit-alert-future-face :background "#F57F17")
+    '(org-habit-clear-face :background "#7E57C2")
+    '(org-habit-clear-future-face :background "#B388FF")
+    '(org-habit-overdue-face :background "#D50000")
+    '(org-habit-overdue-future-face :background "#FF1744")
+    '(org-habit-ready-face :foreground "#424242" :background "#66BB6A")
+    '(org-habit-ready-future-face :background "#558B2F")))
 #+end_src
 
 Doom has an interesting setup for ~org-todo-keywords~ where he also includes checklist items in Org agendas. I don't really want to use that functionality and I want to start off with a simple setup. So far, this is as follows:
