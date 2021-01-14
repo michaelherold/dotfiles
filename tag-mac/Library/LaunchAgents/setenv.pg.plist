@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>setenv.emacs</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/launchctl</string>
+      <string>setenv</string>
+      <string>PGPASSFILE</string>
+      <string>$HOME/.config/pg/pgpass</string>
+      <string>PSQLRC</string>
+      <string>$HOME/.config/pg/psqlrc</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true />
+    <key>StandardErrorPath</key>
+    <string>$HOME/Library/Logs/setenv.pg.start.log</string>
+    <key>StandardOutPath</key>
+    <string>$HOME/Library/Logs/setenv.pg.start.log</string>
+    <key>WorkingDirectory</key>
+    <string>/tmp</string>
+  </dict>
+</plist>

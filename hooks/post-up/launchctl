@@ -1,0 +1,7 @@
+#/bin/sh
+
+[[ "$(uname)" != 'Darwin' ]] && exit 0
+
+for file in $HOME/Library/LaunchAgents/setenv.*.plist; do
+  sed -i '' "s|\$HOME|${HOME}|g" "$file"
+done

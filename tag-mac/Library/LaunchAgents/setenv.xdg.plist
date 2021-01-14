@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>setenv.xdg</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/launchctl</string>
+      <string>setenv</string>
+      <string>XDG_CACHE_HOME</string>
+      <string>$HOME/.cache</string>
+      <string>XDG_CONFIG_HOME</string>
+      <string>$HOME/.config</string>
+      <string>XDG_DATA_HOME</string>
+      <string>$HOME/.local/share</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true />
+    <key>StandardErrorPath</key>
+    <string>$HOME/Library/Logs/setenv.xdg.start.log</string>
+    <key>StandardOutPath</key>
+    <string>$HOME/Library/Logs/setenv.xdg.start.log</string>
+    <key>WorkingDirectory</key>
+    <string>/tmp</string>
+  </dict>
+</plist>
