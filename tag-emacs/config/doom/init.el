@@ -14,6 +14,8 @@
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
+;; Must come before loading 'evil - since the doom! block loads it, it must be here
+(setq evil-respect-visual-line-mode t)
 
 (doom! :completion
        (company +childframe)
