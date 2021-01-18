@@ -350,6 +350,21 @@ Also, bibliographic notes are an important accompanying artifact for a Zettelkas
          :unnarrowed t)))
 #+end_src
 
+** Smartparens
+
+Note: the configuration in this section is the biggest hammer I could think of. Smartparens loads its configuration lazily, causing changes to pairs for Org mode when Org loads for the first time. This causes any configuration that I do with ~after! org~ or even ~defer-until! (featurep smartparens-org)~ to be wiped out. I can't figure out a better way of doing this, but the changes fix things that were too annoying not to shim this in.
+
+The automatic pairing for smartparens' =`= pair gets applied within Org mode when it shouldn't. Also, the built-in pair for the =~= key is not working, which makes it harder to use the formatting for code. Lastly, the ='= pair is irritating when I am modifying my literate configuration because it tries to pair when I'm writing elisp.
+
+#+begin_src elisp
+(add-hook! org-mode :append
+  (sp-local-pair 'org-mode "~" "~" :unless '(sp-point-before-word-p
+                                             sp-point-after-word-p
+                                             sp-point-before-same-p))
+  (sp-local-pair 'org-mode "`" nil :actions :rem)
+  (sp-local-pair 'org-mode "'" nil :actions :rem))
+#+end_src
+
 * Wakatime
 
 I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here:
