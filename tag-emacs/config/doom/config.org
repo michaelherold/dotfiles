@@ -187,6 +187,12 @@ I saw a nice ellipsis configuration in [[https://github.com/jethrokuan/dots/blob
 (setq org-ellipsis " ▼ ")
 #+end_src
 
+I'd rather not see the emphasis markers and instead see just the change in face. This makes it seem less like I'm writing in plain text, which is kind of fun.
+
+#+begin_src elisp
+(setq org-hide-emphasis-markers t)
+#+end_src
+
 I enjoy using ~org-habit~ to track my habits that I am trying to build. It is not enabled by default in Doom's configuration, so I do that here. I feel like there should be a cleaner way of doing this, but I haven't figured out how.
 
 My preferred theme does not stylize the habit tracker out-of-the-box, so I also define some faces here to match.
