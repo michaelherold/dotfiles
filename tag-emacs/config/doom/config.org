@@ -343,6 +343,89 @@ I find the weekly view of my agenda to be a little overwhelming, so I want to to
        "w" #'org-agenda-week-view))
 #+end_src
 
+** Capture
+
+While Doom's capture templates are really interesting, they don't really work for how I want to organize my life. So I'm rolling my own capture templates.
+
+I want a better way to write to my Org journal without leaving the buffer open, so I'm starting from the recommended capture templates in their readme. This function opens the current journal location for Org capture to write to.
+
+#+begin_src elisp :tangle autoload/mjh-org.el
+;;;###autoload
+(defun +mjh-org-journal-find-location ()
+  "Go to the location for a Org journal entry for the current time."
+  (org-journal-new-entry t)
+  (org-narrow-to-subtree)
+  (goto-char (point-max)))
+#+end_src
+
+And for scheduling future entries, I need a variable in which to save the scheduled time:
+
+#+begin_src elisp
+(defvar mjh-org-journal--date-location-scheduled-time nil)
+#+end_src
+
+And an auto-loaded function for setting it while getting the journal location:
+
+#+begin_src elisp :tangle autoload/mjh-org.el
+;;;###autoload
+(defun +mjh-org-journal-date-location (&optional scheduled-time)
+  "Go to the location for a scheduled Org journal entry at SCHEDULED-TIME or, if
+  not given, ask for it first."
+  (let ((scheduled-time (or scheduled-time (org-read-date nil nil nil "Date:"))))
+    (setq mjh-org-journal--date-location-scheduled-time scheduled-time)
+    (org-journal-new-entry t (org-time-string-to-time scheduled-time))
+    (org-narrow-to-subtree)
+    (goto-char (point-max))))
+#+end_src
+
+To prevent the variable from potentially affecting future captures, I want to make sure to clear it once we finalize the capture. To do that, I create a simple auto-loaded function:
+
+#+begin_src elisp :tangle autoload/mjh-org.el
+;;;###autoload
+(defun mjh-org-journal--clear-time ()
+    (setq mjh-org-journal--date-location-scheduled-time nil))
+#+end_src
+
+And add it to the hook that Org calls after capture:
+
+#+begin_src elisp
+(add-hook! (org-capture-after-finalize) :append #'mjh-org-journal--clear-time)
+#+end_src
+
+Now we come to the capture templates. Currently, I have a few different places where I want to capture information:
+
+- Personal todos - These are tasks that are not work-related. They might be family- or household-related, or they could be things to read or watch. They live in a general file I call "Life" for now. I'm considering moving these to my journal but that's harder to implement in Orgzly, which I use when I'm not at my computer.
+- Work todos - These are tasks that are work-related.
+- Journal entry - This is an entry in my Org journal. I use it to track what I'm doing throughout the day. I am still building this habit.
+- Scheduled journal entry - This is an entry in my Org journal in the future. I'm thinking it will help me organize tasks that I want to do on a specific day.
+
+#+begin_src elisp
+(after! org
+  (setq org-capture-templates
+        '(("t" "Personal todo" entry (file+headline "~/org/life.org" "Inbox")
+           "* TODO %?\n%T\n%a\n")
+          ("w" "Work todo" entry (file+headline "~/org/work.org" "Inbox")
+           "* TODO %? :work:\n%T\n%a\n")
+          ("j" "Journal entry" plain #'+mjh-org-journal-find-location
+           "** %(format-time-string org-journal-time-format)%?\n"
+           :kill-buffer t)
+          ("J" "Scheduled journal entry" plain #'+mjh-org-journal-date-location
+           "** TODO %?\n <%(princ mjh-org-journal--date-location-scheduled-time)>\n"))))
+#+end_src
+
+** Journal
+
+I switched to using ~org-journal~ for my journal-like activities from ~org-roam~'s dailies. The dailies functionality just doesn't have what I'm looking for. To keep the structure similar, I use daily journals, though I'm considering monthly or yearly journal files. I want my journal entries to be part of my agenda, so I ensure the directory exists in the list.
+
+#+begin_src elisp
+(after! org-journal
+  (setq org-journal-date-format "%Y-%m-%d (%A)"
+        org-journal-enable-agenda-integration t
+        org-journal-file-format "%Y-%m-%d.org"
+        org-journal-file-type 'daily
+        org-journal-dir (concat org-directory "journal")))
+#+end_src
+
 ** Roam
 
 As a knowledge management solution, I settled on trying the ~org-roam~ package, which brings some of the behavior of [[https://roamresearch.com/][Roam Research]] into Org mode. I intend to build a Zettelkasten, or "slip box", using it. As of yet, I have not made a lot of progress on this.
@@ -351,15 +434,6 @@ My Zettelkasten is, for now, set as below. It lives in a separate Git repository
 
 #+begin_src elisp
 (setq org-roam-directory (concat org-directory "roam/"))
-#+end_src
-
-I am using ~org-roam~'s dailies instead of ~org-journal~ right now. To log to today is too many key presses, so I want to make it easier to get to today:
-
-#+begin_src elisp
-(map! :after org-roam
-      :leader
-      (:prefix ("r" . "roam")
-       :desc "Capture today" "t" #'org-roam-dailies-capture-today))
 #+end_src
 
 In an attempt to make my Roam database more like a Zettelkasten, I have Roam notes that I consider fleeting. These will be when I am working through writing a permanent note but don't have them to a point where I'm happy with them yet.
