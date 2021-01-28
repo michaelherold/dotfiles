@@ -51,6 +51,7 @@
   helper = cache --timeout=3600
 
 [diff]
+  algorithm = histogram
   colorMoved = zebra
 
 [diff "orgmode"]
