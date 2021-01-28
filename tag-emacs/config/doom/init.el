@@ -35,7 +35,6 @@
 
        :editor
        (evil +everywhere)
-       file-templates
        fold
        multiple-cursors
        snippets
