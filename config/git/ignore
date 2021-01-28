@@ -1,6 +1,7 @@
 \#*\#
 .\#*
 .DS_Store
+.dir-locals.el
 .idea
 *.sublime-workspace
 *.sublime-project
