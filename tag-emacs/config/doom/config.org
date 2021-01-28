@@ -118,6 +118,12 @@ Mixed pitch mode is nice in theory, but it ignores a mismatch in weight. As such
   :pin "25151d96bd101ee99341115bfe9a141316e26deb")
 #+end_src
 
+I want to use ~mixed-pitch~ by default in Org mode, so I set up a hook to enable it automatically:
+
+#+begin_src elisp
+(add-hook! org-mode 'mixed-pitch-mode)
+#+end_src
+
 ** TODO Consider adding a ~fontconfig~ tangle here :@computer:
 :PROPERTIES:
 :CREATED: <2021-01-09 Sat>
