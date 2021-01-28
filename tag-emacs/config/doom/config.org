@@ -65,15 +65,24 @@ This theme is not included by default in Doom, so I need to install it like so:
 (package! apropospriate-theme)
 #+end_src
 
-On my Linux machines, I have been trying to fight with ~fontconfig~ to ensure that it aliases my [[https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/FiraCode][Nerd Font version of Fira Code]] as Fira Code to match my macOS machine. That is proving frustrating, so I think what I will do is rely for now on mapping ~monospace~ correctly. Right now it's set to Droid Sans Mono on this machine, which is okay, but I find Fira Code to be a little more readable.
+On my Linux machines, I have been trying to fight with ~fontconfig~ to ensure that it aliases my [[https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/FiraCode][Nerd Font version of Fira Code]] as Fira Code to match my macOS machine. That is proving frustrating, so I am instead toggling the family based on whether the host runs Linux.
 
-I landed at 16pt for the font size because it works reasonably well on my HiDPI laptop and my work-issued LG 4K monitor. It's not as great on my older 1080p displays, but that's okay.
+Because my different computers have monitors at different resolution, I decided to switch on ~system-name~ to decide what font size I use.
+
+The variable pitch font is for when I'm writing in Org. I really enjoy the variable pitch for writing via [[*Mixed pitch][mixed-pitch]]. I went a little larger for it because it balances out against the fixed-pitch nicely.
 
 #+begin_src elisp
-(setq doom-font (font-spec :family "monospace" :size 16))
+(let ((font-family (if IS-LINUX "FuraCode Nerd Font" "Fira Code"))
+      (font-size (pcase (system-name)
+                   ("michael-herold" 24)  ;; Work laptop - Macbook Pro
+                   ("ramuh" 32)           ;; Personal laptop - 4K
+                   ("zeromus" 16)         ;; Personal desktop - 1080p
+                   (_ 16))))              ;; Safe fallback
+  (setq doom-font (font-spec :family font-family :size font-size))
+  (setq doom-variable-pitch-font (font-spec :family "Fira Sans" :size (floor (* font-size 1.25)) :weight 'light)))
 #+end_src
 
-I have been testing Doom's ~:ui zen~ module for writing. It uses the built-in font zooming that Doom uses and I prefer a 2x zoom, which looks like:
+The big font increment is for when I toggle on the big mode. I do this sometimes when my eyes are feeling tired, usually at night.
 
 #+begin_src elisp
 (setq doom-big-font-increment 2)
@@ -91,6 +100,16 @@ Since I am an ex-Vim user, I prefer to use Vim motions for moving around files. 
 :END:
 
 When I'm in daylight, I switch to ~apropospriate-light~. In [[https://spacemacs.org][Spacemacs]], they have a nice [[https://github.com/syl20bnr/spacemacs/blob/82ba73a1c0fdf055e9c062beb5ba669c52a19e7f/core/core-themes-support.el#L399-L415][function for cycling themes]] that you configure, but Doom doesn't have the same sort of functionality.
+
+** Mixed pitch
+
+Mixed pitch mode is nice in theory, but it ignores a mismatch in weight. As such, I needed to patch it. I don't believe my patch is doable using advice only, so I forked the repository and use my fork instead of upstream.
+
+#+begin_src elisp :tangle packages.el
+(package! mixed-pitch
+  :recipe (:host gitlab :repo "michaelherold/mixed-pitch" :branch "respect-weights")
+  :pin "25151d96bd101ee99341115bfe9a141316e26deb")
+#+end_src
 
 ** TODO Consider adding a ~fontconfig~ tangle here :@computer:
 :PROPERTIES:
