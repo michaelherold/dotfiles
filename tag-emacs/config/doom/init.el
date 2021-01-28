@@ -77,7 +77,7 @@
        json
        (javascript +lsp)
        (markdown +grip)
-       (org +dragndrop +journal +noter +pretty +roam)
+       (org +dragndrop +hugo +journal +noter +pretty +roam)
        php
        plantuml
        (python +lsp)
