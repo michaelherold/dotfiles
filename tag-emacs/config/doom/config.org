@@ -427,8 +427,8 @@ I switched to using ~org-journal~ for my journal-like activities from ~org-roam~
 (after! org-journal
   (setq org-journal-date-format "%Y-%m-%d (%A)"
         org-journal-enable-agenda-integration t
-        org-journal-file-format "%Y-%m-%d.org"
-        org-journal-file-type 'daily
+        org-journal-file-format "%Y-%m.org"
+        org-journal-file-type 'monthly
         org-journal-dir (concat org-directory "journal")))
 #+end_src
 
