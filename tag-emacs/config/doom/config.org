@@ -305,7 +305,7 @@ When showing tasks for the day, I want to make sure I'm including notes from my 
 
 #+begin_src elisp
 (defun +mjh-org-init-agenda-h ()
-  (setq org-agenda-files (list "~/org/" "~/org/roam/daily/" "~/.config/doom/config.org")
+  (setq org-agenda-files (list "~/org/" "~/org/journal/" "~/.config/doom/config.org")
         org-agenda-span 1
         org-agenda-start-day nil))
 
