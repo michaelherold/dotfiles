@@ -425,7 +425,8 @@ I switched to using ~org-journal~ for my journal-like activities from ~org-roam~
 
 #+begin_src elisp
 (after! org-journal
-  (setq org-journal-date-format "%Y-%m-%d (%A)"
+  (setq org-journal-created-property-timestamp-format "%Y-%m-%d"
+        org-journal-date-format "%Y-%m-%d (%A)"
         org-journal-enable-agenda-integration t
         org-journal-file-format "%Y-%m.org"
         org-journal-file-type 'monthly
