@@ -124,6 +124,16 @@ I want to use ~mixed-pitch~ by default in Org mode, so I set up a hook to enable
 (add-hook! org-mode 'mixed-pitch-mode)
 #+end_src
 
+** Toggling current line highlighting
+
+I like to have the current line highlighted to give me more information about where my cursor is at any given time. However, this mode interferes with seeing the current face of the character my cursor is on. As such, I want to be able to easily turn the mode off, so I add a key binding in Doom's "toggle" section to do just that:
+
+#+begin_src elisp
+(map! :leader
+      (:prefix ("t" . "toggle")
+       :desc "Highlight current line" "h" #'hl-line-mode))
+#+end_src
+
 ** TODO Consider adding a ~fontconfig~ tangle here :@computer:
 :PROPERTIES:
 :CREATED: <2021-01-09 Sat>
