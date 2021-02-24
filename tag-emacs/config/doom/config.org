@@ -141,6 +141,23 @@ I like to have the current line highlighted to give me more information about wh
 
 It could be interesting to tangle a ~fontconfig~ configuration for that here, but since I'm new to this, I will consider that at a later date.
 
+* Credentials management
+
+In order to prevent Emacs from asking me for my SSH and GPG key passphrases every time I use those programs, I use [[http://www.funtoo.org/wiki/Keychain][Keychain]] to start the agents for me. I then integrate those agents into Emacs through the use of ~keychain-environment.el~.
+
+#+begin_src elisp :tangle packages.el
+(package! keychain-environment)
+#+end_src
+
+The only configuration you have to do to use this module is to somehow run a function to load the Keychain information into your environment. I use Doom's lazy loading hooks to do this a single time, when it's necessary.
+
+#+begin_src elisp
+(use-package! keychain-environment
+  :after-call doom-first-file-hook magit-status
+  :config
+  (keychain-refresh-environment))
+#+end_src
+
 * Evil customization
 
 Firstly, let's take a moment to giggle at the name of Emacs' Vim emulation: ~evil-mode~. I know that there's a faux war that has been waging since the 70s or 80s between the two editors, but that it's still called this is hilarious to me.
