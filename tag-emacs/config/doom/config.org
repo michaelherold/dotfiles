@@ -158,6 +158,14 @@ The only configuration you have to do to use this module is to somehow run a fun
   (keychain-refresh-environment))
 #+end_src
 
+* Completion and IDE behavior
+
+Company pops up the completion dialog after a short delay. This ends up being visually distracting more than it is helpful, at least in the current tech stacks in which I work. Instead of letting it try to auto-complete for me on a timer, I'm choosing to make it so I have to use =C-SPC= to pop up the completion dialog on demand. There's a little bit of lag from the time I hit =C-SPC=, but I /think/ that is only the first time you run Company in a project. To switch to this behavior, turn off the delay:
+
+#+begin_src elisp
+(setq company-idle-delay nil)
+#+end_src
+
 * Evil customization
 
 Firstly, let's take a moment to giggle at the name of Emacs' Vim emulation: ~evil-mode~. I know that there's a faux war that has been waging since the 70s or 80s between the two editors, but that it's still called this is hilarious to me.
