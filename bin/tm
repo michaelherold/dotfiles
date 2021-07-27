@@ -13,7 +13,11 @@ function list_sessions() {
 }
 
 function new_session() {
-  read -p "New session name: " session_name
+  base="$(basename "$PWD")"
+  read -p "New session name ($base): " session_name
+
+  [ -z "$session_name" ] && session_name="$base"
+
   tmux new -s "${session_name}"
 }
 
