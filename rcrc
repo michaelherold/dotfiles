@@ -1,5 +1,6 @@
-COPY_ALWAYS="config/environment.d/* config/git/config-local config/git/template/**/* config/pg/pgsqlrc.local"
+COPY_ALWAYS="config/environment.d/* config/git/config-local config/git/template/**/* config/pg/pgsqlrc.local Library/LaunchAgents/*"
 DOTFILES_DIRS="$HOME/code/dotfiles"
 EXCLUDES=""
 SYMLINK_DIRS=""
 TAGS="bspwm emacs media"
+UNDOTTED="Library"
