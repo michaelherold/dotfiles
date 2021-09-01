@@ -89,7 +89,6 @@ The variable pitch font is for when I'm writing in Org. I really enjoy the varia
 (let ((font-family (if IS-LINUX "FuraCode Nerd Font" "Fira Code"))
       (font-size (pcase (system-name)
                    ("michael-herold" 24)  ;; Work laptop - Macbook Pro
-                   ("ramuh" 32)           ;; Personal laptop - 4K
                    ("zeromus" 16)         ;; Personal desktop - 1080p
                    (_ 16))))              ;; Safe fallback
   (setq doom-font (font-spec :family font-family :size font-size))
