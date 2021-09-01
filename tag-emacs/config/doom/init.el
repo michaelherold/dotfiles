@@ -76,6 +76,7 @@
        (go +lsp)
        json
        (javascript +lsp)
+       (kotlin +lsp)
        (markdown +grip)
        (org +dragndrop +hugo +journal +noter +pretty +roam)
        php

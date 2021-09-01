@@ -507,6 +507,12 @@ The automatic pairing for smartparens' =`= pair gets applied within Org mode whe
   (atomic-chrome-start-server))
 #+end_src
 
+* GraphQL
+
+#+begin_src elisp :tangle packages.el
+(package! graphql-mode)
+#+end_src
+
 * Wakatime
 
 I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here:
@@ -522,4 +528,14 @@ I like to track my time on different projects using the Wakatime service. To do 
     :config
     (global-wakatime-mode +1)))
 #+end_src
+
+*  Shadowenv
+
+#+begin_src elisp :tangle packages.el
+(package! shadowenv)
+#+end_src
+
+#+begin_src elisp
+(use-package! shadowenv
+  :hook (after-init . shadowenv-global-mode))
 #+end_src
