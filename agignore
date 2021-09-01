@@ -1,5 +1,6 @@
 .git
 *.enc
+*.ri
 *.svg
 .puli/
 _build/
