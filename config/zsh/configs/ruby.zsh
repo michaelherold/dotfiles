@@ -9,5 +9,3 @@
   source /usr/local/share/chruby/chruby.sh
   source /usr/local/share/chruby/auto.sh
 }
-
-which chruby >/dev/null && chruby ruby-2.6.3
