@@ -60,7 +60,7 @@
        (eval +overlay)
        (lookup +dictionary +docsets)
        lsp
-       magit
+       (magit +forge)
        pdf
        rgb
        terraform
