@@ -15,6 +15,7 @@
   lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
   merged-to-master = !git branch --merged | grep -v '\\*\\|master'
   merged-remote = !git branch -vv | grep ': gone]' | awk '{ print $1 }'
+  oss = !git config user.email "opensource@michaeljherold.com"
   pf = push --force-with-lease
   rbm = rebase master --committer-date-is-author-date
   st = status
