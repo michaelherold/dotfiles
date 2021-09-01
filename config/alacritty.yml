@@ -13,7 +13,7 @@ scrolling:
 
 font:
   normal:
-    family: Fura Code Nerd Font
+    family: FiraCode Nerd Font
   size: 12.0
   use_thin_strokes: true
 

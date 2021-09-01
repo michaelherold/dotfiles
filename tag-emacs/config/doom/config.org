@@ -86,7 +86,7 @@ Because my different computers have monitors at different resolution, I decided 
 The variable pitch font is for when I'm writing in Org. I really enjoy the variable pitch for writing via [[*Mixed pitch][mixed-pitch]]. I went a little larger for it because it balances out against the fixed-pitch nicely.
 
 #+begin_src elisp
-(let ((font-family (if IS-LINUX "FuraCode Nerd Font" "Fira Code"))
+(let ((font-family "FiraCode Nerd Font")
       (font-size (pcase (system-name)
                    ("michael-herold" 24)  ;; Work laptop - Macbook Pro
                    ("zeromus" 16)         ;; Personal desktop - 1080p
