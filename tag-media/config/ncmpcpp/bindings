@@ -178,12 +178,12 @@ def_key "l"
 #def_key "}"
 #  scroll_down_artist
 #
-#def_key "page_up"
-#  page_up
-#
-#def_key "page_down"
-#  page_down
-#
+def_key "page_up"
+  page_up
+
+def_key "page_down"
+  page_down
+
 #def_key "home"
 #  move_home
 #
@@ -208,24 +208,24 @@ def_key "l"
 #def_key "right"
 #  slave_screen
 #
-#def_key "right"
-#  volume_up
-#
-#def_key "+"
-#  volume_up
-#
+def_key "right"
+  volume_up
+
+def_key "+"
+  volume_up
+
 #def_key "left"
 #  previous_column
 #
 #def_key "left"
 #  master_screen
 #
-#def_key "left"
-#  volume_down
-#
-#def_key "-"
-#  volume_down
-#
+def_key "left"
+  volume_down
+
+def_key "-"
+  volume_down
+
 #def_key ":"
 #  execute_command
 #
@@ -280,9 +280,9 @@ def_key "l"
 #def_key "s"
 #  stop
 #
-#def_key "p"
-#  pause
-#
+def_key "p"
+  pause
+
 #def_key ">"
 #  next
 #
