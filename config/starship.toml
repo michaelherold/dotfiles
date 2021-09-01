@@ -1,0 +1,54 @@
+format = """
+$directory( $username$hostname)( $git_branch$git_state$git_status)( $cmd_duration)
+$character
+"""
+
+add_newline = true
+command_timeout = 500
+scan_timeout = 30
+
+[character]
+success_symbol = "[↪](blue)"
+error_symbol = "[↪](red)"
+vicmd_symbol = "[↪](purple)"
+
+[cmd_duration]
+min_time = 5_000
+format = "[$duration](yellow) "
+
+[directory]
+format = "[$path]($style)"
+style = "blue"
+truncate_to_repo = false
+truncation_length = 0
+truncation_symbol = "../"
+
+[git_branch]
+format = "([$branch]($style))"
+style = "fg:242"
+
+[git_state]
+format = "[|$state](fg:242)"
+cherry_pick = "cherry"
+rebase = "rebase-i"
+
+[git_status]
+format = "([$dirty](fg:242))([ $ahead_behind](cyan))"
+ahead = "⇣"
+behind = "⇡"
+conflicted = "*"
+dirty = "*"
+diverged = "⇣⇡"
+modified = "*"
+staged = "*"
+untracked = "*"
+
+[hostname]
+format = "[@$hostname]($style)"
+style = "fg:242"
+trim_at = ""
+
+[username]
+format = "[$user]($style)"
+style_root = "fg:242"
+style_user = "fg:242"
