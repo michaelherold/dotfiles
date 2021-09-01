@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Launch a tmux session named by the current directory.
-
-DIRECTORY=`pwd | sed 's,^\(.*/\)\?\([^/]*\),\2,' | sed 's/\./-/'`
-
-tmux new -s $DIRECTORY

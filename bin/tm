@@ -1,51 +1,108 @@
 #!/usr/bin/env sh
 
-# Launch a previous tmux session or a new one.
+[ -z "$TMUX" ] || exit 0
 
-[ "$TMUX" == "" ] || exit 0
+set -euf
 
-function launch_session() {
-  tmux attach-session -t $1
+if ! command -v tmux >/dev/null; then
+  echo "You do not have tmux installed."
+  exit 1
+fi
+
+set +e
+sessions="$(tmux list-sessions -F "#S" 2>/dev/null)"
+set -e
+number_of_sessions="$(echo "$sessions" | wc -l | tr -d '[:space:]')"
+session_name=
+index=1
+
+is_integer() {
+  case "${1#[+-]}" in
+    (*[!0123456789]*) return 1 ;;
+    ('')              return 1 ;;
+    (*)               return 0 ;;
+  esac
 }
 
-function list_sessions() {
-  tmux list-sessions -F "#S" 2>/dev/null
-}
+list_sessions() {
+  [ -z "$*" ] && return
 
-function new_session() {
-  base="$(basename "$PWD")"
-  read -p "New session name ($base): " session_name
+  cat <<MSG
+Available sessions
+------------------
 
-  [ -z "$session_name" ] && session_name="$base"
+MSG
 
-  tmux new -s "${session_name}"
-}
+  old_ifs=$IFS
+  IFS='
+  '
+  for session in "$@"; do
+    padding=
+    if [ "$number_of_sessions" -gt 9 ] && [ "$index" -lt 10 ]; then
+      padding=" "
+    fi
 
-function show_header() {
-  echo "Available Sessions"
-  echo "------------------"
+    printf "%s%s. %s\n" "$padding" "$index" "$session"
+    eval "choice_$index='$session'"
+    index=$((index+1))
+  done
+
+  IFS=$old_ifs
+
   echo
 }
 
-PS3="Choose your session: "
-sessions=$(list_sessions)
-options=($sessions "New Session" "zsh")
+usage() {
+  cat <<MSG
+usage: tm [options] [session_name]
 
-show_header
+Options
+  -h, --help
+          print this help
+MSG
 
-select option in "${options[@]}"
-do
-  case $option in
-    "New Session")
-      new_session
-      break
-      ;;
-    "zsh")
-      zsh --login
-      break;;
-    *)
-      launch_session $option
-      break
+  exit 1
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      usage
       ;;
   esac
+  shift
+done
+
+# shellcheck disable=SC2086
+list_sessions $sessions
+
+while :; do
+  if [ -n "$sessions" ]; then
+    printf "Choose or name your session: "
+  else
+    printf "Name your session: "
+  fi
+
+  [ -z "$session_name" ] && read -r session_name
+  echo
+
+  if is_integer "$session_name"; then
+    if [ "$session_name" -gt 0 ] && [ "$session_name" -le "$number_of_sessions" ]; then
+      session_name=$(eval echo "\$choice_$session_name")
+      tmux attach-session -t "$session_name"
+      break
+    else
+      echo "You picked a numerical session name, which isn't supported."
+      session_name=
+    fi
+  else
+    [ -z "$session_name" ] && session_name="$(basename "$PWD")"
+
+    if echo "$sessions" | grep "$session_name" >/dev/null; then
+      tmux attach-session -t "$session_name"
+    else
+      tmux new-session -s "$session_name"
+    fi
+    break
+  fi
 done
