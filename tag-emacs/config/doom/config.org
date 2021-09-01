@@ -512,11 +512,14 @@ The automatic pairing for smartparens' =`= pair gets applied within Org mode whe
 I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here:
 
 #+begin_src elisp :tangle packages.el
-(package! wakatime-mode)
+(unless (string= (system-name) "michael-herold.local")
+  (package! wakatime-mode))
 #+end_src
 
 #+begin_src elisp
-(use-package! wakatime-mode
-  :config
-  (global-wakatime-mode +1))
+(unless (string= (system-name) "michael-herold.local")
+  (use-package! wakatime-mode
+    :config
+    (global-wakatime-mode +1)))
+#+end_src
 #+end_src
