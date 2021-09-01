@@ -1,11 +1,9 @@
 #!/usr/bin/env zsh
 
-# Chruby for when we have it
-[[ -d /usr/share/chruby ]] && {
-  source /usr/share/chruby/chruby.sh
-  source /usr/share/chruby/auto.sh
-}
-[[ -d /usr/local/share/chruby ]] && {
-  source /usr/local/share/chruby/chruby.sh
-  source /usr/local/share/chruby/auto.sh
-}
+local dir
+
+[[ -d /usr/share/chruby ]] && dir=/usr/share/chruby
+[[ -d /usr/local/share/chruby ]] && dir=/usr/local/share/chruby
+
+source "$dir/chruby.sh"
+[[ -z "$CHRUBY_DISABLE_AUTO" ]] && source "$dir/auto.sh"
