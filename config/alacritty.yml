@@ -25,29 +25,31 @@ draw_bold_text_with_bright_colors: true
 
 colors:
   primary:
-    background: '0x2b2b2b'
-    foreground: '0xe6e1dc'
+    background: '#282a36'
+    foreground: '#eff0eb'
   cursor:
-    text: '0x2b2b2b'
-    cursor: '0xe6e1dc'
+    cursor: '#97979b'
   normal:
-    black:   '0x2b2b2b'
-    red:     '0xda4939'
-    green:   '0xa5c261'
-    yellow:  '0xffc66d'
-    blue:    '0x6d9cbe'
-    magenta: '0xb6b3eb'
-    cyan:    '0x519f50'
-    white:   '0xe6e1dc'
+    black:   '#282a36'
+    red:     '#ff5c57'
+    green:   '#5af78e'
+    yellow:  '#f3f99d'
+    blue:    '#57c7ff'
+    magenta: '#ff6ac1'
+    cyan:    '#9aedfe'
+    white:   '#f1f1f0'
   bright:
-    black:   '0x2b2b2b'
-    red:     '0xda4939'
-    green:   '0xa5c261'
-    yellow:  '0xffc66d'
-    blue:    '0x6d9cbe'
-    magenta: '0xb6b3eb'
-    cyan:    '0x519f50'
-    white:   '0xf9f7f3'
+    black:   '#686868'
+    red:     '#ff5c57'
+    green:   '#5af78e'
+    yellow:  '#f3f99d'
+    blue:    '#57c7ff'
+    magenta: '#ff6ac1'
+    cyan:    '#9aedfe'
+    white:   '#eff0eb'
+  selection:
+    text:       '#282a36'
+    background: '#feffff'
 
 key_bindings:
   - { key: Paste,                         action: Paste                            }

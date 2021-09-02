@@ -15,7 +15,7 @@ let g:mapleader = " "
 call plug#begin('~/.vim/plugged')
 
 " Colorschemes
-Plug 'chriskempson/base16-vim'
+Plug 'connorholyday/vim-snazzy'
 
 " Utilities
 Plug 'christoomey/vim-tmux-navigator'
@@ -86,8 +86,7 @@ endif
 set background=dark
 syntax on  " switch syntax highlighting on for color term
 
-let base16colorspace=256
-colorscheme base16-railscasts
+colorscheme snazzy
 
 " }}}
 " => Editing Behavior {{{
@@ -466,6 +465,7 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     autocmd!
 
     let g:lightline = {
+      \ 'colorscheme': 'snazzy',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
