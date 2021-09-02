@@ -51,8 +51,7 @@ Plug 'vim-scripts/bats.vim', { 'for': ['bats'] }
 
 " UI
 Plug 'airblade/vim-gitgutter'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'itchyny/lightline.vim'
 Plug 'ryanoasis/vim-devicons'
 
 " Styles
@@ -142,7 +141,7 @@ set mouse=a                 " enable using the mouse if terminal emulator suppor
 set noerrorbells            " don't beep
 set nojoinspaces            " only insert space in join after punctuation
 set nolist                  " don't show invisible characters by default
-set noshowmode              " don't show the current mode since we have airline
+set noshowmode              " don't show the current mode in command line
 set nostartofline           " don't reset cursor to start of line when moving around
 set nowrap                  " don't wrap lines
 set number                  " always show line numbers
@@ -345,21 +344,6 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
   augroup END
 
   " }}}
-  " => Airline Settings {{{
-  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-  augroup airline_config
-    autocmd!
-
-    let g:airline_left_step=''
-    let g:airline_powerline_fonts = 1
-    let g:airline_right_step=''
-    let g:airline_theme = 'base16'
-    let g:airline#extensions#ale#enabled = 1
-    let g:airline#extensions#whitespace#enabled = 0
-  augroup END
-
-  " }}}
   " => Dim-Inactive Settings {{{
   """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -472,6 +456,24 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     set grepprg=ag
 
     let g:grep_cmd_opts = '--line-numbers --noheading'
+  augroup END
+
+  " }}}
+  " => Lightline Settings {{{
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  augroup lightline_config
+    autocmd!
+
+    let g:lightline = {
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
   augroup END
 
   " }}}
