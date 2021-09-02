@@ -94,22 +94,27 @@ colorscheme base16-railscasts
 " => Editing Behavior {{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-if !has('nvim')
- " Restore buffer links, remember 9999 files of marks, remember registers <= 512kb
-  set viminfo=%,'9999,s512,n~/.vim/viminfo
+if has('nvim')
+  set backupdir=$XDG_CACHE_HOME/neovim/backup
+  set directory=$XDG_CACHE_HOME/neovim/swap
+  set undodir=$XDG_CACHE_HOME/neovim/undo
+  set viminfo=%,'9999,s512,n$XDG_CACHE_HOME/neovim/viminfo
+else
+  set backupdir=$XDG_CACHE_HOME/vim/backup
+  set directory=$XDG_CACHE_HOME/vim/swap
+  set undodir=$XDG_CACHE_HOME/vim/undo
+  set viminfo=%,'9999,s512,n$XDG_CACHE_HOME/vim/viminfo
 endif
 
 set autoindent              " always set autoindenting on
 set autowrite               " automatically :write before running commands
 set backspace=2             " allow backspacing over everything in insert mode
 set backup                  " enable backup files
-set backupdir=$HOME/.vim/files/backup/ " but keep them in a backups folder
 set backupext=-vimbackup    " and name them something easy to see
 set copyindent              " copy the previous indentation on autoindenting
 set cursorline              " underline the current line, for quick orientation
 set diffopt+=algorithm:patience " use the patient algorithm for diffing
 set diffopt+=indent-heuristic   " use heuristics for intelligent diffing
-set directory=$HOME/.vim/files/swap// " keep swapfiles here
 set display+=lastline       " show as much as possible of the last line
 set encoding=utf-8 nobomb   " UTF-8 by default without BOM
 set expandtab               " expand tabs by default (overloadable per file type)
@@ -161,7 +166,6 @@ set termencoding=utf-8
 set title                   " change the terminal's title
 set ttyfast                 " always redraw on character change since we're on fast computers now
 set undofile                " try out undo files again for persistence across opens
-set undodir=$HOME/.vim/files/undo/ " but keep them in the vim folder instead in-folder
 set undolevels=1000         " use many mucho levels of undo
 set updatecount=100         " write swapfiles after 100 characters changed
 set virtualedit=block       " allow cursor to go in to 'invalid' places
