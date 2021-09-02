@@ -5,11 +5,6 @@
 " Must be first, because it changes other options as a side effect
 set nocompatible
 
-" When we're running in fish shell, use bash because fish is ... fishy
-if &shell =~# 'fish$'
-  set shell=/bin/bash
-endif
-
 " Set leader to ' '
 let mapleader = " "
 let g:mapleader = " "
