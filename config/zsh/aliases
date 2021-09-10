@@ -1,22 +1,45 @@
-# Unix
-alias ll="ls -al"
-alias ln="ln -v"
-alias mkdir="mkdir -p"
-alias e="$EDITOR"
-alias v="$VISUAL"
+# -*- mode: sh -*-
 
-# Bundler
+alias cd="nocorrect cd"
+alias chmod="chmod --preserve-root -v"
+alias chown="chown --preserve-root -v"
+alias cp="nocorrect cp -i"
+alias gcc="nocorrect gcc"
+alias ln="nocorrect ln -iv"
+alias man="nocorrect man"
+alias mkdir="nocorrect mkdir -ip"
+alias mv="nocorrect mv"
+alias rm="nocorrect rm -i"
+
+if (( ${+commands[ggrep]} )); then
+    alias grep='nocorrect ggrep --color=auto'
+else
+    alias grep='nocorrect grep --color=auto'
+fi
+
+if [[ "$(uname)" == 'Darwin' ]]; then
+    alias ls="${aliases[ls]:-ls}"
+else
+    alias ls="${aliases[ls]:-ls} --color=auto"
+    alias open="xdg-open"
+fi
+
+alias l="ls -1A"
+alias ll="ls -lh"
+alias lal="ls -alh"
+
+# Ruby
 alias b="bundle"
 alias be="bundle exec"
+alias rake="noglob rake"
 
-# Rails
-alias migrate="rake db:migrate db:rollback && rake db:migrate db:test:prepare"
-alias s="rspec"
+# Containers & Co.
+(( ${+commands[docker-compose]} )) && alias dcr="docker-compose run --rm"
+(( ${+commands[kubectl]} )) && alias kc="kubectl"
 
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
 
-# Include custom aliases
-[[ -f $ZDOTDIR/aliases.local ]] && source $ZDOTDIR/aliases.local
+[ -f $ZDOTDIR/aliases.local ] && source $ZDOTDIR/aliases.local
 
 # vim: filetype=zsh:foldmethod=marker
