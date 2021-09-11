@@ -3,7 +3,6 @@ stty -ixon
 
 # vi mode
 bindkey -v
-bindkey "^F" vi-cmd-mode
 
 # handy keybindings
 bindkey "^A" beginning-of-line
