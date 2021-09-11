@@ -5,6 +5,8 @@ stty -ixon
 bindkey -v
 
 # handy keybindings
+bindkey "^k" up-line-or-history
+bindkey "^j" down-line-or-history
 bindkey "^A" beginning-of-line
 bindkey "^E" end-of-line
 bindkey "^K" kill-line
