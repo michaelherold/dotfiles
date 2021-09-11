@@ -492,7 +492,16 @@ The automatic pairing for smartparens' =`= pair gets applied within Org mode whe
   (sp-local-pair 'org-mode "'" nil :actions :rem))
 #+end_src
 
-* Using Emacs to edit textboxes in the browser
+* Miscellaneous
+** Editing udev rules
+
+When editing ~udev~ rules, it's easy to make a syntax error since you're writing a long line of comma-delimited fields. Having an editing mode for that purpose helps to prevent mistakes. So let's install one:
+
+#+begin_src elisp :tangle packages.el
+(package! udev-mode)
+#+end_src
+
+** Using Emacs to edit textboxes in the browser
 
 #+begin_src elisp :tangle packages.el
 (package! atomic-chrome)
@@ -507,13 +516,13 @@ The automatic pairing for smartparens' =`= pair gets applied within Org mode whe
   (atomic-chrome-start-server))
 #+end_src
 
-* GraphQL
+** GraphQL
 
 #+begin_src elisp :tangle packages.el
 (package! graphql-mode)
 #+end_src
 
-* Wakatime
+** Wakatime
 
 I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here:
 
@@ -529,7 +538,7 @@ I like to track my time on different projects using the Wakatime service. To do 
     (global-wakatime-mode +1)))
 #+end_src
 
-*  Shadowenv
+**  Shadowenv
 
 #+begin_src elisp :tangle packages.el
 (package! shadowenv)
