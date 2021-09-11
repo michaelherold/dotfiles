@@ -539,3 +539,23 @@ I like to track my time on different projects using the Wakatime service. To do 
 (use-package! shadowenv
   :hook (after-init . shadowenv-global-mode))
 #+end_src
+
+** Meson
+
+#+begin_src elisp :tangle packages.el
+(package! meson-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package! meson-mode)
+#+end_src
+
+** Systemd
+
+#+begin_src elisp :tangle packages.el
+(package! systemd)
+#+end_src
+
+#+begin_src elisp
+(use-package! systemd)
+#+end_src
