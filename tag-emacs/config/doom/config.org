@@ -329,31 +329,6 @@ When showing tasks for the day, I want to make sure I'm including notes from my 
 (advice-add '+org-init-agenda-h :after #'+mjh-org-init-agenda-h)
 #+end_src
 
-Org mode's agenda is powerful, with myriad bells and whistles. To cut down on my setup costs, I am starting with a simple agenda configuration using the [[https://github.com/alphapapa/org-super-agenda][org-super-agenda package]].
-
-#+begin_src elisp :tangle packages.el
-(package! org-super-agenda)
-#+end_src
-
-#+begin_src elisp
-(use-package! org-super-agenda
-  :hook (org-load . org-super-agenda-mode)
-  :config
-  (setq org-super-agenda-groups
-        '((:log t)
-          (:habit t)
-          (:name "Standup" :tag "@standup")
-          (:name "Schedule" :time-grid t :todo ("TODO" "MEETING" "AGENDA"))
-          (:name "Overdue" :deadline past)
-          (:name "Waiting …" :todo "WAITING" :order 99))))
-#+end_src
-
-~org-super-agenda~ has a separate map for its header lines that I don't really understand the purpose of. It gets in the way of my Vim bindings, so I override it with a blank map here, based on a suggestion [[https://github.com/alphapapa/org-super-agenda/issues/50#issuecomment-446272744][from StackOverflow]]:
-
-#+begin_src elisp
-(setq org-super-agenda-header-map (make-sparse-keymap))
-#+end_src
-
 I find the weekly view of my agenda to be a little overwhelming, so I want to toggle between time spans easily. This allows me to do that:
 
 #+begin_src elisp
@@ -364,6 +339,22 @@ I find the weekly view of my agenda to be a little overwhelming, so I want to to
        "d" #'org-agenda-day-view
        "m" #'org-agenda-month-view
        "w" #'org-agenda-week-view))
+#+end_src
+
+When looking at the agenda, I like to see what I've worked on, so I enable ~org-agenda-start-with-log-mode~.
+
+#+begin_src elisp
+(setq org-agenda-start-with-log-mode t
+      org-agenda-custom-commands
+      `(("d" "Dashboard"
+         ((agenda "" ((org-deadline-warning-days 7)))
+          (tags-todo "+PRIORITY=\"A\"-SCHEDULED"
+                     ((org-agenda-overriding-header "High Priority")))
+          (tags-todo "-STYLE=\"habit\""
+                ((org-agenda-overriding-header "Unprocessed Inbox Tasks")
+                 (org-agenda-files '(,(concat org-directory "life.org")
+                                     ,(concat org-directory "work.org")))
+                 (org-agenda-text-search-extra-files nil)))))))
 #+end_src
 
 ** Capture
