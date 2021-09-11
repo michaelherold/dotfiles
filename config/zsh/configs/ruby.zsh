@@ -1,9 +1,11 @@
 #!/usr/bin/env zsh
 
-local dir
+local rootdir
 
-[[ -d /usr/share/chruby ]] && dir=/usr/share/chruby
-[[ -d /usr/local/share/chruby ]] && dir=/usr/local/share/chruby
+[ -d /usr/share/chruby ] && rootdir=/usr/share/chruby
+[ -d /usr/local/share/chruby ] && rootdir=/usr/local/share/chruby
 
-source "$dir/chruby.sh"
-[[ -z "$CHRUBY_DISABLE_AUTO" ]] && source "$dir/auto.sh"
+[ -z "$rootdir" ] && return
+
+source "$rootdir/chruby.sh"
+[ -z "$CHRUBY_DISABLE_AUTO" ] && source "$rootdir/auto.sh"
