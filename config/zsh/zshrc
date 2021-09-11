@@ -1,46 +1,29 @@
-# load custom executable functions
-for function in $ZDOTDIR/functions/*; do
-  source $function
-done
+# -*- mode: sh -*-
 
-# extra files in $ZDOTDIR/configs/pre , $ZDOTDIR/configs , and $ZDOTDIR/configs/post
-# these are loaded first, second, and third, respectively.
-_load_settings() {
-  _dir="$1"
-  if [ -d "$_dir" ]; then
-    if [ -d "$_dir/pre" ]; then
-      for config in "$_dir"/pre/**/*(N-.); do
-        . $config
-      done
-    fi
 
-    for config in "$_dir"/**/*(N-.); do
-      case "$config" in
-        "$_dir"/pre/*)
-          :
-          ;;
-        "$_dir"/post/*)
-          :
-          ;;
-        *)
-          if [ -f $config ]; then
-            . $config
-          fi
-          ;;
-      esac
-    done
+for fn in $ZDOTDIR/functions/*; do source $fn; done
 
-    if [ -d "$_dir/post" ]; then
-      for config in "$_dir"/post/**/*(N-.); do
-        . $config
-      done
-    fi
-  fi
+() {
+  local _dir="$ZDOTDIR/configs"
+
+  [ -d "$_dir" ] || return
+
+  for config in $_dir/pre/**/*(N-.); do source $config; done
+
+  for config in $_dir/**/*(N-.); do
+    case "$config" in
+      $_dir/pre/*|$_dir/post/*)
+        :
+        ;;
+      *)
+        [ -f $config ] && source $config
+        ;;
+    esac
+  done
+
+  for config in $_dir/post/**/*(N-.); do source $config; done
 }
-_load_settings "$ZDOTDIR/configs"
 
-# aliases
-[[ -f $ZDOTDIR/aliases ]] && source $ZDOTDIR/aliases
+[ -f $ZDOTDIR/aliases ] && source $ZDOTDIR/aliases
+[ -f $ZDOTDIR/zshrc.local ] && source $ZDOTDIR/zshrc.local
 
-# Local config
-[[ -f $ZDOTDIR/zshrc.local ]] && source $ZDOTDIR/zshrc.local
