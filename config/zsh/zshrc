@@ -1,5 +1,10 @@
 # -*- mode: sh -*-
 
+if [ -n "$ZSH_DEBUG" ]; then
+  PS4=$'\\\011%D{%s%6.}\011%x\011%I\011%N\011%e\011'
+  exec 3>&2 2>/tmp/zshstart.$$.log
+  setopt xtrace prompt_subst
+fi
 
 for fn in $ZDOTDIR/functions/*; do source $fn; done
 
@@ -27,3 +32,7 @@ for fn in $ZDOTDIR/functions/*; do source $fn; done
 [ -f $ZDOTDIR/aliases ] && source $ZDOTDIR/aliases
 [ -f $ZDOTDIR/zshrc.local ] && source $ZDOTDIR/zshrc.local
 
+if [ -n "$ZSH_DEBUG" ]; then
+  unsetopt xtrace
+  exec 2>&3 3>&-
+fi
