@@ -17,6 +17,9 @@
 ;; Must come before loading 'evil - since the doom! block loads it, it must be here
 (setq evil-respect-visual-line-mode t)
 
+(when noninteractive
+  (add-to-list 'doom-env-whitelist "^SSH_"))
+
 (doom! :completion
        (company +childframe)
        ivy
