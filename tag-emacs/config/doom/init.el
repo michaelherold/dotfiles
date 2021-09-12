@@ -22,7 +22,7 @@
 
 (doom! :completion
        (company +childframe)
-       ivy
+       vertico
 
        :ui
        doom
