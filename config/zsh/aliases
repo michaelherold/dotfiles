@@ -7,7 +7,7 @@ alias cp="nocorrect cp -i"
 alias gcc="nocorrect gcc"
 alias ln="nocorrect ln -iv"
 alias man="nocorrect man"
-alias mkdir="nocorrect mkdir -ip"
+alias mkdir="nocorrect mkdir -vp"
 alias mv="nocorrect mv"
 alias rm="nocorrect rm -i"
 
