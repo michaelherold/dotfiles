@@ -2,6 +2,7 @@
 
 [[ "$(uname)" == 'Linux' ]] && {
   fpath=(/usr/share/zsh/site-functions $fpath)
+  [ -f "/usr/share/fzf/completion.zsh" ] && source "/usr/share/fzf/completion.zsh"
 }
 
 fpath=($ZDOTDIR/completion $fpath)
