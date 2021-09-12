@@ -81,7 +81,7 @@
        (javascript +lsp)
        (kotlin +lsp)
        (markdown +grip)
-       (org +dragndrop +hugo +journal +noter +pretty +roam)
+       (org +dragndrop +hugo +jorunal +noter +pretty +roam2)
        php
        plantuml
        (python +lsp)
