@@ -5,6 +5,10 @@
   [ -f "/usr/share/fzf/completion.zsh" ] && source "/usr/share/fzf/completion.zsh"
 }
 
+[[ "$(uname)" == 'Darwin' && -f "/usr/local/opt/fzf/shell/completion.zsh" ]] && {
+  source "/usr/local/opt/fzf/shell/completion.zsh"
+}
+
 fpath=($ZDOTDIR/completion $fpath)
 
 autoload -U compinit || exit
