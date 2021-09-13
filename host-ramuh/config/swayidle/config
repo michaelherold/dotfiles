@@ -1,0 +1,6 @@
+after-resume 'swaymsg "output * dpms on"'
+before-sleep 'systemctl --user start swaylock'
+lock 'systemctl --user start swaylock'
+timeout 300 'systemctl --user start swaylock'
+timeout 600 'swaymsg "output * dpms off"'
+unlock 'swaymsg "output * dpms on"'

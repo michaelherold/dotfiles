@@ -1,0 +1,44 @@
+# -*- mode: i3wm-config; tab-width: 4; -*-
+
+set $mod Mod4
+
+set $left h
+set $down j
+set $up k
+set $right l
+
+set $black   "#282a36"
+set $red     "#ff5c57"
+set $green   "#5af78e"
+set $yellow  "#f3f99d"
+set $blue    "#57c7ff"
+set $magenta "#ff6ac1"
+set $cyan    "#9aedfe"
+set $white   "#f1f1f0"
+
+# Your preferred application launcher
+# Note: pass the final command to swaymsg so that the resulting window can be opened
+# on the original workspace that the command was run on.
+set $menu env rofi -show | xargs swaymsg exec --
+set $term alacritty
+
+bar {
+    swaybar_command waybar
+}
+
+focus_follows_mouse no
+
+include /etc/sway/config.d/*
+include 10-input
+include 20-output
+include 40-gui
+include 50-bindings
+include 80-apps
+
+exec swayidle -w \
+    timeout 300 'swaylock -f -c 000000' \
+    timeout 600 'swaymsg "output * dpms off"' \
+    resume 'swaymsg "output * dpms on"' \
+    before-sleep 'swaylock -f -c 000000'
+
+exec avizo-service

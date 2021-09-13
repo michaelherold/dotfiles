@@ -1,0 +1,45 @@
+# -*- mode: i3wm-config; tab-width: 4; -*-
+
+for_window [app_id="avizo-service"] {
+    border pixel 0
+    sticky toggle
+}
+
+for_window [app_id="avizo-service"] border pixel
+for_window [app_id="avizo-service"] sticky toggle
+
+no_focus [app_id="avizo-service"]
+
+for_window [app_id="gcr-prompter"] {
+    focus
+    sticky toggle
+}
+
+for_window [class="Firefox" window_role="browser"] {
+    border normal 0
+}
+
+for_window [class="Firefox" window_role="^(?!browser$)"] {
+    floating enable
+}
+
+for_window [app_id="firefox"] {
+    border normal 0
+    inhibit_idle fullscreen
+}
+
+for_window [app_id="firefox" title="^About Mozilla Firefox$"] {
+    border normal 1
+    floating enable
+}
+
+for_window [app_id="pinentry-qt"] {
+    move position center
+    floating enable
+}
+
+for_window [app_id="lutris"] floating enable
+for_window [class="Steam"] floating enable
+for_window [class="steam_app*"] inhibit_idle focus
+for_window [title="Stardew Valley"] inhibit_idle focus
+for_window [app_id="org.zealdocs.zeal"] floating enable

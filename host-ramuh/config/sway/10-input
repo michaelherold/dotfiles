@@ -1,0 +1,14 @@
+# -*- mode: i3wm-config; tab-width: 4; -*-
+
+input "1739:30383:DELL08AF:00_06CB:76AF_Touchpad" {
+    click_method clickfinger
+    dwt enabled
+    natural_scroll enabled
+    pointer_accel 0.75
+    tap enabled
+    tap_button_map lrm
+}
+
+input type:keyboard {
+    xkb_options caps:escape
+}

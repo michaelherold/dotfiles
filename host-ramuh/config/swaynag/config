@@ -1,0 +1,18 @@
+# See swaynag(5) for options
+
+edge=bottom
+font=Fira Sans Bold 10
+
+button-border-size=0
+button-gap=10
+button-padding=5
+
+button-dismiss-gap=20
+dismiss-button=✕
+
+[alert]
+background=FF5C57
+border=FF5C57
+button-background=D04642
+button-text=F1F1F0
+text=F1F1F0

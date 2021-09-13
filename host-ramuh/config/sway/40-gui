@@ -1,0 +1,9 @@
+# -*- mode: i3wm-config; tab-width: 4; -*-
+
+client.focused $green $green $black $magenta
+client.focused_inactive $black $black $white $magenta
+client.unfocused $black $black $white $magenta
+client.urgent $red $red $white $blue
+
+gaps inner 5
+smart_gaps off
