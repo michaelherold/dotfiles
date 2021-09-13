@@ -80,6 +80,7 @@
        json
        (javascript +lsp)
        (kotlin +lsp)
+       (lua +lsp)
        (markdown +grip)
        (org +dragndrop +hugo +jorunal +noter +pretty +roam2)
        php
