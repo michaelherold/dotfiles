@@ -5,6 +5,7 @@
 .idea
 .ignore
 .shadowenv.d/
+.venv/
 *.sublime-workspace
 *.sublime-project
 *~
