@@ -4,6 +4,7 @@
 .dir-locals.el
 .idea
 .ignore
+.shadowenv.d/
 *.sublime-workspace
 *.sublime-project
 *~
