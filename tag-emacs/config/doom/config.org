@@ -457,17 +457,8 @@ Also, bibliographic notes are an important accompanying artifact for a Zettelkas
 
 #+begin_src elisp
 (setq org-roam-capture-templates
-      '(("f" "Fleeting" plain (function org-roam-capture--get-point)
-         "%?"
-         :file-name "fleeting/%<%Y%m%d>---${slug}"
-         :head "#+title: ${title}\n#+roam_tags:\n\n* ${title}\n\n"
-         :unnarrowed t)
-
-        ("p" "Templates for permanent notes")
-        ("pb" "Permanent > Bibliographic" plain (function org-roam-capture--get-point)
-         "%?"
-         :file-name "bibliographies/%<%Y%m%d>---${slug}"
-         :head "#+title: ${title}\n#+roam_key:\n#+roam_tags:\n\n* ${title}\n\n"
+      '(("d" "Default" plain "%?" :if-new
+         (file+head "%<%Y%m%d>---${slug}.org" "#+title: ${title}\n\n")
          :unnarrowed t)))
 #+end_src
 
