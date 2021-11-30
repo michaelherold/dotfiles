@@ -3,4 +3,4 @@
 output * background /home/herold/.local/share/sway/wallpaper.jpg fill
 
 output eDP-1 scale 2
-xwayland scale 2
+xwayland scale 1
