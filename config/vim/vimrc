@@ -9,10 +9,15 @@ set nocompatible
 let mapleader = " "
 let g:mapleader = " "
 
+" Add XDG directories to runtimepath
+set runtimepath^=$XDG_CONFIG_HOME/vim
+set runtimepath+=$XDG_DATA_HOME/vim
+set runtimepath+=$XDG_CONFIG_HOME/vim/after
+
 " }}}
 " => Plugins {{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/plugged')
+call plug#begin($XDG_DATA_HOME . '/vim/plugged')
 
 " Colorschemes
 Plug 'connorholyday/vim-snazzy'
@@ -97,13 +102,13 @@ if has('nvim')
   set directory=$XDG_CACHE_HOME/neovim/swap | call mkdir(&directory, 'p')
   set undodir=$XDG_CACHE_HOME/neovim/undo | call mkdir(&undodir, 'p')
   set viminfo=%,'9999,s512,n$XDG_STATE_HOME/neovim/viminfo
-  call mkdir($XDG_STATE_HOME."/neovim", 'p')
+  call mkdir($XDG_STATE_HOME . '/neovim', 'p')
 else
   set backupdir=$XDG_CACHE_HOME/vim/backup | call mkdir(&backupdir, 'p')
   set directory=$XDG_CACHE_HOME/vim/swap | call mkdir(&directory, 'p')
   set undodir=$XDG_CACHE_HOME/vim/undo | call mkdir(&undodir, 'p')
   set viminfo=%,'9999,s512,n$XDG_STATE_HOME/vim/viminfo
-  call mkdir($XDG_STATE_HOME."/vim", 'p')
+  call mkdir($XDG_STATE_HOME . '/vim', 'p')
 endif
 
 set autoindent              " always set autoindenting on
@@ -489,7 +494,7 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     nnoremap <leader>N :NERDTreeFind<CR>
 
     " Store the bookmarks file
-    let NERDTreeBookmarksFile=expand("$HOME/.vim/NERDTreeBookmarks")
+    let NERDTreeBookmarksFile=expand($XDG_DATA_HOME . '/vim/NERDTreeBookmarks')
 
     " Show the bookmarks table on startup
     let NERDTreeShowBookmarks=1
@@ -544,7 +549,7 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
   augroup ultisnips_config
     autocmd!
 
-    let g:UltiSnipsSnippetDirectories='~/.vim/UltiSnips'
+    let g:UltiSnipsSnippetDirectories=$XDG_CONFIG_HOME . '/vim/UltiSnips'
     let g:UltiSnipsEditSplit='context'
 
   augroup END
@@ -736,7 +741,7 @@ autocmd BufReadPost *
   \ endif
 
 " Common abbreviations/misspellings
-source ~/.vim/autocorrect.vim
+source $XDG_CONFIG_HOME/vim/autocorrect.vim
 
 " Helper function for search
 function! PulseCursorLine()
