@@ -93,15 +93,17 @@ colorscheme snazzy
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has('nvim')
-  set backupdir=$XDG_CACHE_HOME/neovim/backup
-  set directory=$XDG_CACHE_HOME/neovim/swap
-  set undodir=$XDG_CACHE_HOME/neovim/undo
-  set viminfo=%,'9999,s512,n$XDG_CACHE_HOME/neovim/viminfo
+  set backupdir=$XDG_CACHE_HOME/neovim/backup | call mkdir(&backupdir, 'p')
+  set directory=$XDG_CACHE_HOME/neovim/swap | call mkdir(&directory, 'p')
+  set undodir=$XDG_CACHE_HOME/neovim/undo | call mkdir(&undodir, 'p')
+  set viminfo=%,'9999,s512,n$XDG_STATE_HOME/neovim/viminfo
+  call mkdir($XDG_STATE_HOME."/neovim", 'p')
 else
-  set backupdir=$XDG_CACHE_HOME/vim/backup
-  set directory=$XDG_CACHE_HOME/vim/swap
-  set undodir=$XDG_CACHE_HOME/vim/undo
-  set viminfo=%,'9999,s512,n$XDG_CACHE_HOME/vim/viminfo
+  set backupdir=$XDG_CACHE_HOME/vim/backup | call mkdir(&backupdir, 'p')
+  set directory=$XDG_CACHE_HOME/vim/swap | call mkdir(&directory, 'p')
+  set undodir=$XDG_CACHE_HOME/vim/undo | call mkdir(&undodir, 'p')
+  set viminfo=%,'9999,s512,n$XDG_STATE_HOME/vim/viminfo
+  call mkdir($XDG_STATE_HOME."/vim", 'p')
 endif
 
 set autoindent              " always set autoindenting on

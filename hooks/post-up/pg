@@ -1,0 +1,4 @@
+#!/bin/sh
+
+mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}"/pg
+mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}"/pg

@@ -13,7 +13,7 @@ fpath=($ZDOTDIR/completion $fpath)
 
 autoload -U compinit || exit
 
-compinit -C
+compinit -C -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
 
 # See zshcompsys(1) for the manual on these options
 
