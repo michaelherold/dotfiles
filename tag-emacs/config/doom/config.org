@@ -520,6 +520,16 @@ I like to track my time on different projects using the Wakatime service. To do 
     (global-wakatime-mode +1)))
 #+end_src
 
+** Cucumber
+
+#+begin_src elisp :tangle packages.el
+(package! feature-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package! feature-mode)
+#+end_src
+
 **  Shadowenv
 
 #+begin_src elisp :tangle packages.el
