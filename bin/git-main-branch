@@ -1,0 +1,22 @@
+#!/bin/bash
+# Detects and prints the main branch name for a Git repository
+
+set -euo pipefail
+
+if ! git rev-parse --git-dir &>/dev/null; then
+  echo "fatal: not a git repository (or any of the parent directories): .git"
+  exit 1
+fi
+
+branch=master
+
+set +e
+for ref in refs/{heads,remotes/{origin,upstream}}/main; do
+  if command git show-ref -q --verify $ref; then
+    branch="$(basename $ref)"
+    break
+  fi
+done
+set -e
+
+echo "$branch"

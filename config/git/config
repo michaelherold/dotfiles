@@ -5,7 +5,7 @@
   both = diff HEAD
   branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
   ci = commit -v
-  cleanup = "!git merged-to-master | xargs -n 1 git branch -d; git merged-remote | xargs -n 1 git branch -D"
+  cleanup = "!git merged-to-main | xargs -n 1 git branch -d; git merged-remote | xargs -n 1 git branch -D"
   co = checkout
   cpr = co-pr
   dp = diff --patience
@@ -13,11 +13,11 @@
   fm = find-migration
   lc = "diff HEAD^1..HEAD"
   lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
-  merged-to-master = !git branch --merged | grep -v '\\*\\|master'
+  merged-to-main = !git branch --merged | grep -v "'\\*\\|$(git main-branch)'"
   merged-remote = !git branch -vv | grep ': gone]' | awk '{ print $1 }'
   oss = !git config user.email "opensource@michaeljherold.com"
   pf = push --force-with-lease
-  rbm = rebase master --committer-date-is-author-date
+  rbm = !git rebase $(git main-branch) --committer-date-is-author-date
   st = status
   staged = diff --cached
   swap-origin = !git remote rename origin upstream && git remote rename michaelherold origin
