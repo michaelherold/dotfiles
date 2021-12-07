@@ -1,4 +1,5 @@
 *.enc
+*.rbi
 *.ri
 *.svg
 .git
