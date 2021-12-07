@@ -5,6 +5,7 @@
 export PURE_GIT_PULL=0
 export PURE_PROMPT_SYMBOL="↪"
 export PURE_PROMPT_VICMD_SYMBOL="↩️"
+export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 fpath=("$ZDOTDIR/functions/prompt" $fpath)
 
