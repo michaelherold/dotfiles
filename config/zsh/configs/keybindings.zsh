@@ -20,5 +20,13 @@ bindkey -v '^[[3~' delete-char
 bindkey -v '^[[H' beginning-of-line
 bindkey -v '^[[F' end-of-line
 
-[ -f "/usr/share/fzf/key-bindings.zsh" ] && source "/usr/share/fzf/key-bindings.zsh"
-[ -f "/usr/local/opt/fzf/shell/key-bindings.zsh" ] && source "/usr/local/opt/fzf/shell/key-bindings.zsh"
+case "$(uname)" in
+    Darwin)
+        [ -f "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh" ] && source "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
+        ;;
+    Linux)
+        [ -f "/usr/share/fzf/key-bindings.zsh" ] && source "/usr/share/fzf/key-bindings.zsh"
+        ;;
+    *)
+        ;;
+esac

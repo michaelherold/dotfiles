@@ -2,13 +2,23 @@
 
 [ "$TERM" = "dumb" ] && return
 
-[[ "$(uname)" == 'Darwin' ]] && DIRECTORY=/usr/local/opt/zsh-history-substring-search/share/zsh-history-substring-search
-[[ "$(uname)" == 'Linux' ]] && DIRECTORY=/usr/share/zsh/plugins/zsh-history-substring-search
+local directory=
 
-FILENAME=${DIRECTORY}/zsh-history-substring-search.zsh
+case "$(uname)" in
+    Darwin)
+        directory=${HOMEBREW_PREFIX}/opt/zsh-history-substring-search/share/zsh-history-substring-search
+        ;;
+    Linux)
+        directory=/usr/share/zsh/plugins/zsh-history-substring-search
+        ;;
+    *)
+        ;;
+esac
 
-[[ -f $FILENAME ]] && {
-  source $FILENAME
+local filename=${directory}/zsh-syntax-highlighting.zsh
+
+[[ -f $filename ]] && {
+  source $filename
 
   # Bind up and down arrow keys with a hard-coded value
   [[ "$(uname)" == 'Darwin' ]] && {
@@ -31,6 +41,3 @@ FILENAME=${DIRECTORY}/zsh-history-substring-search.zsh
   bindkey -M vicmd 'k' history-substring-search-up
   bindkey -M vicmd 'j' history-substring-search-down
 }
-
-unset DIRECTORY
-unset FILENAME

@@ -1,11 +1,18 @@
 #!/usr/bin/env zsh
 
-[[ "$(uname)" == 'Darwin' ]] && DIRECTORY=/usr/local/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting
-[[ "$(uname)" == 'Linux' ]] && DIRECTORY=/usr/share/zsh/plugins/zsh-syntax-highlighting
+local directory=
 
-FILENAME=${DIRECTORY}/zsh-syntax-highlighting.zsh
+case "$(uname)" in
+    Darwin)
+        directory=${HOMEBREW_PREFIX}/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting
+        ;;
+    Linux)
+        directory=/usr/share/zsh/plugins/zsh-syntax-highlighting
+        ;;
+    *)
+        exit
+esac
 
-[[ -f $FILENAME ]] && source $FILENAME
+local filename=${directory}/zsh-syntax-highlighting.zsh
 
-unset DIRECTORY
-unset FILENAME
+[[ -f $filename ]] && source $filename
