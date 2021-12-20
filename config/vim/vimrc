@@ -46,7 +46,7 @@ Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'w0rp/ale'
 
-if (!exists($NO_WAKATIME))
+if (empty($NO_WAKATIME))
   Plug 'wakatime/vim-wakatime'
 end
 
