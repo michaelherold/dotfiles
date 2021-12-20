@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ "$SPIN" ]; then
+    sudo apt-get install -yq \
+        bat \
+        fd-find \
+        fzy \
+        fzf \
+        ripgrep \
+        rcm
+
+    cp host-spin/rcrc ~/.rcrc
+
+    rcup -v
+
+    tic -x -o ~/.terminfo ~/.local/share/kitty/terminfo
+fi
