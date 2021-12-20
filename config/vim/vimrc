@@ -95,7 +95,10 @@ endif
 set background=dark
 syntax on  " switch syntax highlighting on for color term
 
-colorscheme snazzy
+try
+  colorscheme snazzy
+catch
+endtry
 
 " }}}
 " => Editing Behavior {{{
@@ -347,10 +350,12 @@ nnoremap <silent> <leader>gt :TestVisit<CR>
     let g:ale_sign_warning = '⚠'
 
     set updatetime=1000
-    autocmd CursorHold * call ale#Queue(0, 'lint_file')
-    autocmd CursorHoldI * call ale#Queue(0, 'lint_file')
-    autocmd InsertLeave * call ale#Queue(0, 'lint_file')
-    autocmd TextChanged * call ale#Queue(0, 'lint_file')
+    if exists('*ale#Queue')
+      autocmd CursorHold * call ale#Queue(0, 'lint_file')
+      autocmd CursorHoldI * call ale#Queue(0, 'lint_file')
+      autocmd InsertLeave * call ale#Queue(0, 'lint_file')
+      autocmd TextChanged * call ale#Queue(0, 'lint_file')
+    endif
   augroup END
 
   " }}}
