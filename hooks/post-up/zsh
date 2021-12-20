@@ -1,4 +1,7 @@
-#/bin/sh
+#!/bin/sh
 
 [ -f ~/.config/zsh/zshrc ] && mv ~/.config/zsh/zshrc ~/.config/zsh/.zshrc
 ln -sf ~/.config/zsh/zprofile ~/.config/zsh/.zprofile
+
+mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/zsh"
