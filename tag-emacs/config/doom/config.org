@@ -506,15 +506,15 @@ When editing ~udev~ rules, it's easy to make a syntax error since you're writing
 
 ** Wakatime
 
-I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here:
+I like to track my time on different projects using the Wakatime service. To do so, it's easiest to use its global mode, so I enable that here unless I'm on a work computer, where it isn't allowed:
 
 #+begin_src elisp :tangle packages.el
-(unless (string= (system-name) "michael-herold.local")
+(unless (getenv "NO_WAKATIME")
   (package! wakatime-mode))
 #+end_src
 
 #+begin_src elisp
-(unless (string= (system-name) "michael-herold.local")
+(unless (getenv "NO_WAKATIME")
   (use-package! wakatime-mode
     :config
     (global-wakatime-mode +1)))
