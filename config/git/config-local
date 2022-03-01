@@ -1,11 +1,12 @@
+# -*- mode: gitconfig; indent-tab-mode: t; tab-width: 4 -*-
+# vim: ft=gitconfig ts=4 sts=4 sw=4 noexpandtab
+
 [credential]
-  helper = cache --timeout=3600
+	helper = cache --timeout=3600
 
 [github]
-  user = michaelherold
+	user = michaelherold
 
 [user]
-  name = Michael Herold
-  email = opensource@michaeljherold.com
-
-# vim:filetype=gitconfig
+	name = Michael Herold
+	email = opensource@michaeljherold.com

@@ -1,116 +1,117 @@
+# -*- mode: gitconfig; indent-tab-mode: t; tab-width: 4 -*-
+# vim: ft=gitconfig ts=4 sts=4 sw=4 noexpandtab
+
 [alias]
-  aa = add --all
-  ap = add --patch
-  amend = commit --amend
-  both = diff HEAD
-  branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
-  ci = commit -v
-  cleanup = "!git merged-to-main | xargs -n 1 git branch -d; git merged-remote | xargs -n 1 git branch -D"
-  co = checkout
-  cpr = co-pr
-  dp = diff --patience
-  fm = find-migration
-  lc = "diff HEAD^1..HEAD"
-  lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
-  merged-to-main = !git branch --merged | grep -v "'\\*\\|$(git main-branch)'"
-  merged-remote = !git branch -vv | grep ': gone]' | awk '{ print $1 }'
-  oss = !git config user.email "opensource@michaeljherold.com"
-  pf = push --force-with-lease
-  rbm = !git rebase $(git main-branch) --committer-date-is-author-date
-  st = status
-  staged = diff --cached
-  swap-origin = !git remote rename origin upstream && git remote rename michaelherold origin
-  undo-commit = reset --soft HEAD^
-  unstaged = diff
+	aa = add --all
+	ap = add --patch
+	amend = commit --amend
+	both = diff HEAD
+	branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
+	ci = commit -v
+	cleanup = "!git merged-to-main | xargs -n 1 git branch -d; git merged-remote | xargs -n 1 git branch -D"
+	co = checkout
+	cpr = co-pr
+	dp = diff --patience
+	fm = find-migration
+	lc = "diff HEAD^1..HEAD"
+	lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+	merged-to-main = !git branch --merged | grep -v "'\\*\\|$(git main-branch)'"
+	merged-remote = !git branch -vv | grep ': gone]' | awk '{ print $1 }'
+	oss = !git config user.email "opensource@michaeljherold.com"
+	pf = push --force-with-lease
+	rbm = !git rebase $(git main-branch) --committer-date-is-author-date
+	st = status
+	staged = diff --cached
+	swap-origin = !git remote rename origin upstream && git remote rename michaelherold origin
+	undo-commit = reset --soft HEAD^
+	unstaged = diff
 
 [color]
-  ui = true
+	ui = true
 
 [color "branch"]
-  current = yellow reverse
-  local = yellow
-  remote = green
+	current = yellow reverse
+	local = yellow
+	remote = green
 
 [color "diff"]
-  frag = magenta bold
-  meta = yellow bold
-  new = green bold
-  old = red bold
+	frag = magenta bold
+	meta = yellow bold
+	new = green bold
+	old = red bold
 
 [commit]
-  gpgsign = true
-  template = ~/.config/git/message
-  verbose = true
+	gpgsign = true
+	template = ~/.config/git/message
+	verbose = true
 
 [core]
-  attributesfile = ~/.config/git/attributes
-  commitGraph = true
-  excludesfile = ~/.config/git/ignore
+	attributesfile = ~/.config/git/attributes
+	commitGraph = true
+	excludesfile = ~/.config/git/ignore
 
 [diff]
-  algorithm = histogram
-  colorMoved = zebra
+	algorithm = histogram
+	colorMoved = zebra
 
 [diff "orgmode"]
-  xfuncname = "^(\\*+.*)$"
+	xfuncname = "^(\\*+.*)$"
 
 [diff "rlang"]
-  xfuncname = "^([a-zA-z.]+ <- function.*)$"
+	xfuncname = "^([a-zA-z.]+ <- function.*)$"
 
 [diff "rspec"]
-  xfuncname = "^[ \t]*((RSpec|describe|context|it|before|after|around|feature|scenario|background)[ \t].*)$"
+	xfuncname = "^[ \t]*((RSpec|describe|context|it|before|after|around|feature|scenario|background)[ \t].*)$"
 
 [diff "texinfo"]
-  xfuncname = "^@node[ \t][ \t]*\\([^,][^,]*\\)"
+	xfuncname = "^@node[ \t][ \t]*\\([^,][^,]*\\)"
 
 [fetch]
-  prune = true
+	prune = true
 
 [gc]
-  writeCommitGraph = true
+	writeCommitGraph = true
 
 [help]
-  autocorrect = 1
+	autocorrect = 1
 
 [init]
-  templatedir = ~/.config/git/template
-  defaultBranch = main
+	templatedir = ~/.config/git/template
+	defaultBranch = main
 
 [protocol]
-  version = 2
+	version = 2
 
 [pull]
-  ff = only
+	ff = only
 
 [push]
-  default = current
+	default = current
 
 [rebase]
-  autosquash = true
+	autosquash = true
 
 # Rewrite github to SSH for aliases and when pushing
 [url "git@github.com:"]
-  insteadOf = "gh:"
-  insteadOf = "git://github.com"
-  pushInsteadOf = "github:"
-  pushInsteadOf = "git://github.com/"
-  pushInsteadOf = "https://github.com/"
+	insteadOf = "gh:"
+	insteadOf = "git://github.com"
+	pushInsteadOf = "github:"
+	pushInsteadOf = "git://github.com/"
+	pushInsteadOf = "https://github.com/"
 
 # Retwrite gists to SSH for aliases and when pushing
 [url "git@gist.github.com:"]
-  insteadOf = "gst:"
-  pushInsteadOf = "gist:"
-  pushInsteadOf = "git://gist.github.com/"
-  pushInsteadOf = "https://gist.github.com/"
+	insteadOf = "gst:"
+	pushInsteadOf = "gist:"
+	pushInsteadOf = "git://gist.github.com/"
+	pushInsteadOf = "https://gist.github.com/"
 
 # Make sure we're using SSH for any of my repos
 [url "git@github.com:michaelherold/"]
-  insteadOf = "git://github.com/michaelherold/"
+	insteadOf = "git://github.com/michaelherold/"
 
 [user]
-  signingkey = "E3974749"
+	signingkey = "E3974749"
 
 [include]
-  path = ~/.config/git/config-local
-
-# vim:filetype=gitconfig
+	path = ~/.config/git/config-local
