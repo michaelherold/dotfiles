@@ -34,6 +34,25 @@ elif (( ${+commands[rg]} )); then
     _fzf_compgen_path() {
         command rg --uu --glob '!.git' --files "${1}"
     }
+
+    _fzf_compgen_dir() {
+        command find -L "$1" \
+            -name .git -prune -o -name .hg -prune -o -name .svn -o -type d \
+            -a -not -ath "$1" -print 2>/dev/null | sed 's@^\./@@'
+    }
+else
+    _fzf_compgen_path() {
+        echo "$1"
+        command find -L "$1" \
+            -name .git -prune -o -name .hg -prune -o -name .svn -o \( -type d -o -type f -o -type l \) \
+            -a -not -path "$1" -print 2>/dev/null | sed 's@^\./@@'
+    }
+
+    _fzf_compgen_dir() {
+        command find -L "$1" \
+            -name .git -prune -o -name .hg -prune -o -name .svn -o -type d \
+            -a -not -ath "$1" -print 2>/dev/null | sed 's@^\./@@'
+    }
 fi
 
 if (( ${+commands[bat]} )); then
