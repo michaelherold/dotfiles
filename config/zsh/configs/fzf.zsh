@@ -8,11 +8,11 @@ if (( ${+commands[fd]} )); then
     export FZF_ALT_C_COMMAND="command fd --color always --hidden --exclude .git --type directory"
 
     _fzf_compgen_path() {
-        command fd --color always --hidden --exclude .git --type file "${1}"
+        command fd --color always --hidden --exclude .git --type file . "${1}"
     }
 
     _fzf_compgen_dir() {
-        command fd --color always --hidden --exclude .git --type directory "${1}"
+        command fd --color always --hidden --exclude .git --type directory . "${1}"
     }
 
     export FZF_DEFAULT_OPTS="--ansi ${FZF_DEFAULT_OPTS}"
@@ -21,11 +21,11 @@ elif (( ${+commands[fdfind]} )); then
     export FZF_ALT_C_COMMAND="command fdfind --color always --hidden --exclude .git --type directory"
 
     _fzf_compgen_path() {
-        command fdfind --color always --hidden --exclude .git --type file "${1}"
+        command fdfind --color always --hidden --exclude .git --type file . "${1}"
     }
 
     _fzf_compgen_dir() {
-        command fdfind --color always --hidden --exclude .git --type directory "${1}"
+        command fdfind --color always --hidden --exclude .git --type directory . "${1}"
     }
 
     export FZF_DEFAULT_OPTS="--ansi ${FZF_DEFAULT_OPTS}"
