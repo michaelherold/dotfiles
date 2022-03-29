@@ -20,13 +20,26 @@ bindkey -v '^[[3~' delete-char
 bindkey -v '^[[H' beginning-of-line
 bindkey -v '^[[F' end-of-line
 
-case "$(uname)" in
-    Darwin)
-        [ -f "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh" ] && source "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
-        ;;
-    Linux)
-        [ -f "/usr/share/fzf/key-bindings.zsh" ] && source "/usr/share/fzf/key-bindings.zsh"
-        ;;
-    *)
-        ;;
-esac
+(( ${+commands[fzf]} )) && {
+    # TAB - Complete with fzf when the cursor is on a FZF_COMPLETION_TRIGGER
+    zle -N fzf-completion-widget
+    bindkey '^I' fzf-completion-widget
+
+    # Ctrl-T - Paste the selected file path(s) into the command line
+    zle -N fzf-file-widget
+    bindkey -M emacs '^T' fzf-file-widget
+    bindkey -M vicmd '^T' fzf-file-widget
+    bindkey -M viins '^T' fzf-file-widget
+
+    # Alt-C - Change to the selected directory
+    zle -N fzf-cd-widget
+    bindkey -M emacs '\ec' fzf-cd-widget
+    bindkey -M vicmd '\ec' fzf-cd-widget
+    bindkey -M viins '\ec' fzf-cd-widget
+
+    # Ctrl-R - Paste the selected command from history into the command line
+    zle -N fzf-history-widget
+    bindkey -M emacs '^R' fzf-history-widget
+    bindkey -M vicmd '^R' fzf-history-widget
+    bindkey -M viins '^R' fzf-history-widget
+}
