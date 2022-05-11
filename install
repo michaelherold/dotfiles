@@ -14,4 +14,8 @@ if [ "$SPIN" ]; then
     rcup -v
 
     tic -x -o ~/.terminfo ~/.local/share/kitty/terminfo
+elif [[ $OSTYPE == darwin* ]]; then
+    mkdir -p "$HOME/Pictures/Screenshots"
+
+    defaults write com.apple.screencapture location $HOME/Pictures/Screenshots
 fi
