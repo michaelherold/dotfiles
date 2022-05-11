@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [ "$#" -lt 1 ]; then
+  git checkout
+  exit $?
+fi
+
+args=()
+
+while [ "$#" -gt 0 ]; do
+  arg="$1"
+
+  case $arg in
+    main|master)
+      args+=("$(git main-branch)")
+      ;;
+    *)
+      args+=("$arg")
+      ;;
+  esac
+
+  shift
+done
+
+
+git checkout "${args[@]-}"
