@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+if ! command grep 'TAGS.*work' ~/.rcrc >/dev/null; then
+  exit 0
+fi
+
+if [ -f ~/.config/git/template/hooks/pre-commit ]; then
+  command mkdir -p ~/.config/git/template/hooks/pre-commit.d
+  command mv ~/.config/git/template/hooks/pre-commit{,.d/10-exec-local}
+fi
