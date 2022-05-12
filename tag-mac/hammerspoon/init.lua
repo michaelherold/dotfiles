@@ -15,6 +15,35 @@ function reloadConfig(files)
   end
 end
 
+function halfTop()
+  local win = hs.window.focusedWindow()
+  local f = win:frame()
+  local screen = win:screen()
+  local max = screen:frame()
+
+  f.x = max.x
+  f.y = max.y
+  f.w = max.w
+  f.h = max.h / 2
+
+  win:setFrame(f)
+end
+
+
+function halfBottom()
+  local win = hs.window.focusedWindow()
+  local f = win:frame()
+  local screen = win:screen()
+  local max = screen:frame()
+
+  f.x = max.x
+  f.y = max.y + max.h / 2 + 5
+  f.w = max.w
+  f.h = max.h / 2
+
+  win:setFrame(f)
+end
+
 function halfLeft()
   local win = hs.window.focusedWindow()
   local f = win:frame()
@@ -57,6 +86,10 @@ function fullscreen()
   win:setFrame(f)
 end
 
+hs.hotkey.bind({"cmd", "ctrl"}, "k", halfTop)
+hs.hotkey.bind({"cmd", "ctrl"}, "Up", halfTop)
+hs.hotkey.bind({"cmd", "ctrl"}, "j", halfBottom)
+hs.hotkey.bind({"cmd", "ctrl"}, "Down", halfBottom)
 hs.hotkey.bind({"cmd", "ctrl"}, "h", halfLeft)
 hs.hotkey.bind({"cmd", "ctrl"}, "Left", halfLeft)
 hs.hotkey.bind({"cmd", "ctrl"}, "l", halfRight)
