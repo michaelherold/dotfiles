@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eo pipefail
+
 if [ "$SPIN" ]; then
     sudo apt-get install -yq \
         bat \
@@ -18,4 +20,52 @@ elif [[ $OSTYPE == darwin* ]]; then
     mkdir -p "$HOME/Pictures/Screenshots"
 
     defaults write com.apple.screencapture location $HOME/Pictures/Screenshots
+
+    if ! command -v brew >/dev/null; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+
+    brew tap d12frosted/emacs-plus
+    brew tap homebrew/cask-fonts
+
+    brew install \
+      bat \
+      chruby \
+      cmake \
+      coreutils \
+      fd \
+      fzf \
+      fzy \
+      gpg \
+      htop \
+      neovim \
+      pinentry-mac \
+      reattach-to-user-namespace \
+      rcm \
+      ripgrep \
+      ruby-install \
+      shadowenv \
+      tmux \
+      vim \
+      wakatime-cli \
+      zsh \
+      zsh-autosuggestions \
+      zsh-history-substring-search \
+      zsh-syntax-highlighting \
+
+    brew install emacs-plus@28 \
+      --with-no-frame-refocus \
+      --with-native-comp
+
+    brew install --cask \
+      1password \
+      alacritty \
+      alfred \
+      firefox \
+      font-fira-sans \
+      font-fira-code-nerd-font \
+      hammerspoon \
+      mos
+
+    rcup -v
 fi
