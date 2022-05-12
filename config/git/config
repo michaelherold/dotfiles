@@ -93,21 +93,14 @@
 # Rewrite github to SSH for aliases and when pushing
 [url "git@github.com:"]
 	insteadOf = "gh:"
+	insteadOf = "github:"
 	insteadOf = "git://github.com"
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-	pushInsteadOf = "https://github.com/"
+	insteadOf = "https://github.com/"
 
-# Retwrite gists to SSH for aliases and when pushing
+# Rewrite gists to SSH for aliases and when pushing
 [url "git@gist.github.com:"]
 	insteadOf = "gst:"
-	pushInsteadOf = "gist:"
-	pushInsteadOf = "git://gist.github.com/"
-	pushInsteadOf = "https://gist.github.com/"
-
-# Make sure we're using SSH for any of my repos
-[url "git@github.com:michaelherold/"]
-	insteadOf = "git://github.com/michaelherold/"
+	insteadOf = "gist:"
 
 [user]
 	signingkey = "E3974749"
