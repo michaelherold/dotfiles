@@ -46,11 +46,9 @@
 
 [core]
 	attributesfile = ~/.config/git/attributes
-	commitGraph = true
 	excludesfile = ~/.config/git/ignore
 
 [diff]
-	algorithm = histogram
 	colorMoved = zebra
 
 [diff "orgmode"]
@@ -68,18 +66,12 @@
 [fetch]
 	prune = true
 
-[gc]
-	writeCommitGraph = true
-
 [help]
 	autocorrect = 1
 
 [init]
 	templatedir = ~/.config/git/template
 	defaultBranch = main
-
-[protocol]
-	version = 2
 
 [pull]
 	ff = only

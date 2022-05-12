@@ -1,11 +1,23 @@
 # -*- mode: gitconfig; indent-tab-mode: t; tab-width: 4 -*-
 # vim: ft=gitconfig ts=4 sts=4 sw=4 noexpandtab
 
+[core]
+	commitGraph = true
+
 [credential]
 	helper = cache --timeout=3600
 
+[diff]
+	algorithm = histogram
+
+[gc]
+	writeCommitGraph = true
+
 [github]
 	user = michaelherold
+
+[protocol]
+	version = 2
 
 [user]
 	name = Michael Herold
