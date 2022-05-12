@@ -1,0 +1,6 @@
+COPY_ALWAYS="config/git/config-local config/git/template/**/* config/pg/pgsqlrc.local Library/LaunchAgents/* rcrc"
+DOTFILES_DIRS="~/code/dotfiles"
+EXCLUDES="install"
+SYMLINK_DIRS=""
+TAGS="emacs mac"
+UNDOTTED="bin Library"
