@@ -4,3 +4,16 @@
 [filter "ignoreExtraIncludes"]
 	clean = sed '/path = .*dev/d'
 	smudge = cat
+
+[github]
+	user = michaelherold
+
+[user]
+	name = Michael Herold
+	email = michael.herold@shopify.com
+
+[url "https://github.com/"]
+	insteadOf = "gh:"
+	insteadOf = "github:"
+	insteadOf = "git://github.com/"
+	insteadOf = "git@github.com:"
