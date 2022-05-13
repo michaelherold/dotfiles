@@ -49,6 +49,15 @@ At this time, I don't generally use my middle initial when I write my name, alth
       user-mail-address "michael@michaeljherold.com")
 #+end_src
 
+* Doom configuration
+
+I don't want all of Doom's data files to exist in my profile directory. As such, I set the appropriate variables to ensure the profile directory remains clean.
+
+#+begin_src elisp
+(setq doom-local-dir (concat (getenv-internal "XDG_DATA_HOME") "/doom/")
+      doom-cache-dir (concat (getenv-internal "XDG_CACHE_HOME") "/doom/"))
+#+end_src
+
 * Look and Feel
 
 There isn't much more personal to a computing professional than their text editor. You spend much of your time looking at it, so it behooves you to have it look in a way that is easy to read in all conditions and have a general aesthetic that aligns with yours. It's also a great way to share a little bit of personality with your coworkers when you're pairing!
