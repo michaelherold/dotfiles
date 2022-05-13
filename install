@@ -37,6 +37,7 @@ elif [[ $OSTYPE == darwin* ]]; then
       fzf \
       fzy \
       gpg \
+      graphviz \
       htop \
       neovim \
       pinentry-mac \
