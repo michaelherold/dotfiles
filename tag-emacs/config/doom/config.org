@@ -460,17 +460,6 @@ My Zettelkasten is, for now, set as below. It lives in a separate Git repository
 (setq org-roam-directory (concat org-directory "roam/"))
 #+end_src
 
-In an attempt to make my Roam database more like a Zettelkasten, I have Roam notes that I consider fleeting. These will be when I am working through writing a permanent note but don't have them to a point where I'm happy with them yet.
-
-Also, bibliographic notes are an important accompanying artifact for a Zettelkasten. These belong in the bibliographic section of my ~org-roam~ database. This idea was originally cribbed from [[https://takeonrules.com/2020/12/18/directory-structure-for-my-org-instance/][Jeremy Friesen's writings on his ~org-roam~ usage]].
-
-#+begin_src elisp
-(setq org-roam-capture-templates
-      '(("d" "Default" plain "%?" :if-new
-         (file+head "%<%Y%m%d>---${slug}.org" "#+title: ${title}\n\n")
-         :unnarrowed t)))
-#+end_src
-
 ** Smartparens
 
 Note: the configuration in this section is the biggest hammer I could think of. Smartparens loads its configuration lazily, causing changes to pairs for Org mode when Org loads for the first time. This causes any configuration that I do with ~after! org~ or even ~defer-until! (featurep smartparens-org)~ to be wiped out. I can't figure out a better way of doing this, but the changes fix things that were too annoying not to shim this in.
