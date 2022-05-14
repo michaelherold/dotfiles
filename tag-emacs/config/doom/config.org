@@ -460,6 +460,41 @@ My Zettelkasten is, for now, set as below. It lives in a separate Git repository
 (setq org-roam-directory (concat org-directory "roam/"))
 #+end_src
 
+The process of capturing notes in my Roam configuration is still a work in progress.
+
+#+begin_src elisp
+(setq org-roam-capture-templates
+      '(("d" "default" plain "%?" :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+         :unnarrowed t)
+        ("a" "Article" plain "%?" :target
+         (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :article:\n")
+        ("b" "Blog" plain "%?" :target
+         (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :blog:\n")
+         :unnarrowed t)
+        ("B" "Book" plain "%?" :target
+         (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :book:\n")
+         :unnarrowed t)
+        ("l" "Location" plain "%?" :target
+         (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :location:\n")
+         :unnarrowed t)
+        ("p" "Person" plain "%?" :target
+         (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :person:\n\n+ Title ::\n+ Company ::\n+ Phone numbers ::\n+ Location ::\n")
+         :unnarrowed t))))
+#+end_src
+
+#+begin_src elisp
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry "* %?" :target
+         (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n* [[id:9e332f95-ef6b-41f5-974c-154504d1b23d][Top of Mind]]\n"))))
+#+end_src
+
+#+begin_src elisp :tangle packages.el
+(package! org-roam-ui
+  :recipe (:host github :repo "org-roam/org-roam-ui")
+  :pin "05d7de409e92dbf3d6b8ef50da0b743c247b4eac")
+#+end_src
+
 ** Smartparens
 
 Note: the configuration in this section is the biggest hammer I could think of. Smartparens loads its configuration lazily, causing changes to pairs for Org mode when Org loads for the first time. This causes any configuration that I do with ~after! org~ or even ~defer-until! (featurep smartparens-org)~ to be wiped out. I can't figure out a better way of doing this, but the changes fix things that were too annoying not to shim this in.
