@@ -469,6 +469,7 @@ The process of capturing notes in my Roam configuration is still a work in progr
          :unnarrowed t)
         ("a" "Article" plain "%?" :target
          (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :article:\n")
+         :unnarrowed t)
         ("b" "Blog" plain "%?" :target
          (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :blog:\n")
          :unnarrowed t)
@@ -480,7 +481,7 @@ The process of capturing notes in my Roam configuration is still a work in progr
          :unnarrowed t)
         ("p" "Person" plain "%?" :target
          (file+head "%<%y%m%d%h%m%s>-${slug}.org" "#+title: ${title}\n#+filetags: :person:\n\n+ Title ::\n+ Company ::\n+ Phone numbers ::\n+ Location ::\n")
-         :unnarrowed t))))
+         :unnarrowed t)))
 #+end_src
 
 #+begin_src elisp
