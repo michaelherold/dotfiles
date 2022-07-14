@@ -1,0 +1,5 @@
+#compdef git_co
+
+_git_co() {
+  _git-checkout
+}
