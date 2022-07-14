@@ -82,13 +82,6 @@
 [rebase]
 	autosquash = true
 
-# Rewrite github to SSH for aliases and when pushing
-[url "git@github.com:"]
-	insteadOf = "gh:"
-	insteadOf = "github:"
-	insteadOf = "git://github.com"
-	insteadOf = "https://github.com/"
-
 # Rewrite gists to SSH for aliases and when pushing
 [url "git@gist.github.com:"]
 	insteadOf = "gst:"

@@ -19,6 +19,13 @@
 [protocol]
 	version = 2
 
+# Rewrite github to SSH for aliases and when pushing
+[url "git@github.com:"]
+	insteadOf = "gh:"
+	insteadOf = "github:"
+	insteadOf = "git://github.com"
+	insteadOf = "https://github.com/"
+
 [user]
 	name = Michael Herold
 	email = opensource@michaeljherold.com
