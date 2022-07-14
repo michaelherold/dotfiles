@@ -1,4 +1,5 @@
 #compdef git_co
+#description checkout branch or paths to working tree (with awareness of main branch name)
 
 _git_co() {
   _git-checkout
