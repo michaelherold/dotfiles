@@ -30,7 +30,6 @@ elif [[ $OSTYPE == darwin* ]]; then
 
     brew install \
       bat \
-      chruby \
       cmake \
       coreutils \
       fd \
