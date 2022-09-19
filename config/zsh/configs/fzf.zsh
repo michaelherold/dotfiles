@@ -358,6 +358,22 @@ __fzf_select_file() {
     return $ret
 }
 
+__fzf_select_git_branch() {
+    local branch cmd ret
+    setopt localoptions pipefail no_aliases 2>/dev/null
+
+    cmd="git for-each-ref --format='%(refname:short)' refs/{heads,remotes/**}"
+
+    eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS" $(__fzfcmd) -m "$@" | while read branch; do
+        echo -n "${(q)branch} "
+    done
+
+    ret=$?
+    echo
+
+    return $ret
+}
+
 # A widget for multi-selecting files
 fzf-file-widget() {
     LBUFFER="${LBUFFER}$(__fzf_select_file)"
@@ -409,6 +425,15 @@ fzf-history-widget() {
             zle vi-fetch-history -n $num
         fi
     fi
+
+    zle reset-prompt
+
+    return $ret
+}
+
+fzf-git-branch-widget() {
+    LBUFFER="${LBUFFER}$(__fzf_select_git_branch)"
+    local ret=$?
 
     zle reset-prompt
 

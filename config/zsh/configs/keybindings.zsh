@@ -42,4 +42,10 @@ bindkey -v '^[[F' end-of-line
     bindkey -M emacs '^R' fzf-history-widget
     bindkey -M vicmd '^R' fzf-history-widget
     bindkey -M viins '^R' fzf-history-widget
+
+    # Ctrl-G - Select a Git branch
+    zle -N fzf-git-branch-widget
+    bindkey -M emacs '^G' fzf-git-branch-widget
+    bindkey -M vicmd '^G' fzf-git-branch-widget
+    bindkey -M viins '^G' fzf-git-branch-widget
 }
