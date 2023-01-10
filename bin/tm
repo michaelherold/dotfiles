@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 
-[ -z "$TMUX" ] || exit 0
+if [ -n "$TMUX" ]; then
+  tmux choose-tree -s -O name
+  exit
+fi
 
 set -euf
 
