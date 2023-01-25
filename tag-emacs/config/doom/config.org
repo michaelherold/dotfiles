@@ -631,3 +631,10 @@ in the search."
       (:prefix-map ("s" . "search")
        :desc "Seach project for thing at point" "P" #'+vertico/search-project-for-symbol-at-point))
 #+end_src
+
+** Searching for things in the current file
+
+#+begin_src emacs-lisp
+(define-key global-map [remap isearch-backward] 'consult-line)
+(define-key global-map [remap isearch-forward] 'consult-line)
+#+end_src
