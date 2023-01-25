@@ -638,3 +638,25 @@ in the search."
 (define-key global-map [remap isearch-backward] 'consult-line)
 (define-key global-map [remap isearch-forward] 'consult-line)
 #+end_src
+
+** Add undo commit command to Magit
+
+One of my most-used Git aliases on the command line is ~git undo-commit~, which is an alias to ~git reset --soft HEAD^1~. I use it because I can never remember either the ~--soft~ or the ~HEAD^1~, at varying intervals. I miss this behavior in Magit and it often causes me to leave the editor to run it.
+
+To keep myself in Emacs, I modify the ~magit-reset~ transient to insert a new command called "undo commit." The syntax is inscrutable to here's a breakdown:
+
+1. ~'magit-reset~ the name of the transient to modify
+2. ~"i"~ the transient key /after which/ we will insert the command list
+3. ~'("u" "undo commit" mjh/magit-undo-commit)~ the command list made up of /key/, /label/, and /command/
+
+#+begin_src emacs-lisp
+(after! magit
+  (defun mjh/magit-undo-commit ()
+    "Undoes the current commit and leaves the changes staged."
+    (interactive)
+
+    (magit-reset-internal "--soft" "HEAD^1"))
+
+  (transient-append-suffix 'magit-reset "i"
+    '("u" "undo commit" mjh/magit-undo-commit)))
+#+end_src
