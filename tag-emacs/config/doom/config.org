@@ -232,6 +232,13 @@ I'd rather not see the emphasis markers and instead see just the change in face.
 (setq org-hide-emphasis-markers t)
 #+end_src
 
+However, I find it frustrating to edit emphasis markers when hiding them. By using ~org-appear~, I can see the markers when I enter into their blocks.
+
+#+begin_src elisp
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode))
+#+end_src
+
 I enjoy using ~org-habit~ to track my habits that I am trying to build. It is not enabled by default in Doom's configuration, so I do that here. I feel like there should be a cleaner way of doing this, but I haven't figured out how.
 
 My preferred theme does not stylize the habit tracker out-of-the-box, so I also define some faces here to match.
