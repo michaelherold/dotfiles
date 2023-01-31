@@ -494,7 +494,7 @@ The process of capturing notes in my Roam configuration is still a work in progr
 #+begin_src elisp
 (setq org-roam-dailies-capture-templates
       '(("d" "default" entry "* %?" :target
-         (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n* [[id:9e332f95-ef6b-41f5-974c-154504d1b23d][Top of Mind]]\n"))))
+         (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n* [[id:9e332f95-ef6b-41f5-974c-154504d1b23d][Top of Mind]]\n\n* Journal\n"))))
 #+end_src
 
 #+begin_src elisp :tangle packages.el
