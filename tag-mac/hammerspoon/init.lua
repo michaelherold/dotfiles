@@ -31,3 +31,6 @@ hs.spoons.use(
   "WindowManagement",
   {}
 )
+
+--- Utility bindings
+hs.hotkey.bind({"cmd", "ctrl"}, "c", hs.toggleConsole)
