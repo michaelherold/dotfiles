@@ -1,19 +1,20 @@
-function reloadConfig(files)
-  doReload = false
+hs.spoons.use(
+  "ReloadConfiguration",
+  {
+    config = {
+      watch_paths = {
+        dotHammerspoon = hs.configdir,
+        dotfilesTag = os.getenv("HOME") .. "/code/dotfiles/tag-mac/hammerspoon/"
+      }
+    },
+    hotkeys = {
+      reloadConfiguration = {{"cmd", "ctrl"}, "r"}
+    },
+    start = true,
+  }
+)
 
-  for _, file in pairs(files) do
-    if (file:sub(-4) == ".lua") then
-      hs.console.printStyledtext("yo")
-      hs.console.printStyledtext(file)
-      hs.console.printStyledtext("yo")
-      doReload = true
-    end
-  end
-
-  if doReload then
-    hs.reload()
-  end
-end
+hs.alert.show("Hammerspoon reloaded")
 
 function halfTop()
   local win = hs.window.focusedWindow()
@@ -95,7 +96,3 @@ hs.hotkey.bind({"cmd", "ctrl"}, "Left", halfLeft)
 hs.hotkey.bind({"cmd", "ctrl"}, "l", halfRight)
 hs.hotkey.bind({"cmd", "ctrl"}, "Right", halfRight)
 hs.hotkey.bind({"cmd", "ctrl"}, "f", fullscreen)
-
-configWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
-
-hs.alert.show("Hammerspoon reloaded")
