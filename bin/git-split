@@ -1,0 +1,20 @@
+#!/bin/bash
+# Splits a commit into a series of commits by file
+#
+# This is helpful when rebasing chains of commits to create a better story
+# prior to review. To use it during a rebase, consider using:
+#
+#     git rebase -i --exec git-split <branch>
+#
+# Extracted from [Stack Overflow](https://stackoverflow.com/a/44269268/37436).
+
+set -euo pipefail
+
+SHA=$(git rev-parse --short HEAD)
+
+git reset HEAD^
+
+git diff-tree --no-commit-id --name-only -r "$SHA" | while read -r file; do
+  git add "$file"
+  GIT_EDITOR="echo '0a\n$SHA $file\n\n.\nw' | ed -s" git commit -c "$SHA"
+done
