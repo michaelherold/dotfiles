@@ -17,6 +17,17 @@ hs.spoons.use(
 hs.alert.show("Hammerspoon reloaded")
 
 hs.spoons.use(
+  "AudioDeviceManagement",
+  {
+    config = {
+      device_names = { "MacBook Pro Speakers", "ATR USB microphone" },
+    },
+    hotkeys = { switchAudioDevice = {{}, "f19"} },
+    start = true,
+  }
+)
+
+hs.spoons.use(
   "WindowManagement",
   {}
 )
