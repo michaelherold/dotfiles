@@ -1,0 +1,6 @@
+COPY_ALWAYS="config/environment.d/* config/git/config-local config/git/template/**/* config/pg/pgsqlrc.local rcrc"
+DOTFILES_DIRS="$HOME/src/github.com/michaelherold/dotfiles"
+EXCLUDES="install"
+SYMLINK_DIRS=""
+TAGS="arch emacs linux"
+UNDOTTED="bin"
