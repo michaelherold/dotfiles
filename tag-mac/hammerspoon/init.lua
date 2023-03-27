@@ -8,7 +8,7 @@ hs.spoons.use(
       }
     },
     hotkeys = {
-      reloadConfiguration = {{"cmd", "ctrl"}, "r"}
+      reloadConfiguration = {{"cmd", "ctrl"}, "c"}
     },
     start = true,
   }
@@ -33,4 +33,4 @@ hs.spoons.use(
 )
 
 --- Utility bindings
-hs.hotkey.bind({"cmd", "ctrl"}, "c", hs.toggleConsole)
+hs.hotkey.bind({"cmd", "ctrl"}, "z", hs.toggleConsole)
