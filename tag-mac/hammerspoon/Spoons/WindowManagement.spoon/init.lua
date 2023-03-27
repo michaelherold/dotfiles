@@ -14,6 +14,19 @@ obj.author = "Michael Herold <opensource@michaeljherold.com"
 obj.homepage = "https://github.com/michaelherold/dotfiles/tag-mac/hammerspoon/Spoons"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
+function makeMap(name, mods, key)
+  local map = hs.hotkey.modal.new(mods, key)
+
+  function map:entered() hs.alert("Entered " .. name .. " mode") end
+  function map:exited() hs.alert("Exited " .. name .. " mode") end
+
+  map:bind("",       "escape", function () map:exit() end)
+  map:bind({"ctrl"}, "g",      function () map:exit() end)
+  map:bind(mods,     key,      function () map:exit() end)
+
+  return map
+end
+
 -- Disable window animations
 hs.window.animationDuration = 0
 
@@ -41,24 +54,26 @@ hs.hotkey.bind({"cmd", "ctrl"}, "up",    function () resizeToUnit(units.top50) e
 hs.hotkey.bind({"cmd", "ctrl"}, "right", function () resizeToUnit(units.right50) end)
 
 -- Grow or shrink windows by a quarter of the screen
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "h",     function () changeByUnit(units.quarter, "W") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "j",     function () changeByUnit(units.quarter, "S") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "k",     function () changeByUnit(units.quarter, "N") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "l",     function () changeByUnit(units.quarter, "E") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "left",  function () changeByUnit(units.quarter, "W") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "down",  function () changeByUnit(units.quarter, "S") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "up",    function () changeByUnit(units.quarter, "N") end)
-hs.hotkey.bind({"cmd", "ctrl", "shift"}, "right", function () changeByUnit(units.quarter, "E") end)
+obj.resizeMap = makeMap("resize", {"cmd", "ctrl"}, "r")
+obj.resizeMap:bind("", "h",     function () changeByUnit(units.quarter, "W") end)
+obj.resizeMap:bind("", "j",     function () changeByUnit(units.quarter, "S") end)
+obj.resizeMap:bind("", "k",     function () changeByUnit(units.quarter, "N") end)
+obj.resizeMap:bind("", "l",     function () changeByUnit(units.quarter, "E") end)
+obj.resizeMap:bind("", "left",  function () changeByUnit(units.quarter, "W") end)
+obj.resizeMap:bind("", "down",  function () changeByUnit(units.quarter, "S") end)
+obj.resizeMap:bind("", "up",    function () changeByUnit(units.quarter, "N") end)
+obj.resizeMap:bind("", "right", function () changeByUnit(units.quarter, "E") end)
 
 -- Move windows by a quarter of the screen
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "h",     function () moveFocusedByUnit(units.quarter, "W") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "j",     function () moveFocusedByUnit(units.quarter, "S") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "k",     function () moveFocusedByUnit(units.quarter, "N") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "l",     function () moveFocusedByUnit(units.quarter, "E") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "left",  function () moveFocusedByUnit(units.quarter, "W") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "down",  function () moveFocusedByUnit(units.quarter, "S") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "up",    function () moveFocusedByUnit(units.quarter, "N") end)
-hs.hotkey.bind({"cmd", "ctrl", "option"}, "right", function () moveFocusedByUnit(units.quarter, "E") end)
+obj.moveMap = makeMap("movement", {"cmd", "ctrl"}, "m")
+obj.moveMap:bind("", "h",     function () moveFocusedByUnit(units.quarter, "W") end)
+obj.moveMap:bind("", "j",     function () moveFocusedByUnit(units.quarter, "S") end)
+obj.moveMap:bind("", "k",     function () moveFocusedByUnit(units.quarter, "N") end)
+obj.moveMap:bind("", "l",     function () moveFocusedByUnit(units.quarter, "E") end)
+obj.moveMap:bind("", "left",  function () moveFocusedByUnit(units.quarter, "W") end)
+obj.moveMap:bind("", "down",  function () moveFocusedByUnit(units.quarter, "S") end)
+obj.moveMap:bind("", "up",    function () moveFocusedByUnit(units.quarter, "N") end)
+obj.moveMap:bind("", "right", function () moveFocusedByUnit(units.quarter, "E") end)
 
 --- Change a frame by a particular unit rectangle.
 -- Growth happens to the east and south.
