@@ -48,10 +48,7 @@ elif [[ $OSTYPE == darwin* ]]; then
       tmux \
       vim \
       wakatime-cli \
-      zsh \
-      zsh-autosuggestions \
-      zsh-history-substring-search \
-      zsh-syntax-highlighting \
+      zsh
 
     brew install emacs-plus@28 \
       --with-no-frame-refocus \
