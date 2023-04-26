@@ -28,9 +28,30 @@ hs.spoons.use(
 )
 
 hs.spoons.use(
+  "DarkMode",
+  {
+    config = {
+      handlers = {
+        function(mode)
+          local theme
+
+          if mode == "light" then theme = "Solarized Light"
+          else theme = "Snazzy"
+          end
+
+          hs.execute("kitty +kitten themes --reload-in=all '" .. theme .. "'", true)
+        end,
+      },
+    },
+    hotkeys = { toggle = {{}, "f18"}  },
+    start = true,
+  }
+)
+
+hs.spoons.use(
   "WindowManagement",
   {}
 )
 
 --- Utility bindings
-hs.hotkey.bind({"cmd", "ctrl"}, "z", hs.toggleConsole)
+-- hs.hotkey.bind({"cmd", "ctrl"}, "z", hs.toggleConsole)
