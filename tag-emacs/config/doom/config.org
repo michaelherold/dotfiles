@@ -660,3 +660,18 @@ To keep myself in Emacs, I modify the ~magit-reset~ transient to insert a new co
   (transient-append-suffix 'magit-reset "i"
     '("u" "undo commit" mjh/magit-undo-commit)))
 #+end_src
+
+** Dark mode
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! auto-dark :pin "a8cef72b679828eceebe00ab82b879c5d2df54fe")
+#+end_src
+
+#+begin_src elisp
+(use-package! auto-dark
+  :init
+  (setq auto-dark-dark-theme 'apropospriate-dark
+        auto-dark-light-theme 'apropospriate-light)
+  :config
+  (auto-dark-mode +1))
+#+end_src
