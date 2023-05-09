@@ -41,6 +41,9 @@ hs.spoons.use(
 
           hs.execute("kitty +kitten themes --reload-in=all '" .. theme .. "'", true)
         end,
+        function(mode)
+          hs.execute("tmux source-file ~/.config/tmux/" .. mode .. ".conf", true)
+        end,
       },
     },
     hotkeys = { toggle = {{}, "f18"}  },
