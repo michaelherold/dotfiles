@@ -11,6 +11,7 @@
 	cleanup = "!git merged-to-main | xargs -n 1 git branch -d; git merged-remote | xargs -n 1 git branch -D"
 	cpr = co-pr
 	dp = diff --patience
+	extend = commit --amend --no-edit
 	fm = find-migration
 	lc = "diff HEAD^1..HEAD"
 	lg = log --graph --pretty=format:'%Cred%h%Creset %Cblue<%ae>%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
