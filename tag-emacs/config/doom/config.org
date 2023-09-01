@@ -657,6 +657,14 @@ To keep myself in Emacs, I modify the ~magit-reset~ transient to insert a new co
 
     (magit-reset-internal "--soft" "HEAD^1"))
 
+  (defun mjh/magit-wip-commit ()
+    "Commits a work-in-progress commit to HEAD."
+    (interactive)
+
+    (magit-run-git-async "commit" "-m" "WIP"))
+
+  (transient-append-suffix 'magit-commit "S"
+    '("W" "WIP commit" mjh/magit-wip-commit))
   (transient-append-suffix 'magit-reset "i"
     '("u" "undo commit" mjh/magit-undo-commit)))
 #+end_src
