@@ -669,6 +669,47 @@ To keep myself in Emacs, I modify the ~magit-reset~ transient to insert a new co
     '("u" "undo commit" mjh/magit-undo-commit)))
 #+end_src
 
+** Adding a branch cleanup command to Magit
+
+Another Git command that I use often is ~git cleanup~, which is a command that cleans up both local branches that the team has subsequently merged into the main branch and remote branches that someone deleted from the upstream.
+
+To keep myself in Emacs, I modify the ~magit-branch~ transient to insert a new command called "clean up." When in the Magit dashboard, I can press ~b #~ to clean up branches that I no longer need.
+
+#+begin_src emacs-lisp
+(after! magit
+  (defun mjh/magit-list-merged-to-main ()
+    "Lists the local refs that were previously merged to the main branch."
+    (let* ((main-branch (magit-main-branch))
+           (refs (magit-git-lines "for-each-ref"
+                                  "--format=%(refname:short)"
+                                  (concat "--merged=" main-branch)
+                                  "refs/heads")))
+      (seq-remove (lambda (ref) (string-equal ref main-branch)) refs)))
+
+  (defun mjh/magit-list-deleted-remotes ()
+    "Lists the local refs whose upstream branches are gone."
+    (let ((refs (magit-git-lines "for-each-ref"
+                                 "--format=%(refname:short):%(upstream:track,nobracket)"
+                                 "refs/heads")))
+      (-keep (lambda (branch-and-tracking)
+               (when (string-match "\\(.*\\):gone" branch-and-tracking)
+                 (match-string 1 branch-and-tracking)))
+             refs)))
+
+  (defun mjh/magit-cleanup ()
+    "Cleans up local branches merged into the main branch."
+    (interactive)
+
+    (let ((branches (mjh/magit-list-merged-to-main)))
+      (when branches (magit-branch-delete branches)))
+
+    (let ((branches (mjh/magit-list-deleted-remotes)))
+      (when branches (magit-branch-delete branches t))))
+
+  (transient-append-suffix 'magit-branch "x"
+    '("#" "clean up" mjh/magit-cleanup)))
+#+end_src
+
 ** Dark mode
 
 #+begin_src emacs-lisp :tangle packages.el
