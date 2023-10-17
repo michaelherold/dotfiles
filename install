@@ -20,6 +20,7 @@ elif [[ $OSTYPE == darwin* ]]; then
     mkdir -p "$HOME/Pictures/Screenshots"
 
     defaults write com.apple.screencapture location $HOME/Pictures/Screenshots
+    defaults write -g AppleFontSmoothing -int 0
 
     if ! command -v brew >/dev/null; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

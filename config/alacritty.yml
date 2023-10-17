@@ -15,7 +15,6 @@ font:
   normal:
     family: FiraCode Nerd Font
   size: 16.0
-  use_thin_strokes: true
 
 debug:
   render_timer: false
