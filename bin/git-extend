@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-GIT_COMMITER_DATE="$(git log --no-walk --format="%cD")" git commit --amend --no-edit
+GIT_COMMITER_DATE="$(git log --no-walk --format="%cD")" git commit --amend --no-edit "$@"
