@@ -20,7 +20,7 @@ hs.spoons.use(
   "AudioDeviceManagement",
   {
     config = {
-      device_names = { "MacBook Pro Speakers", "ATR USB microphone" },
+      deviceNames = { "MacBook Pro Speakers", "ATR USB microphone" },
     },
     hotkeys = { switchAudioDevice = {{}, "f19"} },
     start = true,

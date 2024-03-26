@@ -6,28 +6,31 @@
 ---
 --- Note: This works well enough for my purposes right now but I wouldn't recommend use by anyone else!
 
+local log = require("hs.logger").new("audio", "info")
 local obj = {}
 obj.__index = obj
 
 -- Metadata
 obj.name = "AudioDeviceManagement"
-obj.version = "1.0"
+obj.version = "1.1"
 obj.author = "Michael Herold <opensource@michaeljherold.com"
 obj.homepage = "https://github.com/michaelherold/dotfiles/tag-mac/hammerspoon/Spoons"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
-obj.device_names = {}
+obj.deviceNames = {}
+obj.getLogLevel = log.getLogLevel
+obj.setLogLevel = log.setLogLevel
 
 function obj:start()
   self.devices = {}
 
-  for idx, device_name in pairs(self.device_names) do
-    local device = hs.audiodevice.findOutputByName(device_name)
+  for idx, deviceName in pairs(self.deviceNames) do
+    local device = hs.audiodevice.findOutputByName(deviceName)
 
     if device ~= nil then
-      self.devices[idx] = device_name
+      self.devices[idx] = deviceName
     else
-      print("  Warning: could not find device " .. device_name .. ", skipping")
+      log.wf("could not find device %s, skipping", deviceName)
     end
   end
 
@@ -39,28 +42,35 @@ end
 --- Binds hotkeys for AudioDeviceManagement
 ---
 --- Parameters:
----  * mapping - A table containing hotkey modifier/key details for the following items:
+---   * mapping - A table containing hotkey modifier/key details for the following items:
 ---   * switchAudioDevice - This will switch the audio device to the opposing one
 function obj:bindHotkeys(mapping)
   local def = { switchAudioDevice = hs.fnutils.partial(switchAudioDevice, self) }
   hs.spoons.bindHotkeysToSpec(def, mapping)
 end
 
---- Switches audio output device between the MacBook Pro speakers and my microphone feed
+--- Toggles the next audio device in the list after the current device as the default
 function switchAudioDevice()
   if not next(obj.devices) then return end
 
   local needsHandling = false
+  local defaultDevice = hs.audiodevice.defaultOutputDevice()
+  local defaultDeviceName = nil
 
-  for _, device_name in pairs(obj.devices) do
-    device = hs.audiodevice.findOutputByName(device_name)
+  if defaultDevice ~= nil then
+    defaultDeviceName = defaultDevice:name()
+  end
+
+  -- Iterate through until we find the current default device, then enabling the
+  -- toggle behavior for the next device
+  for idx, deviceName in pairs(obj.devices) do
+    device = hs.audiodevice.findOutputByName(deviceName)
 
     if device and needsHandling then
-      device:setDefaultOutputDevice()
-      hs.alert.show("Output: " .. device:name())
+      toggleDeviceAsDefault(device)
       needsHandling = false
       break
-    elseif device and device:inUse() then
+    elseif device and deviceName == defaultDeviceName then
       needsHandling = true
     end
   end
@@ -68,8 +78,21 @@ function switchAudioDevice()
   -- Toggling back to the first output in the list
   if needsHandling then
     device = hs.audiodevice.findOutputByName(obj.devices[1])
+
+    toggleDeviceAsDefault(device)
+  end
+end
+
+--- Toggles a device as the default output and shows an alert, when present
+---
+--- Parameters:
+---   * device - device or nil
+function toggleDeviceAsDefault(device)
+  if device ~= nil then
     device:setDefaultOutputDevice()
     hs.alert.show("Output: " .. device:name())
+  else
+    log.wf("No device to toggle")
   end
 end
 
