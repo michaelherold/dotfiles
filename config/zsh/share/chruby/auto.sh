@@ -1,3 +1,5 @@
+[ -n "$CHRUBY_DISABLE_AUTO" ] && return
+
 unset RUBY_AUTO_VERSION
 
 function chruby_auto() {
@@ -15,7 +17,7 @@ function chruby_auto() {
 				chruby "$version"
 				return $?
 			fi
-        elif version=$(grep ruby "$dir/.tool-versions" 2>/dev/null) || [[ -n "$version" ]]; then
+		elif version=$(grep ruby "$dir/.tool-versions" 2>/dev/null) || [[ -n "$version" ]]; then
 			version="${version%%[[:space:]]}"
 
 			if [[ "$version" == "$RUBY_AUTO_VERSION" ]]; then return
