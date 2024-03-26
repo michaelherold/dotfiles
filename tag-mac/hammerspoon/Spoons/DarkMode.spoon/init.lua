@@ -63,7 +63,7 @@ function obj:start()
 	self.currentMode = obj:getCurrentMode()
 	self.watcher = hs.distributednotifications.new(
 		function(name, object, userInfo)
-		local currentMode = obj:getCurrentMode()
+			local currentMode = obj:getCurrentMode()
 
 			if currentMode ~= self.currentMode then
 				self.currentMode = currentMode
