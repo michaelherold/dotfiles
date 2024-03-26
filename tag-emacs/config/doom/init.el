@@ -86,7 +86,7 @@
        php
        plantuml
        (python +lsp)
-       (ruby +chruby +rails)
+       (ruby +chruby +lsp +rails)
        (rust +lsp)
        sh
        web

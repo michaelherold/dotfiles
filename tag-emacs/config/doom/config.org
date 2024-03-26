@@ -724,3 +724,9 @@ To keep myself in Emacs, I modify the ~magit-branch~ transient to insert a new c
   :config
   (auto-dark-mode +1))
 #+end_src
+
+** Ruby
+
+#+begin_src emacs-lisp
+(setq lsp-sorbet-use-bundler t)
+#+end_src
