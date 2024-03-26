@@ -1,0 +1,178 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# -*- mode: ruby -*-
+#
+# Sets up a Git hook that allows for automated Co-authored-by trailers when pairing
+#
+# Note that this does _not_ apply when rebasing or merging because those typed of
+# work don't tend to be work that you're actively doing unless the original commit
+# was part of what you were originally pairing on
+
+require "erb"
+require "fileutils"
+require "open3"
+require "optparse"
+require "pathname"
+
+module Colors
+  extend self
+
+  def green(message)
+    return message if ENV["NO_COLOR"]
+
+    "\e[32m#{message}\e[0m"
+  end
+
+  def yellow(message)
+    return message if ENV["NO_COLOR"]
+
+    "\e[33m#{message}\e[0m"
+  end
+end
+
+module Git
+  def self.cmd(*args)
+    result, status = Open3.capture2("git", *args)
+
+    if status.success?
+      result
+    else
+      exit 1
+    end
+  end
+end
+
+class Hook
+  include Colors
+
+  MARKER = /Added by git-pair/.freeze
+
+  def self.resolve(root, type:)
+    root = Pathname.new(root)
+    hooks_dir = root.join(".git/hooks")
+
+    if (resolved = hooks_dir.join("#{type}.d")) && Dir.exist?(resolved)
+      Hook.new(resolved, path: "010-co-author")
+    else
+      FileHook.new(hooks_dir, path: type)
+    end
+  end
+
+  def initialize(root, path:)
+    @root = root
+    @path = root.join(path)
+  end
+
+  attr_reader :root
+  attr_reader :path
+
+  def owned?
+    !File.exist?(path) || File.readlines(path).any? { |line| MARKER.match?(line) }
+  end
+
+  def remove
+    return false unless owned?
+
+    File.delete(path)
+    true
+  end
+
+  def write(script)
+    FileUtils.mkdir_p(root)
+    File.open(path, "w") { |f| f.write(script) }
+    FileUtils.chmod(0o755, path)
+    true
+  end
+end
+
+class FileHook < Hook
+  def write(script)
+    return super if owned?
+
+    puts <<~ERROR
+      You have a Git hook installed at #{yellow(path.relative_path_from(Dir.pwd))} that wasn't
+      installed by git-pair. Please remove the existing hook or move it into a
+      prepare-commit-msg.d directory that prepare-commit-msg iterates through.
+    ERROR
+
+    false
+  end
+end
+
+def generate_script(authors)
+  script_vars = TOPLEVEL_BINDING.dup
+  script_vars.local_variable_set(
+    :lines,
+    authors.map do |author|
+      %{git interpret-trailers --in-place --if-exists addIfDifferent --trailer "Co-authored-by: #{author}" "$1"}
+    end
+  )
+
+  ERB.new(<<~BASH, trim_mode: "-").result(script_vars)
+    #!/bin/bash
+    # Added by git-pair -- do not modify or remove this line
+
+    set -euo pipefail
+
+    <% lines.each do |line| -%>
+    <%= line %>
+    <% end -%>
+  BASH
+end
+
+root = Git.cmd("rev-parse", "--show-toplevel").then(&:chomp)
+hook = Hook.resolve(root, type: "prepare-commit-msg")
+
+parser = OptionParser.new do |opts|
+  opts.banner = "usage: git-pair [--stop] <authors>"
+  opts.set_program_name "git-pair"
+  opts.set_summary_indent "  "
+
+  opts.on("-h", "--help", "Prints this help") do
+    puts opts.help
+    exit 1
+  end
+
+  opts.on("--stop", "Removes the prepare-commit-msg hook to stop pairing") do
+    hook.remove
+    puts "No longer pairing"
+    exit 0
+  end
+
+  opts.define_singleton_method(:help) do
+    summarize([<<~MSG])
+      #{banner}
+
+      Arguments
+        authors                          A search term to use when finding your pair, e.g.
+                                         bilbo, bilbo.baggins@bagend.com, or "Bilbo Baggins".
+                                         See `man 1 git-log', the `--author' section for more
+                                         information.
+
+                                         Multiple terms add multiple co-authors so use quotes
+                                         when you want a complex term.
+
+      Options
+    MSG
+  end
+end
+
+search_terms = parser.parse!
+
+if search_terms.empty?
+  puts parser.help
+  exit 1
+end
+
+authors =
+  search_terms
+    .map { |term| Git.cmd("log", "-1", "-i", "--author=#{term}", "--pretty=format:%aN <%aE>") }
+    .tap(&:flatten!)
+
+script = generate_script(authors)
+
+if hook.write(script)
+  puts "Configured for pairing with #{authors.map { |author| Colors.green(author) }.join(", ")}."
+else
+  exit 1
+end
