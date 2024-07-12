@@ -101,7 +101,7 @@ while :; do
   else
     [ -z "$session_name" ] && session_name="$(basename "$PWD")"
 
-    if echo "$sessions" | grep "$session_name" >/dev/null; then
+    if echo "$sessions" | egrep "^$session_name$" >/dev/null; then
       tmux attach-session -t "$session_name"
     else
       tmux new-session -s "$session_name"
