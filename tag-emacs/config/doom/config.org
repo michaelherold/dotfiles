@@ -729,4 +729,15 @@ To keep myself in Emacs, I modify the ~magit-branch~ transient to insert a new c
 
 #+begin_src emacs-lisp
 (setq lsp-sorbet-use-bundler t)
+
+*** RBS Mode
+
+When working on Ruby RBS files, which I am doing for a library that I am working on, it's nice to have proper syntax highlighting. The simple ~rbs-mode~ package gives that ability to Emacs.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! rbs-mode :pin "ad36bb138cec7396f029821d0cf755a8bc663260")
+#+end_src
+
+#+begin_src elisp
+(use-package! rbs-mode)
 #+end_src
