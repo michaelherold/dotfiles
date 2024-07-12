@@ -80,8 +80,8 @@ When I'm in daylight, I switch to ~apropospriate-light~. That is easily done thr
 (defun mjh-toggle-theme ()
   (interactive)
   (if (eq doom-theme 'apropospriate-dark)
-      (load-theme 'apropospriate-light)
-    (load-theme 'apropospriate-dark)))
+      (load-theme 'apropospriate-light t)
+    (load-theme 'apropospriate-dark t)))
 
 (map! :leader
       (:prefix ("t" . "toggle")
