@@ -19,6 +19,7 @@ function chruby_auto() {
 			fi
 		elif version=$(grep ruby "$dir/.tool-versions" 2>/dev/null) || [[ -n "$version" ]]; then
 			version="${version%%[[:space:]]}"
+			version="${version/[[:space:]]/-}"
 
 			if [[ "$version" == "$RUBY_AUTO_VERSION" ]]; then return
 			else
