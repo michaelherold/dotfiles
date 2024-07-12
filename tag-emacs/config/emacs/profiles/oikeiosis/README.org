@@ -1,0 +1,1970 @@
+#+title: Oikeiôsis
+#+property: header-args :tangle init.el
+
+An Emacs configuration of my own mind and sensibilities.
+
+* Early initialization
+
+** Lexical binding
+
+Lexical binding is useful for performance reasons and to make sure that closures work properly.
+
+#+begin_src elisp :tangle early-init.el
+;;; early-init.el -*- lexical-binding: t; -*-
+#+end_src
+
+#+begin_src elisp :tangle init.el
+;;; init.el -*- lexical-binding: t; -*-
+#+end_src
+
+** Garbage collection
+
+In order for startup to be as fast as possible, this disables garbage collection until later.
+
+#+begin_src elisp :tangle early-init.el
+(setq gc-cons-threshold most-positive-fixnum)
+#+end_src
+
+** Look and feel during boot up
+
+Since I intend my Emacs to be keyboard-centric, I disable the chrome for the window. I do this within =early-init.el= because it can impact the performance of startup and the way the initially shows. Otherwise, I would move this to the [[*User interface][User interface]] section.
+
+#+begin_src elisp :tangle early-init.el
+(push '(menu-bar-mode . 0)    default-frame-alist)
+(push '(tool-bar-mode . 0)    default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+
+(setq menu-bar-mode nil
+      scroll-bar-mode nil
+      tool-bar-mode nil)
+#+end_src
+
+* Preamble
+
+I use these variables to check for specific feature flags. Specifically, when debugging, launch Emacs with =DEBUG=t= to set the central debugger flag.
+
+#+begin_src elisp
+(defvar oik-debug-p (or (getenv-internal "DEBUG") init-file-debug)
+  "If non-nil, Oikeiôsis enables debugging for the whole of Emacs.")
+#+end_src
+
+I use these constants throughout the code base to store different files and keep the Emacs profile directory clean.
+
+#+begin_src elisp
+(defconst oik-cache-dir (format "%s/oikeiosis/"
+                                (or (getenv "XDG_CACHE_HOME") "~/.cache"))
+  "Where to write non-essential cached data files.")
+
+(defconst oik-data-dir (format "%s/oikeiosis/"
+                               (or (getenv "XDG_DATA_HOME") "~/.local/share"))
+  "Where to write user-specific data files.")
+
+(defconst oik-private-dir (format "%s/oikeiosis/"
+                                  (or (getenv "XDG_CONFIG_HOME") "~/.config"))
+  "Where to store private configuration like customizations.")
+
+(defconst oik-state-dir (format "%s/oikeiosis/"
+                                (or (getenv "XDG_STATE_HOME") "~/.local/state"))
+  "Where to store state, like compiled files and pids.")
+#+end_src
+
+Since I use both Linux and macOS, I have some configuration that only applies to specific operating systems. These predicates detect those states:
+
+#+begin_src elisp
+(defconst oik-linux-p (eq system-type 'gnu/linux)
+  "When running on a Linux machine, this will be `t'.")
+
+(defconst oik-macos-p (eq system-type 'darwin)
+  "When running on a macOS machine, this will be `t'.")
+#+end_src
+
+* Native compilation
+
+Emacs 29 changes the name of one of the native compilation variables. This shims it back in for cases where a package hasn't updated to it.
+
+#+begin_src elisp
+(unless (boundp 'native-comp-deferred-compilation-deny-list)
+  (defvaralias 'native-comp-deferred-compilation-deny-list 'native-comp-jit-compilation-deny-list))
+#+end_src
+
+Move the native compilation cache out of my =user-emacs-directory= into somewhere more suited for long-term storage.
+
+#+begin_src elisp
+(when (boundp 'native-comp-eln-load-path)
+  (add-to-list 'native-comp-eln-load-path (concat oik-state-dir "eln/")))
+#+end_src
+
+Disable compilation for some packages that can't currently compile.
+
+#+begin_src elisp
+(with-eval-after-load 'comp
+  (mapc (apply-partially #'add-to-list 'native-comp-deferred-compilation-deny-list)
+        (let ((local-dir-re (concat "\\`" (regexp-quote oik-data-dir))))
+          (list (concat local-dir-re ".*/with-editor\\.el\\'")))))
+#+end_src
+
+* Quiet startup
+
+During startup, Emacs loads many libraries. Some of these libraries are old and use the legacy advice system. When doing so, they redefine functions and issue a warning. Without touching those packages upstream, there is not a way to prevent this from happening. As such, I choose to silently accept the redefinitions to reduce startup cruft.
+
+#+begin_src elisp
+(setq ad-redefinition-action 'accept)
+#+end_src
+
+Emacs allows you to debug things along the way. This setting centralizes debugging via the =DEBUG= environment variable.
+
+#+begin_src elisp
+(setq debug-on-error oik-debug-p
+      jka-compr-verbose oik-debug-p)
+#+end_src
+
+Emacs, being a GNU project, does a lot of proselytizing throughout the program. I know all about the GNU Project and Emacs; I don't need them to sell me on it. As such, I disable said evangelism.
+
+#+begin_src elisp
+(unless (daemonp)
+  (advice-add #'display-startup-echo-area-message :override #'ignore))
+#+end_src
+
+Emacs also outputs a lot of information to =*Messages*= upon startup. I need any of those messages and it leaves cruft to parse through whenever I need to debug anything, so I disable as many of these as I can:
+
+#+begin_src elisp
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message user-login-name
+      inhibit-default-init t)
+#+end_src
+
+I took this idea from Doom: start up in fundamental mode because it's the fastest mode and we don't have enough information /a priori/ to make a decision until the normal mode hooks kick in. Also, I prevent the instructional message in the scratch buffer since I know how it works already.
+
+#+begin_src elisp
+(setq initial-major-mode 'fundamental-mode
+      initial-scratch-message nil)
+#+end_src
+
+* Keep the profile directory clean
+
+Emacs uses the =.emacs.d= directory to store everything, but this is a new century from when Emacs came to be. We have dedicated locations for storing data now so let's use them and keep the profile directory clean.
+
+#+begin_src elisp
+(setq async-byte-compile-log-file (concat oik-cache-dir "async-bytecomp.log")
+      custom-file                 (concat oik-private-dir "custom.el")
+      pcache-directory            (concat oik-cache-dir "pcache/")
+      request-storage-directory   (concat oik-cache-dir "request")
+      shared-game-score-directory (concat oik-data-dir "shared-game-score/"))
+#+end_src
+
+* Optimizations
+
+This section is a grab-bag of stuff, mostly from Doom, to optimize the performance of Emacs.
+
+Emacs performs a second pass through the auto-mode list to allow for case-insensitive matches. This made a lot of sense back when some filesystems presented files in =SNAKE_CASE= but isn't really something that comes up. People tend to follow the conventions of their particular languages anymore, so I don't rely on case-insensitivity for mode changes:
+
+#+begin_src elisp
+(setq auto-mode-case-fold nil)
+#+end_src
+
+Emacs' find-at-point behavior tries to be helpful by doing things such as pinging values that look like domain names. This can lead to delays, so I disable the pinging behavior.
+
+#+begin_src elisp
+(setq ffap-machine-p-known 'reject)
+#+end_src
+
+By default, Emacs only reads 4KiB from a process per chunk. This is a sensible default, but on modern systems this can lead to slow data streaming. Let's increase that setting:
+
+#+begin_src elisp
+(setq read-process-output-max (* 64 1024))  ; 64KiB
+#+end_src
+
+Emacs can run on myriad systems and thus defines options for each of those systems. To optimize what it needs to process at startup, I disable command line options that do not apply to the particular system.
+
+#+begin_src elisp
+(unless oik-macos-p (setq command-line-ns-option-alist nil))
+(unless (memq initial-window-system '(x)) (setq command-line-x-option-alist nil))
+#+end_src
+
+When running in a terminal, =tty-run-terminal-initialization= is slow during startup, but runs well later. As a hack around this issue, I defer it until after window setup. (Note: This is a hack from Doom!)
+
+#+begin_src elisp
+(unless (and (daemonp) initial-window-system)
+  (advice-add #'tty-run-terminal-initialization :override #'ignore)
+  (add-hook 'window-setup-hook
+            (defun oik--reset-tty-run-terminal-initialization-h ()
+              "Runs the terminal initialization"
+              (advice-remove #'tty-run-terminal-initialization #'ignore)
+              (tty-run-terminal-initialization (selected-frame) nil t))))
+#+end_src
+
+** Disable bidirectional text mode
+
+I cannot read or write any language that isn't left-to-right so I truly do not need bidirectional text within my editor.
+
+#+begin_src elisp
+(setq-default bidi-display-reordering 'left-to-right)
+(setq bidi-inhibit-bpa t
+      bidi-paragraph-direction 'left-to-right
+      bidi-paragraph-separate-re nil
+      bidi-paragraph-start-re nil)
+#+end_src
+
+** UI optimizations
+
+Rendering in Emacs (or any other editor) is the expensive part. So performing tweaks to the UI rendering can give you good gains in performance.
+
+When switching to a different window, don't display highlighted sections or cursors to reduce rendering work.
+
+#+begin_src elisp
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+#+end_src
+
+I use the performant scrolling mode. Occasionally when navigating, you'll end up with a garbage display toward the top or bottom of the window. This self-corrects as you move around the file and is something that I do not find too distracting; your mileage may vary.
+
+#+begin_src elisp
+(setq fast-but-imprecise-scrolling t)
+#+end_src
+
+Resizing, particularly when changing a font size, is an expensive part of redrawing the frame. I don't particularly care to have the frame resize when changing my font; I like the frame to stay a specific size since I normally use a tiling window manager (on Linux) or have manually sized windows (on macOS). Thus, disabling the frame resize can make font size changes faster without affecting me:
+
+#+begin_src elisp
+(setq frame-inhibit-implied-resize t)
+#+end_src
+
+The tick rate for updating an idle display defaults to a half-second. There is no need for it to update that much when I'm not using Emacs, so I slow it down to once per second.
+
+#+begin_src elisp
+(setq idle-update-delay 1.0)
+#+end_src
+
+Emacs tries to compact the font cache, which is expensive. In the interest of trading memory for speed, let's disable the compaction:
+
+#+begin_src elisp
+(setq inhibit-compacting-font-caches t)
+#+end_src
+
+Do not try to apply fonts when receiving input in an attempt to help with scrolling performance. This setting is recent (commit =b2f8c9f= in Emacs 28) and has similar trade-offs to =fast-but-imprecise-scrolling=.
+
+#+begin_src elisp
+(setq redisplay-skip-fontification-on-input t)
+#+end_src
+
+* Security
+
+Given that Emacs has nearly as much power as an operating system, we need to make sure it runs securely. This section configures  a variety of security settings to make Emacs more secure.
+
+First, configure GnuTLS with a hardened set of cyphers and settings.
+
+#+begin_src elisp
+(setq gnutls-verify-error (not (getenv-internal "INSECURE"))
+      gnutls-algorithm-priority
+      (when (boundp 'libgnutls-version)
+        (concat "SECURE128:+SECURE192:-VERS-ALL"
+                (if (>= libgnutls-version 30605)
+                    ":+VERS-TLS1.3"
+                  ":+VERS-TLS1.2")))
+      gnutls-min-prime-bits 3072 ; https://www.keylength.com/en/4/
+      tls-checktrust gnutls-verify-error
+      tls-program '("openssl s_client -connect %h:%p -CAfile %t -nbio -no_ssl3 -no_tls1 -no_tls1_1 -ign_eof"
+                    "gnutls-cli -p %p --dh-bits=3072 --ocsp --x509cafile=%t \
+--strict-tofu --priority='SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3' %h"
+                    ;; compatibility fallbacks
+                    "gnutls-cli -p %p %h"))
+#+end_src
+
+Next, disable plaintext credential storage in favor of GPG-encrypted stores.
+
+#+begin_src elisp
+(setq auth-sources (list (concat oik-private-dir "authinfo.gpg")
+                         "~/.authinfo.gpg"))
+#+end_src
+
+* User interface
+
+Trust that I'm doing the right thing, Emacs, when I am creating a new file or buffer.
+
+#+begin_src elisp
+(setq confirm-nonexistant-file-or-buffer nil)
+#+end_src
+
+Showing the command that I'm typing is important because it's easy to fat-finger commands. As such, I choose to quickly show keystrokes:
+
+#+begin_src elisp
+(setq echo-keystrokes 0.02)
+#+end_src
+
+Bells, both visual and aural, tend to only be annoying, not helpful. As such, I disable them:
+
+#+begin_src elisp
+(setq ring-bell-function #'ignore
+      visible-bell nil)
+#+end_src
+
+Use a forward-looking difference when attempting to create a shorter, unique name for a buffer:
+
+#+begin_src elisp
+(setq uniquify-buffer-name-style 'forward)
+#+end_src
+
+I like the look of underlines when Emacs draws them at the descent line instead of the baseline:
+
+#+begin_src elisp
+(setq x-underline-at-descent-line t)
+#+end_src
+
+When confirming or denying a prompt, I really don't want to have to type =yes= or =no= because =y= and =n= are sufficient. This rebinds the prompt command to the shortened version.
+
+#+begin_src elisp
+(fset #'yes-or-no-p #'y-or-n-p)
+#+end_src
+
+** Cursor
+
+While the blinking cursor makes it easier to tell where you're focused, it can cause freezes in macOS so I choose to disable the blinking. This also applies to blinking a matching parenthesis.
+
+#+begin_src elisp
+(blink-cursor-mode -1)
+(setq blink-matching-paren nil)
+#+end_src
+
+Stretching the cursor on wide characters makes it hard to tell where your cursor sits, so I choose to disable that functionality.
+
+#+begin_src elisp
+(setq x-stretch-cursor nil)
+#+end_src
+
+** TODO Fonts
+
+#+begin_src elisp
+(defvar oik-font (font-spec :family "FiraCode Nerd Font" :size 16))
+(defvar oik-variable-pitch-font (font-spec :family "Noto Sans" :size 20))
+
+(apply #'custom-set-faces
+       (let ((attrs '(:weight unspecified :slant unspecified :width unspecified)))
+         (append (when oik-font
+                   `((fixed-pitch ((t (:font ,oik-font ,@attrs))))))
+                 (when oik-variable-pitch-font
+                   `((variable-pitch ((t (:font ,oik-variable-pitch-font ,@attrs)))))))))
+
+(dolist (sym '(fixed-pitch variable-pitch))
+  (put sym 'saved-face nil))
+
+(setf (alist-get 'font default-frame-alist)
+      (font-xlfd-name oik-font))
+#+end_src
+
+** Fringe
+
+The fringe is useful space that we do not want to clutter. I disable the fringe indicators for the beginning/end of buffers and empty lines in favor of reserving that space for real information.
+
+#+begin_src elisp
+(setq indicate-buffer-boundaries nil
+      indicate-empty-lines nil)
+#+end_src
+
+** TODO Line numbers
+
+*** display-line-numbers
+
+#+begin_src elisp
+(setq display-line-numbers-width 3
+      display-line-numbers-widen t
+      display-line-numbers-type 'relative)
+
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
+(add-hook 'conf-mode-hook #'display-line-numbers-mode)
+#+end_src
+
+** Minibuffers
+
+Emacs uses minibuffers for myriad tasks and I often find I need to open another minibuffer from the current one. This setting allows that behavior.
+
+#+begin_src elisp
+(setq enable-recursive-minibuffers t)
+#+end_src
+
+To make it so I can always read output, I allow mini windows (minibuffers and the echo area) to grow when showing long lines.
+
+#+begin_src elisp
+(setq resize-mini-windows 'grow-only)
+#+end_src
+
+Minibuffers often have read-only areas that can be frustrating to find my cursor within. In order to reduce that frustration, this configures minibuffers to attempt to keep the cursor out of those areas by enabling "intangible" cursor detection and setting hints to keep the cursor out of those areas.
+
+#+begin_src elisp
+(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+#+end_src
+
+** Scrolling
+
+When horizontally scrolling, wait until we're close to the edge of the window and then only scroll the minimum amount.
+
+#+begin_src elisp
+(setq hscroll-margin 2
+      hscroll-step 1)
+#+end_src
+
+However, in shell modes, I make it so Emacs will only scroll when hitting the edge of a window because otherwise it causes display glitches.
+
+#+begin_src elisp
+(defun oik--disable-hscroll-margin-h ()
+  "Set the horizontal scrolling margin to zero to prevent display glitches."
+  (setq hscroll-margin 0))
+
+(add-hook 'eshell-mode-hook #'oik--disable-hscroll-margin-h)
+(add-hook 'term-mode-hook #'oik--disable-hscroll-margin-h)
+#+end_src
+
+Scrolling through large files can be painfully slow when Emacs tries to keep the cursor centered. To prevent this issue, do not recenter when making large jumps in a file, but otherwise attempt to recenter.
+
+#+begin_src elisp
+(setq scroll-conservatively 101
+      scroll-margin 0
+      scroll-preserve-screen-position t)
+#+end_src
+
+When attempting to adjust for tall lines or images in a buffer, Emacs attempts to account for it by adjusting the vertical scrolling amount. To save some time when moving the cursor, I disable this behavior because I don't mind stepping through the line or image individually.
+
+#+begin_src elisp
+(setq auto-window-vscroll nil)
+#+end_src
+
+To make mouse scrolling quicker, I choose to scroll two lines at a time with the mouse wheel and hold =Shift= when I want to scroll horizontally with a mouse wheel:
+
+#+begin_src elisp
+(setq mouse-wheel-scroll-amount '(2 ((shift) . hscroll))
+      mouse-wheel-scroll-amount-horizontal 2)
+#+end_src
+
+** Windows and frames
+
+I use a simple name for frames to make it easier to find them in a list or overview.
+
+#+begin_src elisp
+(setq frame-title-format '("%b - Oikeiôsis Emacs")
+      icon-title-format frame-title-format)
+#+end_src
+
+Since I do not use a tiling window manager on macOS, resizing the frame based on the size of the text can lead to a weird display so I allow per-pixel resizes.
+
+#+begin_src elisp
+(setq frame-resize-pixelwise t)
+#+end_src
+
+However, allowing windows to resize per-pixel can lead to crashes because it causes too many redraws when there are many windows open at once. As such, I disable the functionality for windows.
+
+#+begin_src elisp
+(setq window-resize-pixelwise nil)
+#+end_src
+
+I use =window-divider-mode= because it can use less space than the native borders between windows. Since I only really need one pixel, that's what I use, and I place them on both bottoms and rights of windows.
+
+#+begin_src elisp
+(setq window-divider-default-places t
+      window-divider-default-bottom-width 1
+      window-divider-default-right-width 1)
+(add-hook 'window-setup-hook #'window-divider-mode)
+#+end_src
+
+I don't want to use GUIs for anything because they end up being inconsistent across operating systems and I regularly use both Linux and macOS. As such, I choose to disable all GUI widgets.
+
+#+begin_src elisp
+(setq use-dialog-box nil)
+(when (bound-and-true-p tooltip-mode)
+  (tooltip-mode -1))
+(when oik-linux-p
+  (setq x-gtk-use-system-tooltips nil))
+#+end_src
+
+Splitting windows is something I do a lot. Because monitors are wider than they are tall anymore, it makes sense to favor splitting horizontally over vertically. However, I /always/ want to allow splitting vertically because even seeing a single line can be useful.
+
+#+begin_src elisp
+(setq split-width-threshold 160
+      split-height-threshold nil)
+#+end_src
+
+** TODO Switching hooks
+
+Switching frame, windows, and buffer are three cases where I often want to add behavior. As such, I define a system for running (and inhibiting the running of) hooks for both of those cases.
+
+First, frames since they are the "largest". Switching frames can trigger a lot of behavior. As such, I temporarily disable garbage collection while running these hooks.
+
+#+begin_src elisp
+(defvar oik-switch-frame-hook nil
+  "A list of hooks to run after changing the focused frame.")
+
+(defvar oik-inhibit-switch-frame-hooks nil
+  "A flag for indicating whether `oik-switch-frame-hook' should not run.")
+
+(defvar oik--last-frame nil
+  "A register indicating the last frame selected.
+
+This acts as a guard to prevent frame-switching hooks from running more than
+once.")
+
+(defun oik-maybe-run-switch-frame-hooks-a ()
+  "Run hooks from `oik-switch-frame-hook' unless inhibited."
+  (unless (or oik-inhibit-switch-frame-hooks
+              (eq oik--last-frame (selected-frame))
+              (frame-parameter nil 'parent-frame))
+    (let ((gc-cons-threshold most-positive-fixnum)
+          (oik-inhibit-switch-frame-hooks t))
+      (run-hooks 'oik-switch-frame-hooks)
+      (setq oik--last-frame (selected-frame)))))
+#+end_src
+
+Next, windows. Like with frames, switching windows may trigger a lot of behavior so I disable garbage collection while running the hooks.
+
+#+begin_src elisp
+(defvar oik-switch-window-hook nil
+  "A list of hooks run after changing the current window.")
+
+(defvar oik-inhibit-switch-window-hooks nil
+  "A flag for indicating whether `oik-switch-window-hook' should not run.")
+
+(defvar oik--last-window nil
+  "A register indicating the last window selected.
+
+This acts as a guard to prevent window-switching hooks from running more than once.")
+
+(defun oik-maybe-run-switch-window-hooks-h ()
+  "Run hooks from `oik-switch-window-hook' unless inhibited."
+  (unless (or oik-inhibit-switch-window-hooks
+              (eq oik--last-window (selected-window))
+              (minibufferp))
+    (let ((gc-cons-threshold most-positive-fixnum)
+          (oik-inhibit-switch-window-hooks t)
+          (inhibit-redisplay t))
+      (run-hooks 'oik-switch-window-hook)
+      (setq oik--last-window (selected-window)))))
+#+end_src
+
+Lastly, buffers.
+
+#+begin_src elisp
+(defvar oik-switch-buffer-hook nil
+  "A list of hooks run after changing the current buffer.")
+
+(defvar oik-inhibit-switch-buffer-hooks nil
+  "A flag for indicating whether `oik-switch-buffer-hook' should not run.")
+
+(defun oik-maybe-run-switch-buffer-hooks-a (orig-fn buffer-or-name &rest args)
+  ""
+  (if (or oik-inhibit-switch-buffer-hooks
+          (and buffer-or-name
+               (eq (current-buffer) (get-buffer buffer-or-name)))
+          (and (eq orig-fn #'switch-to-buffer) (car args)))
+      (apply orig-fn buffer-or-name args)
+    (let ((gc-cons-threshold most-positive-fixnum)
+          (oik-inhibit-switch-buffer-hooks t)
+          (inhibit-redisplay t))
+      (when-let (buffer (apply orig-fn buffer-or-name args))
+        (with-current-buffer (if (windowp buffer)
+                                 (window-buffer buffer)
+                               buffer)
+          (run-hooks 'oik-switch-buffer-hook))
+        buffer))))
+#+end_src
+
+** Initialization
+
+Because of the likelihood of unintentional runs during initialization, I bind the setup for the UI as late as possible during startup.
+
+#+begin_src elisp
+(defun oik-init-ui-h ()
+  "Initialize the user interface by apply all advice and hooks."
+
+  (add-hook 'buffer-list-update-hook #'oik-maybe-run-switch-window-hooks-h)
+  (advice-add 'after-focus-change-function :after #'oik-maybe-run-switch-frame-hooks-a)
+  (dolist (fn '(switch-to-buffer display-buffer))
+    (advice-add fn :around #'oik-maybe-run-switch-buffer-hooks-a)))
+
+(add-hook 'window-setup-hook #'oik-init-ui-h 100)
+#+end_src
+
+* Editor
+
+I don't use Emacs as an operating system, per se. I use it as a text editor. This section handles the basics for setting it up as I like a text editor to work.
+
+For well-known file extensions, I like to apply particular modes to them even though they aren't automatically set that way by Emacs.
+
+#+begin_src elisp
+(nconc auto-mode-alist
+       '(("/LICENSE\\'" . text-mode)
+         ("\\.log\\'" . text-mode)
+         ("rc\\'" . conf-mode)))
+#+end_src
+
+** File handling
+
+Backups and lock files are useful in the case that Emacs crashes, but their primary use is something that doesn't matter as much as it did in the 70s and 80s. As such, I rely on auto-save to maintain my work instead. In the off chance that something later enables backup files, I ensure that I create them in the cache directory instead of next to their files and set some sane defaults.
+
+#+begin_src elisp
+(setq create-lockfiles nil
+      make-backup-files nil
+      version-control t
+      backup-by-copying t
+      delete-old-versions t
+      kept-old-versions 5
+      kept-new-versions 5
+      backup-directory-alist (list (cons "." (concat oik-cache-dir "backup/")))
+      tramp-backup-directory-alist backup-directory-alist)
+#+end_src
+
+As stated, I use auto-save in case of crashes. Using this, I can rely on =recover-file= and =recover-session= to recover the auto-saved files.
+
+#+begin_src elisp
+(setq auto-save-default t
+      auto-save-include-big-deletions t
+      auto-save-list-file-prefix (concat oik-cache-dir "autosave/")
+      tramp-auto-save-directory  (concat oik-cache-dir "tramp-autosave/")
+      auto-save-file-name-transforms
+      (list (list "\\`[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
+                  (concat auto-save-list-file-prefix "tramp-\\2") t)
+            (list ".*" auto-save-list-file-prefix t)))
+#+end_src
+
+Depending on the file system that I'm running on, long paths might be problematic. To alleviate this problem, I store my auto-save files as hashes instead of the path. I cribbed this entirely from Doom. Henrik noted that he would like to upstream this but it doesn't look like he has done that yet.
+
+#+begin_src elisp
+(defun oik-make-hashed-auto-save-file-name-a (orig-fn)
+  "Compress the autosave filename so paths don't get too long."
+  (let ((buffer-file-name
+         (if (or (null buffer-file-name)
+                 (find-file-name-handler buffer-file-name
+                                         'make-auto-save-file-name))
+             buffer-file-name
+           (sha1 buffer-file-name))))
+    (funcall orig-fn)))
+
+(advice-add #'oik-make-hashed-auto-save-file-name-a
+            :around #'make-auto-save-file-name)
+#+end_src
+
+Like with auto-save files, the default way to generate backup files can lead to paths that are too long for the file system. Since =make-backup-file-name-1= can also present this issue for packages like =undo-tree=, I advise the function to hash the path for them as well.
+
+#+begin_src elisp
+(defun oik-make-hashed-backup-file-name-a (orig-fn file)
+  "Compress the backup filename so paths don't get too long."
+  (let ((alist backup-directory-alist)
+        backup-directory)
+    (while alist
+      (let ((el (pop alist)))
+        (if (string-match (car el) file)
+            (setq backup-directory (cdr el)
+                  alist nil))))
+    (let ((file (funcall orig-fn file)))
+      (if (or (null backup-directory)
+              (not (file-name-absolute-p backup-directory)))
+          file
+        (expand-file-name (sha1 (file-name-nondirectory file))
+                          (file-name-directory file))))))
+
+(advice-add #'oik-make-hashed-backup-file-name-a
+            :around #'make-backup-file-name-1)
+#+end_src
+
+When working on symbolically linked files, it can lead to a jarring experience having Emacs not follow the symbolic link. These settings ensure Emacs always works from a symbolically linked file's true directory.
+
+#+begin_src elisp
+(setq find-file-visit-truename t
+      vc-follow-symlinks t)
+#+end_src
+
+Because I follow symbolic links, Emacs might warn about the file being open in different ways. This is an annoying default so I disable the warning and let Emacs open the existing buffer.
+
+#+begin_src elisp
+(setq find-file-suppress-same-file-warnings t)
+#+end_src
+
+Sometimes, it's easier to define a whole non-existing path when "finding" a new file. This hook allows me to define a nested folder structure using =find-file= instead of requiring me to manually define everything
+
+#+begin_src elisp
+(defun oik-create-missing-directories-h ()
+  "Automatically create missing directories when creating new files."
+  (unless (file-remote-p buffer-file-name)
+    (let ((parent-directory (file-name-directory buffer-file-name)))
+      (and (not (file-directory-p parent-directory))
+           (y-or-n-p (format "Directory `%s' does not exist! Create it?"
+                             parent-directory))
+           (progn (make-directory parent-directory 'parents)
+                  t)))))
+
+(add-hook 'find-file-not-found-functions
+          #'oik-create-missing-directories-h)
+#+end_src
+
+After creating a file and saving it, Emacs should be able to make a guess as to the mode to run for the file. As such, I define a hook that tells Emacs to do just that.
+
+#+begin_src elisp
+(defun oik-guess-mode-h ()
+  "Guess the major mode when saving a file in `fundamental-mode'.
+
+Since you're usually only using fundamental mode upon first creation, it's
+likely that Emacs will be able to guess the mode after you decide to save the
+file."
+  (when (eq major-mode 'fundamental-mode)
+    (let ((buffer (or (buffer-base-buffer) (current-buffer))))
+      (and (buffer-file-name buffer)
+           (eq buffer (window-buffer (selected-window)))
+           (set-auto-mode)))))
+
+(add-hook 'after-save-hook #'oik-guess-mode-h)
+#+end_src
+
+*** Large files
+
+Emacs can slow to a crawl when opening large files. This is partly due to the regular expression engine that powers syntax highlighting, but other features of major modes can cause slowdown as well. To protect against this, I crib Doom's behavior for handling large files by inhibiting major modes when a file exceeds a certain threshold.
+
+#+begin_src elisp
+(defvar-local oik-inhibit-large-file-detection nil
+  "A buffer-local flag that indicates that large file detection should disable.")
+
+(defvar oik-large-file-p nil
+  "A predicate guard for noting whether a buffer is for a large file.")
+(put 'oik-large-file-p 'permanent-local t)
+
+(defvar oik-large-file-size-alist '(("." . 1.0))
+  "An attribute list mapping regular expressions to file size thresholds.
+
+When you open a file above a threshold for the mode, Oikeiôsis performs
+emergency optimizations to prevent Emacs from hanging, crashing, or becoming
+unusably slow.
+
+The thresholds are in MiB.
+
+See `auto-mode-alist' for more information about the regular expression format.
+
+See `oik--optimize-for-large-files-a' for the optimizations.")
+
+(defvar oik-large-file-excluded-modes
+  '(so-long-mode special-mode archive-mode tar-mode jka-compr
+    git-commit-mode image-mode doc-view-mode doc-view-mode-maybe
+    ebrowse-tree-mode pdf-view-mode tags-table-mode)
+  "Major modes that `oik-check-large-file-h' will ignore.")
+
+(defun oik--prepare-for-large-files-a (size _ filename &rest _)
+  "Sets `oik-large-file-p' for the buffer if the file is too large.
+
+Uses `oik-large-file-size-alist' to determine when a file is too large. When `oik-large-file-p' is non-nil, other plugins can detect this and reduce their runtime costs or disable themselves to ensure the buffer is as fast as possible."
+  (and (numberp size)
+       (null oik-inhibit-large-file-detection)
+       (ignore-errors
+         (> size
+            (* 1024 1024
+               (assoc-default filename oik-large-file-size-alist
+                              #'string-match-p)))
+         (setq-local oik-large-file-p size))))
+
+(defun oik-optimize-for-large-files-h ()
+  "Triggers `so-long-minor-mode' when the file is large."
+  (when (and oik-large-file-p buffer-file-name)
+    (if (or oik-inhibit-large-file-detection
+            (memq major-mode doom-large-file-excluded-modes))
+        (kill-local-variable 'oik-large-file-p)
+      (when (fboundp 'so-long-minor-mode)
+        (so-long-minor-mode +1))
+      (message "Large file detected! Optimizing to improve performance."))))
+
+(advice-add #'oik--prepare-for-large-files-a
+            :before #'abort-if-file-too-large)
+(add-hook 'find-file-hook #'oik-optimize-for-large-files-h)
+#+end_src
+
+** Formatting
+
+I prefer spaces to tabs. Outside of Ruby and CSS, I like to use four of them. Set those settings as defaults so that major modes can override them when appropriate.
+
+#+begin_src elisp
+(setq-default indent-tabs-mode nil
+              tab-width 4)
+#+end_src
+
+I want to allow for "real" tabs when I'm not at the beginning of a line so I disable the "always indent" behavior, but do so as a default so that major modes can override it when applicable.
+
+#+begin_src elisp
+(setq-default tab-always-indent nil)
+#+end_src
+
+I only want to tabify space at the beginning of a line, not within the line. While tabularizing data later in the line can be useful, that's a niche application and deserves its own setting.
+
+#+begin_src elisp
+(setq tabify-regexp "^\t* [ \t]+")
+#+end_src
+
+I go back and forth on the optimal fill column width. On Ruby code I like to use 110, but a general setting of 80 still makes the most sense. It allows you to easily have multiple column-wise windows and still see everything.
+
+#+begin_src elisp
+(setq-default fill-column 80)
+#+end_src
+
+I don't care for the behavior of =word-wrap= and instead rely on =visual-line-mode= when appropriate. These three settings allow me to rely on my preferred system.
+
+#+begin_src elisp
+(setq-default word-wrap t
+              truncate-lines t)
+
+(setq truncate-partial-width-windows nil)
+#+end_src
+
+I prefer the Chicago style of writing and use a single space after sentences, so Emacs should too.
+
+#+begin_src elisp
+(setq sentence-end-double-space nil)
+#+end_src
+
+Files should always have a final newline. This is partly due to POSIX standards, but can also useful in cases where you end up concatenating files together.
+
+#+begin_src elisp
+(setq require-final-newline t)
+#+end_src
+
+When writing in text modes, I like to have visual wrapping for the text, so I enable that behavior.
+
+#+begin_src elisp
+(add-hook 'text-mode-hook #'visual-line-mode)
+#+end_src
+
+** Clipboard
+
+When using Evil, you can easily end up with duplicates in your clipboard which makes it harder to use. So I don't allow duplicates in it.
+
+#+begin_src elisp
+(setq kill-do-not-save-duplicates t)
+#+end_src
+
+Rich text and UTF are both useful to allow so I enable them even in the terminal (although this only applies to X so I don't know whether it applies at all anymore).
+
+#+begin_src elisp
+(when oik-linux-p
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+end_src
+
+* Package management
+
+I use [[https://github.com/progfolio/elpaca][Elpaca]] for package management instead of the built-in package manager. These values set up some configuration that I like.
+
+#+begin_src elisp
+(setq package-enable-at-startup nil)
+
+(defvar elpaca-base-dir (expand-file-name "elpaca/" oik-data-dir))
+(defvar elpaca-builds-dir (expand-file-name (format "build-%s" emacs-version) elpaca-base-dir))
+(defvar elpaca-repos-dir (expand-file-name "repos/" elpaca-base-dir))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+#+end_src
+
+Install and configure Elpaca.
+
+#+begin_src elisp
+(defvar elpaca-installer-version 0.6)
+
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-dir))
+       (build (expand-file-name "elpaca/" elpaca-builds-dir))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((bootstrap-buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil bootstrap-buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil bootstrap-buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil bootstrap-buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer bootstrap-buffer))
+          (error "%s" (with-current-buffer bootstrap-buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+#+end_src
+
+** Core packages
+
+Install =use-package= first so that we can use Elpaca via the nicer macro. I assume =:elpaca= unless otherwise stated.
+
+#+begin_src elisp
+(elpaca elpaca-use-package
+  (elpaca-use-package-mode)
+  (setq elpaca-use-package-by-default t))
+#+end_src
+
+To allow for the reset of the setup to continue, I install the =use-package= integration up front.
+
+#+begin_src elisp
+(elpaca-wait)
+#+end_src
+
+*** gcmh
+
+- links :: [[https://melpa.org/#/gcmh][melpa]], [[https://gitlab.com/koral/gcmh][source]]
+
+To automatically manage the Emacs garbage collector, I rely on the Garbage Collector Magic Hack. It attempts to limit garbage collection to when Emacs is idle in order to prevent the garbage collector from interfering with input.
+
+#+begin_src elisp
+(use-package gcmh
+  :config
+  (setq gcmh-idle-delay 5
+        gcmh-high-cons-threshold (* 16 1024 1024) ; 16 MiB
+        gcmh-verbose oik-debug-p)
+  (gcmh-mode +1))
+#+end_src
+
+*** general.el
+
+- links :: [[https://melpa.org/#/general][melpa]], [[https://github.com/noctuid/general.el][source]]
+
+Keybinding in Emacs can be challenging. To make it easier, I use the =general= package which makes binding leader-key commands easier.
+
+#+begin_src elisp
+(use-package general)
+
+(elpaca-wait)
+#+end_src
+
+*** evil
+
+- links :: [[https://melpa.org/#/evil][melpa]], [[https://github.com/emacs-evil/evil][source]]
+
+I used Vim for many years and came to appreciate the way you can use normal mode for navigating and modifying your code. As such, I am an =evil= user.
+
+#+begin_src elisp
+(use-package evil
+  :init
+  (setq evil-want-integration t
+        evil-want-keybinding nil
+        evil-want-C-u-scroll t
+        evil-want-C-i-jump t
+        evil-respect-visual-line-mode t)
+  :config
+  (general-evil-setup)
+  (evil-mode +1)
+  (general-def 'motion
+    "j" 'evil-next-visual-line
+    "k" 'evil-previous-visual-line)
+
+  (general-nmap :keymaps 'process-menu-mode-map
+    "q" #'kill-current-buffer
+    "d" #'process-menu-delete-process)
+
+  (defun oik-map-read-only-mode (map)
+    "Unmap insertion keys from Evil's normal state."
+
+    (general-nmap :keymaps map
+      [remap evil-append-line]          #'ignore
+      [remap evil-append]               #'ignore
+      [remap evil-change-line]          #'ignore
+      [remap evil-change-whole-line]    #'ignore
+      [remap evil-change]               #'ignore
+      [remap evil-delete-backward-char] #'ignore
+      [remap evil-delete-char]          #'ignore
+      [remap evil-delete-line]          #'ignore
+      [remap evil-delete]               #'ignore
+      [remap evil-indent]               #'ignore
+      [remap evil-insert-line]          #'ignore
+      [remap evil-insert]               #'ignore
+      [remap evil-invert-char]          #'ignore
+      [remap evil-join]                 #'ignore
+      [remap evil-open-above]           #'ignore
+      [remap evil-open-below]           #'ignore
+      [remap evil-paste-after]          #'ignore
+      [remap evil-paste-before]         #'ignore
+      [remap evil-replace-state]        #'ignore
+      [remap evil-replace]              #'ignore
+      [remap evil-shift-left]           #'ignore
+      [remap evil-shift-right]          #'ignore
+      [remap evil-substitute]           #'ignore
+      "q"                               #'quit-window
+      "ZZ"                              #'quit-window
+      "ZQ"                              #'evil-quit)))
+#+end_src
+
+*** helpful
+
+- links :: [[https://melpa.org/#/helpful][melpa]], [[https://github.com/Wilfred/helpful][source]]
+
+Emacs is a discoverable editor but it needs help making sure things are truly discoverable. To aid in this quest, I use =helpful= for showing documentation. I remap every binding to the built-in describe functions to use these more --- ahem --- helpful versions.
+
+I also configure =apropos= here upon load to use =helpful= functions instead of the built-in describe functions.
+
+#+begin_src elisp
+(use-package helpful
+  :commands helpful--read-symbol
+  :bind
+  ([remap describe-command] . helpful-command)
+  ([remap describe-function] . helpful-callable)
+  ([remap describe-key] . helpful-key)
+  ([remap describe-symbol] . helpful-symbol)
+  ([remap describe-variable] . helpful-variable)
+  :general
+  (helpful-mode-map
+   "<tab>" #'forward-button
+   "<backtab>" #'backward-button
+   "RET" #'helpful-visit-reference
+   (general-nmap :keymaps 'helpful-mode-map
+     "q" #'quit-window
+     "ZZ" #'quit-window
+     "ZQ" #'evil-quit)
+   )
+  :init
+  (setq apropos-do-all t)
+
+  (oik-map-read-only-mode 'helpful-mode-map)
+
+  (general-with-eval-after-load 'apropos
+    (dolist (fun-btn '(apropos-function apropos-macro apropos-command))
+      (button-type-put
+       fun-btn 'action
+       (lambda (button)
+         (helpful-callable (button-get button 'apropos-symbol)))))
+
+    (dolist (var-btn '(apropos-variable apropos-user-option))
+      (button-type-put
+       var-btn 'action
+       (lambda (button)
+         (helpful-variable (button-get button 'apropos-symbol)))))))
+#+end_src
+
+*** which-key
+
+- links :: [[https://melpa.org/#/which-key][melpa]], [[https://github.com/justbur/emacs-which-key][source]]
+
+=which-key= is helpful for discovering what command a particular key sequence calls.
+
+#+begin_src elisp
+(use-package which-key
+  :init
+  (which-key-mode +1))
+#+end_src
+
+*** explain-pause
+
+- links :: [[https://github.com/lastquestion/explain-pause-mode][source]]
+
+Debugging pauses in Emacs can be frustrating. In order to make it a little easier, =explain-pause-mode= gives you an experience similar to =top= to find the culprits of a pause.
+
+#+begin_src elisp
+(use-package explain-pause-mode
+  :elpaca (explain-pause-mode
+           :type git
+           :host github
+           :repo "lastquestion/explain-pause-mode"))
+#+end_src
+
+** Built-in packages
+
+Emacs continues to include packages in its core with each new version. This section configures packages that are now built into Emacs.
+
+*** ansi-color
+
+- links :: built-in
+
+=ansi-color= adds support for ANSI-compatible color codes, which are useful for shell buffers and compilation buffers. This setting enables compilation buffers to render these ANSI-compatible codes.
+
+#+begin_src elisp
+(setq ansi-color-for-comint-mode t)
+#+end_src
+
+*** autorevert
+
+- links :: built-in
+
+The =autorevert= package is useful because it helps when other programs edit files that Emacs has open. However, its default behavior uses expensive file watchers or polling so I don't like to rely on the default behavior. Instead, I cribbed this behavior from Doom:
+
+1. When your focus leaves Emacs and you come back to it, attempt to auto-revert all visible buffers.
+2. When saving, attempt to auto-revert all visible buffers in case saving one file changes another.
+3. When switching buffers, make sure nothing modified the one you're switching to.
+4. When switching windows, makes sure nothing modified the buffer you're switching to.
+
+This approach is much lighter than filesystem watchers and covers /most/ cases where something might modify a file without Emacs knowing.
+
+#+begin_src elisp
+(defun oik-visible-buffers ()
+  "Return a list of visible, non-buried buffers."
+  (delete-dups (mapcar #'window-buffer (window-list))))
+
+(use-package autorevert
+  :elpaca nil
+  :hook (focus-in . oik-auto-revert-buffers-h)
+  :hook (after-save . oik-auto-revert-buffers-h)
+  :hook (oik-switch-buffer . oik-auto-revert-buffer-h)
+  :hook (oik-switch-window . oik-auto-revert-buffer-h)
+  :config
+  (setq auto-revert-verbose t
+        auto-revert-use-notify nil
+        auto-revert-stop-on-user-input nil
+        revert-without-query (list "."))
+
+  (defun oik-auto-revert-buffer-h ()
+    "Automatically reverts the current buffer, if necessary."
+    (unless (or auto-revert-mode (active-minibuffer-window))
+      (let ((auto-revert-mode t))
+        (auto-revert-handler)))))
+
+  (defun oik-auto-revert-buffers-h ()
+    "Automatically reverts stale buffers in visible windows, if necessary."
+    (dolist (buffer (oik-visible-buffers))
+      (with-current-buffer buffer
+        (oik-auto-revert-buffer-h))))
+#+end_src
+
+*** comint
+
+- links :: built-in
+
+=comint= is a mode for "command interpolation" such as compiling programs and programming shells. For the shells, they each have their own major mode but when running compilation commands, I don't want to try to modify the output so I set it read-only. I also double the default size of the scrollback buffer to make sure I can gain context when compilation fails.
+
+#+begin_src elisp
+(general-with-eval-after-load 'comint
+  (setq comint-prompt-read-only t
+        comint-buffer-maximum-size 2048))
+#+end_src
+
+*** compile
+
+- links :: built-in
+
+=compile= is the actual package that performs program compilation and uses =comint= for display. To make it more usable, I kill any other versions of the same compilation when one starts, save all open buffers when starting a compilation, and automatically scroll the buffer to the first error when there is one. I also allow for ANSI color codes in the compilation buffer and truncate it to the maximum size to prevent compilations from using too many resources.
+
+#+begin_src elisp
+(general-with-eval-after-load 'compile
+  (setq compilation-always-kill t
+        compilation-ask-about-save nil
+        compilation-scroll-output 'first-error)
+
+  ;;;###autoload
+  (defun oik-use-ansi-colors-in-compilation-buffer-h ()
+    "Applies ANSI color codes to compilation buffers to make them more readable. Meant for `compilation-filter-hook'."
+    (with-silent-modifications
+      (ansi-color-apply-on-region compilation-filter-start (point))))
+
+  (general-add-hook 'compilation-filter-hook
+                    #'oik-use-ansi-colors-in-compilation-buffer-h)
+  (autoload 'comint-truncate-buffer "comint" nil t)
+  (general-add-hook 'compilation-filter-hook
+                    #'comint-truncate-buffer))
+#+end_src
+
+*** ediff
+
+- links :: built-in
+
+=ediff= is a great package for reading and applying differences between files. To make the diff less noisy, I ignore whitespace in it. I also like to look at the diff in full frame, so I set up the windowing to only open the two files and the combination, with the diffing files across from each other.
+
+To make diffing unobtrusive, I also save and restore the window configuration when diffing. This means that I can jump right back to what I was doing prior to the diff.
+
+#+begin_src elisp
+(general-with-eval-after-load 'ediff
+  (setq ediff-diff-options "-w"
+        ediff-split-window-function #'split-window-horizontally
+        ediff-window-setup-function #'ediff-setup-windows-plain)
+
+  (defvar oik--ediff-saved-wconf nil
+    "Stores the window configuration from prior to diffing.")
+
+  (defun oik--ediff-save-wconf-h ()
+    "Saves the current window configuration to restore after diffing."
+    (setq oik--ediff-saved-wconf (current-window-configuration)))
+
+  (defun oik--ediff-restore-wconf-h ()
+    "Restores the window configuration from prior to diffing."
+    (when (window-configuration-p oik--ediff-saved-wconf)
+      (set-window-configuration oik--ediff-saved-wconf)
+      (setq oik--ediff-saved-wconf nil)))
+
+  (general-add-hook 'ediff-before-setup-hook #'oik--ediff-save-wconf-h)
+  (general-add-hook '(ediff-quit-hook ediff-suspend-hook)
+                    #'oik--ediff-restore-wconf-h))
+#+end_src
+
+*** hl-line
+
+- links :: built-in
+
+=hl-line= is a package that helps to identify where your cursor is in a buffer. By default, the highlight applies in all buffers, regardless of mode. However, there are modes where it makes little to no sense to highlight the line. As such, I hack the global mode so that it:
+
+1. only applies in a whitelisted family of modes
+2. automatically disables and re-enables when entering specific modes like visual selection and mark mode
+
+#+begin_src elisp
+(use-package hl-line
+  :elpaca nil
+  :hook (window-setup . global-hl-line-mode)
+  :init
+  (defvar global-hl-line-modes
+    '(prog-mode text-mode conf-mode special-mode org-agenda-mode)
+    "The modes to enable `hl-line-mode' in.")
+  :config
+  (define-globalized-minor-mode global-hl-line-mode hl-line-mode
+    (lambda ()
+      (and (cond (hl-line-mode nil)
+                 ((null global-hl-line-modes) nil)
+                 ((eq global-hl-line-modes t))
+                 ((eq (car global-hl-line-modes) 'not)
+                  (not (derived-mode-p global-hl-line-modes)))
+                 ((apply #'derived-mode-p global-hl-line-modes)))
+           (hl-line-mode +1))))
+
+  (defvar oik--hl-line-mode nil
+    "The memoized state of manual `hl-line-mode' deactivation.")
+
+  (defun oik-mark-hl-line-as-disabled-h ()
+    "Saves when `hl-line-mode' is disabled upon entering it."
+    (unless hl-line-mode
+      (setq-local oik--hl-line-mode nil)))
+
+  (defun oik-disable-hl-line-h ()
+    "Temporarily disables `hl-line-mode' for specific modes."
+    (when hl-line-mode
+      (hl-line-mode -1)
+      (setq-local oik--hl-line-mode t)))
+
+  (defun oik-enable-hl-line-maybe-h ()
+    "Reenables `hl-line-mode' when it was temporarily disabled via a hook."
+    (when oik--hl-line-mode
+      (hl-line-mode +1)))
+
+  (general-add-hook 'hl-line-mode-hook #'oik-mark-hl-line-as-disabled-h)
+  (general-add-hook '(evil-visual-state-entry-hook activate-mark-hook)
+                    #'oik-disable-hl-line-h)
+  (general-add-hook '(evil-visual-state-exit-hook deactivate-mark-hook)
+                    #'oik-enable-hl-line-maybe-h))
+#+end_src
+
+*** paren
+
+- links :: built-in
+
+=paren= is a package that highlights the matching delimeter for the current point. It makes it easier for me to visually check, in particular, Lisp parenthesis pairs when writing Emacs configuration. I configure the package so that the matches will be maximally shown when I'm working around a pair and set it so Emacs shows them quickly upon pausing upon a point.
+
+#+begin_src elisp
+(use-package paren
+  :elpaca nil
+  :hook (window-setup . show-paren-mode)
+  :config
+  (setq show-paren-delay 0.1
+        show-paren-highlight-openparen t
+        show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t))
+#+end_src
+
+*** whitespace
+
+- links :: built-in
+
+=whitespace= is a package for visualizing whitespace in your buffers. This is useful for seeing when whitespace is wrong within a file and for double-checking the real characters when working in a new project. I currently do not show a fill-line because I find it distracting. When I want to see whitespace, I want to see /all/ of it, so I enable all styles. I also use unicode characters for visualizing different pieces of whitespace when they are available.
+
+#+begin_src elisp
+(setq whitespace-line-column nil
+      whitespace-style
+      '(face indentation tabs tab-mark spaces space-mark newline newline-mark
+        trailing lines-tail)
+      whitespace-display-mappings
+      '((tab-mark ?\t [?› ?\t])
+        (newline-mark ?\n [?¬ ?\n])
+        (space-mark ?\  [?·] [?.])))
+#+end_src
+
+*** winner
+
+- links :: built-in
+
+=winner= is a package that allows you to  easily undo and redo changes to Emacs' window layout. It automatically binds keys with keys that do not work well for keeping your hands on the home row so I disable the auto-binding. I also mark some extra buffers as "boring" to Winner to make sure it never restores them.
+
+#+begin_src elisp
+(use-package winner
+  :elpaca nil
+  :preface (defvar winner-dont-bind-my-keys t)
+  :hook (window-setup . winner-mode)
+  :config
+  (setq winner-boring-buffers
+        (append winner-boring-buffers "*Apropos*" "*Buffer List*"
+                "*Compile-Log*")))
+#+end_src
+
+** User interface
+
+Being a long-running computer program in which I spend much of my day, I deeply care about the user interface and experience for my Emacs. This section contains the configuration for the user interface of the editor.
+
+*** Look and feel
+
+Visual aesthetics are a common point of customization in text editors. I prefer a minimal look and feel, so you won't find much in here in the way of bells and whistles.
+
+**** apropospriate-theme
+
+- links :: [[https://melpa.org/#/apropospriate-theme][melpa]], [[https://github.com/waymondo/apropospriate-theme][source]]
+
+I currently use the =apropospriate-theme= in both dark and light variants, depending on the environment that I'm in. It mostly works for me, but I find some of the color choices in specific circumstances are wearing on me so I am considering a new theme. I haven't found any contenders as of yet.
+
+I have [[*Theme-specific][some Org-specific customizations]] later in the document.
+
+#+begin_src elisp
+(use-package apropospriate-theme
+  :config
+  (load-theme 'apropospriate-dark t)
+  (load-theme 'apropospriate-light t t))
+#+end_src
+
+** Completion system
+
+*** consult
+
+- links :: [[https://melpa.org/#/consult][melpa]], [[https://github.com/minad/consult][source]]
+
+=consult= upgrades Emacs' built-in =completing-read= system with the ability to show live previews, groups, and narrowing. It is the basis for sourcing data for completions in my configuration.
+
+Where appropriate, I replace all built-in Emacs functions with =consult-= versions. In a fit of pique, I also decided to replace =isearch= with =consult-line= because the extra context is helpful when searching through a buffer.
+
+#+begin_src elisp
+(use-package consult
+  :bind
+  ([remap apropos] . consult-apropos)
+  ([remap bookmark-jump] . consult-bookmark)
+  ([remap evil-show-marks] . consult-mark)
+  ([remap goto-line] . consult-goto-line)
+  ([remap imenu] . consult-imenu)
+  ([remap isearch-backward] . consult-line)
+  ([remap isearch-forward] . consult-line)
+  ([remap locate] . consult-locate)
+  ([remap load-theme] . consult-theme)
+  ([remap man] . consult-man)
+  ([remap recentf-open-file] . consult-recent-file)
+  ([remap switch-to-buffer] . consult-buffer)
+  ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+  ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
+  ([remap yank-pop] . consult-yank-pop)
+  :init
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+  (advice-add #'multi-occur :override #'consult-multi-occur)
+  :config
+  (setq consult-narrow-key "<"
+        consult-line-numbers-widen t
+        consult-async-min-input 2
+        consult-async-refresh-delay 0.15
+        consult-async-input-throttle 0.2
+        consult-async-input-debounce 0.1)
+  (consult-customize
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   :preview-key (list (kbd "C-SPC") (kbd "C-M-j") (kbd "C-M-k"))))
+#+end_src
+
+**** TODO =consult-project-root-function= once I set up =project-x=
+
+**** TODO Figure out =consult-narrow-key=
+
+*** marginalia
+
+- links :: [[https://melpa.org/#/marginalia][melpa]], [[https://github.com/minad/marginalia/][source]]
+
+=marginalia= adds information to minibuffer completions appropriate to the type of the completion. For example, it shows permissions for files and the first line of documentation for callables. Combined with [[*vertico][vertico]], these two packages create a powerful, yet lightweight, completion system that interoperates with Emacs' built-in system.
+
+If there are multiple kinds of marginalia for a command, I can toggle between them with =M-A=.
+
+#+begin_src elisp
+(use-package marginalia
+  :after vertico
+  :general
+  (minibuffer-local-map
+   "M-A" #'marginalia-cycle)
+  :init
+  (marginalia-mode +1))
+#+end_src
+
+*** orderless
+
+- links :: [[https://melpa.org/#/orderless][melpa]], [[https://github.com/oantolin/orderless][source]]
+
+=orderless= adds a completion style that splits your search patterns at spaces and allows each pattern to match in any order. This is particularly helpful when you can't remember if a command is =advice-add= or =add-advice=.
+
+#+begin_src elisp
+(use-package orderless
+  :config
+  (defun oik-orderless-dispatch (pattern _index _total)
+    "Configure an `orderless' query via prefixes and suffixes.
+
+A PATTERN ending in '$' will still work with a Consult command even though it
+adds disambiguation suffixes.
+
+A PATTERN beginning in '!' negates it in the search.
+
+A PATTERN beginning in '`' makes a search only find in-order initials, e.g. abc
+maps to \\<a.*\\<b.*\\c. Useful for searches like 'ffap'.
+
+A PATTERN beginning in '=' quotes it as a literal.
+
+A PATTERN beginning in '~' matches those characters in strict order, e.g. abc
+maps to a.*b.*c."
+    (cond
+     ((string-suffix-p "$" pattern)
+      `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
+     ((string= "!" pattern) `(orderless-literal . ""))
+     ((string-prefix-p "!" pattern) `(orderless-without-literal . ,(substring pattern 1)))
+     ((string-prefix-p "`" pattern) `(orderless-initialism . ,(substring pattern 1)))
+     ((string-prefix-p "=" pattern) `(orderless-literal . ,(substring pattern 1)))
+     ((string-prefix-p "~" pattern) `(orderless-flex . ,(substring pattern 1)))))
+
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (orderless partial-completion))))
+        orderless-style-dispatchers '(oik-orderless-dispatch)))
+#+end_src
+
+*** savehist
+
+- links :: built-in
+
+=orderless= uses Emacs minibuffer history to rank completion targets. In order to make this behavior more useful, =savehist= allows you to save that history between Emacs restarts.
+
+Additionally, =savehist= can save other variables such as the clipboard (also known as the "kill ring"), macros, marks, and searches. This is a nice value-add that helps me to remember what I was doing yesterday upon the unfortunate event that I didn't note it down before the end of the day.
+
+By default, =savehist= auto-saves the minibuffer history every five minutes. I'm not sure why this is desirable, so I disabled that functionality. This means it only saves the history when I kill a minibuffer.
+
+To help with saving the history of the clipboard and the register list, I added hooks to scrub the variables before saving them. These I cribbed from Doom Emacs.
+
+#+begin_src elisp
+(use-package savehist
+  :elpaca nil
+  :custom (savehist-file (concat oik-cache-dir "savehist"))
+  :config
+  (setq savehist-save-minibuffer-history t
+        savehist-autosave-interval nil
+        savehist-additional-variables
+        '(kill-ring
+          register-alist
+          mark-ring global-mark-ring
+          search-ring regexp-search-ring))
+
+  (defun oik-savehist-unpropertize-variables-h ()
+    "Remove text properties from `kill-ring' to reduce savehist cache size."
+    (setq kill-ring
+          (mapcar #'substring-no-properties
+                  (cl-remove-if-not #'stringp kill-ring))
+          register-alist
+          (cl-loop for (reg . item) in register-alist
+                   if (stringp item)
+                   collect (cons reg (substring-no-properties item))
+                   else collect (cons reg item))))
+
+  (defun oik-savehist-remove-unprintable-registers-h ()
+    "Remove unprintable registers (e.g. containing window configurations) from savehist.
+
+This allows it to save the rest of `register-alist' instead of discarding the whole."
+    (setq-local register-alist
+                (cl-remove-if-not #'savehist-printable register-alist)))
+
+  (general-add-hook 'savehist-save-hook
+                    '(oik-savehist-unpropertize-variables-h
+                      oik-savehist-remove-unprintable-registers-h))
+
+  (savehist-mode +1))
+#+end_src
+
+*** vertico
+
+- links :: [[https://elpa.gnu.org/packages/vertico.html][elpa]], [[https://github.com/minad/vertico][source]]
+
+=vertico= is a minimalist completion interface that works with Emacs' default completion system instead of defining its own. This makes it highly interoperable with other Emacs packages.
+
+#+begin_src elisp
+(use-package vertico
+  :general
+  (vertico-map
+   "C-j"   #'vertico-next
+   "C-S-j" #'vertico-next-group
+   "C-k"   #'vertico-previous
+   "C-S-k" #'vertico-previous-group
+   "M-RET" #'vertico-exit-input)
+  (minibuffer-local-map
+   "M-h" #'backward-kill-word)
+  :init
+  (vertico-mode +1)
+  :config
+  (setq vertico-cycle t
+        completion-in-region-function
+        (lambda (&rest args)
+          (cond (vertico-mode (apply #'consult-completion-in-region args))
+                (t (apply #'completion--in-region args))))))
+
+#+end_src
+
+** Text editing
+*** Parenthesis management
+
+Being that I use Emacs as my editor, I end up writing a sizeable amount of Lisp. This means I need a reasonable way to help me keep up with the nesting of parentheses. This involves both generating them and visualizing them.
+
+**** =smartparens=
+
+- links :: [[https://melpa.org/#/smartparens][melpa]], [[https://github.com/Fuco1/smartparens][source]]
+
+=smartparens= is the defacto default package for managing parentheses and other delimeters within Emacs. It can be infuriating and needs tweaks every now and then, but it does it job well enough to use. There are alternatives for this behavior, but it is what I use for now.
+
+I explicitly enable this in Org mode because it wasn't enabling without that. This doesn't feel like the right move, but it works for now.
+
+#+begin_src elisp
+;; (use-package smartparens
+;;   :hook (prog-mode org-mode)
+;;   :commands (sp-pair
+;;              sp-local-pair
+;;              sp-with-modes
+;;              sp-point-in-comment
+;;              sp-point-in-string)
+;;   :config
+;;   ;; Disable overlays because they are expensive and not as useful with evil
+;;   (setq sp-highlight-pair-overlay nil
+;;         sp-highlight-wrap-overlay nil
+;;         sp-highlight-wrap-tag-overlay nil)
+;;
+;;   ;; Tweak some settings for performance
+;;   (setq sp-max-prefix-length 25
+;;         sp-max-pair-length 4)
+;;
+;;   ;; Disable apostrophe and backtick pairing in Lisp-like modes
+;;   (sp-with-modes '(minibuffer-mode minibuffer-inactive-mode org-mode)
+;;     (sp-local-pair "`" nil :actions nil)
+;;     (sp-local-pair "'" nil :actions nil))
+;;
+;;   (smartparens-global-mode +1))
+#+end_src
+
+**** =rainbow-delimiters=
+
+- links :: [[https://melpa.org/#/rainbow-delimiters][melpa]], [[https://github.com/Fanael/rainbow-delimiters][source]]
+
+Since Lisp uses parentheses so heavily, it's helpful to see which parenthesis (or other delimiter) matches with one before or after it. =rainbow-delimiters= helps me do this by coloring pairs to make them visually more similar to each other.
+
+I limit the number of faces to four (from the default of nine) because faces are expensive for Emacs to show.
+
+I explicitly enable this in Org mode because it wasn't enabling without that. This doesn't feel like the right move, but it works for now.
+
+#+begin_src elisp
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  :init
+  (setq rainbow-delimiters-max-face-count 4))
+#+end_src
+
+*** Snippets
+
+ I use =yasnippet= to manage snippets to quickly generate repeated blocks of code, such as Org mode source blocks. I currently do not have a complicated snippet setup because it's something that I end up fighting more than liking when I use pre-made snippet libraries. As such, I am building it as I go along.
+
+ One thing that I found interesting when reading through Doom's snippet system is the [[https://github.com/abo-abo/auto-yasnippet][auto-yasnippet]] package as a compliment to Evil mode macros. I do not currently have that installed but want to note it for later consideration
+
+ I store my snippets in the private directory because I consider them configuration instead of data files. This is debatable, but it works for now.
+
+ #+begin_src elisp
+ (defvar oik-snippets-dir (expand-file-name "snippets/" oik-private-dir)
+   "The directory in which the snippet system should store snippets.")
+ #+end_src
+
+**** =yasnippet=
+
+ - links :: [[https://melpa.org/#/yasnippet][melpa]], [[https://github.com/joaotavora/yasnippet][source]]
+
+ =yasnippet= is a large package so I mark the commands that I use as possible lazy load targets. This later accomplishes nothing though because I eagerly turn on =yas-global-mode= so that I may use my snippets in all modes that have them. I find the crib sheet useful for keeping things fresh in my mind.
+
+#+begin_src elisp
+(use-package yasnippet
+  :commands (yas-minor-mode-on
+             yas-expand
+             yas-expand-snippet
+             yas-lookup-snippet
+             yas-insert-snippet
+             yas-new-snippet
+             yas-visit-snippet-file
+             yas-activate-extra-mode
+             yas-deactivate-extra-mode
+             yas-maybe-expand-abbrev-key-filter)
+  :init
+  (setq yas-snippet-dirs nil)
+  :config
+  (setq yas-verbosity 2
+        yas-prompt-functions
+        '(yas-completing-prompt
+          yas-maybe-ido-prompt
+          yas-no-prompt))
+
+  (defun oik-remove-duplicate-snippets-a (templates)
+    "Remove duplicate TEMPLATES for the yasnippet list.
+
+I don't know why this happens, but it is irritating and confusing when I see a
+snippet listed twice."
+    (cl-delete-duplicates templates :test #'equal))
+
+  (general-add-advice #'yas--all-templates
+                      :filter-return
+                      #'oik-remove-duplicate-snippets-a)
+
+  (add-to-list 'yas-snippet-dirs oik-snippets-dir)
+  (add-to-list 'load-path oik-snippets-dir)
+
+  (yas-global-mode +1))
+#+end_src
+
+** Org mode
+
+Org mode is a (the?) major reason why I use Emacs. I find the promise of storing all of my notes, literate programming like this configuration, my todos, and nearly everything else in a single, text-oriented form alluring. As such, I need to configure Org to my liking.
+
+To start, I store my Org files in my home directory.
+
+#+begin_src elisp :noweb-ref org-config :noweb-sep "\n\n"
+(setq org-directory "~/org")
+#+end_src
+
+*** Look and feel
+
+When opening an indirect buffer, I like to think of it as zooming into the document. As such, I create the indirect buffer within the current window.
+
+#+begin_src elisp :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(setq org-indirect-buffer-display 'current-window)
+#+end_src
+
+Org mode likes to push things far to the right, in particular when you edit Emacs Lisp within it. To fight this somewhat, I disable the indentation of source blocks, showing them against the left margin. Since
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(setq org-edit-src-content-indentation 0)
+#+end_src
+
+The Org ellipsis shows collapsed trees. I like the idea of showing these with a downward arrow.
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(setq org-ellipsis " ▼ ")
+#+end_src
+
+To encourage my Org mode writing to be more like a writing environment, I hide emphasis markers like =*bold*= and =/italics/=.
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(setq org-hide-emphasis-markers t)
+#+end_src
+
+Literate programming in Org is wonderful. To make sure it applies syntax highlighting correctly to source blocks, I explicitly enable it even though it's enabled by default since Org 8.3
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(setq org-src-fontify-natively t)
+#+end_src
+
+**** Numbering
+
+#+begin_src elisp
+(defgroup oik-faces ()
+  "Faces defined specifically for Oikeiôsis."
+  :group 'faces
+  :prefix "oik-")
+#+end_src
+
+#+begin_src elisp
+(defface oik-org-num-numbering nil
+  "The face for high level Org mode numbering."
+  :group 'oik-faces)
+#+end_src
+
+
+#+begin_src elisp
+;; (defun oik--org-num-format (numbering)
+;;   "Formats Org mode headline NUMBERING."
+;;   (if (= (length numbering) 1)
+;;       (propertize (concat (mapconcat #'number-to-string numbering ".") " | ")
+;;                   'face
+;;                   `(:family "Fira Sans" :width 'condensed :height 250 :foreground "#686868"))
+;;     (propertize (concat (mapconcat #'number-to-string numbering ".") " — ")
+;;                 'face
+;;                 'oik-org-num-numbering)))
+(defun oik--org-num-format (numbering)
+  "Formats Org mode headline NUMBERING."
+  (if (= (length numbering) 1)
+      (concat (mapconcat #'number-to-string numbering ".") " | ")
+    (concat (mapconcat #'number-to-string numbering ".") " — ")))
+#+end_src
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(general-with-eval-after-load 'org-num
+  (setq org-num-skip-unnumbered t
+        org-num-skip-footnotes t
+        org-num-max-level 4
+        org-num-face 'oik-org-num-numbering
+        org-num-format-function #'oik--org-num-format))
+#+end_src
+
+**** Faces
+
+Stylizing plain lists, which I write with =-=, with bullets makes them easier on the eyes. This uses font lock to do just that.
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+#+end_src
+
+Being mostly prose, I like to style Org mode with that in mind. These changes use a [[https://www.modularscale.com/?1&em&1.067][minor second modular scale]] for sizing headlines to make them visually distinct. I find that using =org-bullets= makes it hard to see which level I'm at in the tree, so I chose this approach as an alternative. Because I use =variable-pitch-mode= as well, I find that I must hunt-and-peck to make sure things that should be fixed pitch end up that way. Heavy inspiration for this section comes from [[https://zzamboni.org/post/beautifying-org-mode-in-emacs/][Beautifying Org Mode in Emacs]].
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(custom-theme-set-faces
+ 'user
+ '(org-document-title ((t (:inherit default :family "Fira Sans" :weight ultra-bold :height 200))))
+ '(org-level-1        ((t (:inherit default :family "Fira Sans" :weight bold :height 180))))
+ '(org-level-2        ((t (:inherit default :family "Fira Sans" :weight bold :height 160))))
+ '(org-level-3        ((t (:inherit default :family "Fira Sans" :weight semi-bold :height 150))))
+ '(org-level-4        ((t (:inherit default :family "Fira Sans" :weight semi-bold))))
+ '(org-level-5        ((t (:inherit default :family "Fira Sans" :weight semi-bold))))
+ '(org-level-6        ((t (:inherit default :family "Fira Sans" :weight semi-bold))))
+ '(org-level-7        ((t (:inherit default :family "Fira Sans" :weight semi-bold))))
+ '(org-level-8        ((t (:inherit default :family "Fira Sans" :weight semi-bold))))
+
+ '(org-block                 ((t (:inherit fixed-pitch))))
+ '(org-block-end-line        ((t (:inherit org-block-begin-line))))
+ '(org-checkbox              ((t (:inherit fixed-pitch))))
+ '(org-code                  ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-ellipsis              ((t (:inherit default :height 0.8))))
+ '(org-formula               ((t (:inherit fixed-pitch))))
+ '(org-indent                ((t (:inherit (org-hide fixed-pitch)))))
+ '(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-property-value        ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword       ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-table                 ((t (:inherit fixed-pitch))))
+ '(org-tag                   ((t (:inherit fixed-pitch))))
+ '(org-todo                  ((t (:inherit fixed-pitch))))
+ '(org-verbatim              ((t (:inherit (shadow fixed-pitch))))))
+#+end_src
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(custom-theme-set-faces
+ 'apropospriate-dark
+ '(oik-org-num-numbering ((t (:family "Fira Sans" :width condensed :foreground "#686868")))))
+
+(custom-theme-set-faces
+ 'apropospriate-light
+ '(oik-org-num-numbering ((t (:family "Fira Sans" :width condensed :foreground "#c8c8c8")))))
+#+end_src
+
+
+On the agenda, I like to see different priorities set with different faces. As deadlines approach, the faces get gradually more aggressive to catch my attention.
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(setq org-agenda-deadline-faces '((1.001 . error)
+                                  (1.0 . org-imminent-deadline)
+                                  (0.5 . org-upcoming-deadline)
+                                  (0.0 . org-upcoming-distant-deadline)))
+#+end_src
+
+To make it easier to theme specific functionality within Org mode buffers, I enable all of the optional fontification.
+
+****** Theme-specific
+
+My preferred theme does not stylize the habit tracker out-of-the-box, so I also define some faces here to match the dark and light colorschemes.
+
+#+begin_src elisp :tangle no :noweb-ref org-look-and-feel :noweb-sep "\n\n"
+(general-with-eval-after-load 'org-habit
+  (custom-theme-set-faces
+   'apropospriate-dark
+   '(org-habit-alert-face          ((t (:foreground "#424242" :background "#FFEE9D"))))
+   '(org-habit-alert-future-face   ((t (:background "#FFEE58"))))
+   '(org-habit-clear-face          ((t (:background "#E1BEE7"))))
+   '(org-habit-clear-future-face   ((t (:background "#9575CD"))))
+   '(org-habit-overdue-face        ((t (:background "#E57373"))))
+   '(org-habit-overdue-future-face ((t (:background "#EF9A9A"))))
+   '(org-habit-ready-face          ((t (:foreground "#424242" :background "#C5E1A5"))))
+   '(org-habit-ready-future-face   ((t (:background "#F4FF81")))))
+
+  (custom-theme-set-faces
+   'apropospriate-light
+   '(org-habit-alert-face          ((t (:foreground "#424242" :background "#F9A725"))))
+   '(org-habit-alert-future-face   ((t (:background "#F57F17"))))
+   '(org-habit-clear-face          ((t (:background "#7E57C2"))))
+   '(org-habit-clear-future-face   ((t (:background "#B388FF"))))
+   '(org-habit-overdue-face        ((t (:background "#D50000"))))
+   '(org-habit-overdue-future-face ((t (:background "#FF1744"))))
+   '(org-habit-ready-face          ((t (:foreground "#424242" :background "#66BB6A"))))
+   '(org-habit-ready-future-face   ((t (:background "#558B2F"))))))
+#+end_src
+
+*** Task management
+
+For projects, I want to make sure I don't accidentally complete a project before all of its subtasks are done and the same for checklists. To prevent this, I enforce dependencies for both features.
+
+#+begin_src elisp :tangle no :noweb-ref org-config :noweb-sep "\n\n"
+(setq org-enforce-todo-dependencies t
+      org-enforce-todo-checkbox-dependencies t)
+#+end_src
+
+**** Agenda
+
+The agenda is a key part of using the task management functionality of Org mode. This section configures the agenda to my liking.
+
+By default, I want to include all files within my Org directory. I sometimes override this on individual machines.
+
+#+begin_src elisp :tangle no :noweb-ref org-config :noweb-sep "\n\n"
+(setq-default org-agenda-files (list org-directory))
+#+end_src
+
+When showing the agenda, I don't want missing files to impede the view, so I allow skipping unavailable files.
+
+#+begin_src elisp :tangle no :noweb-ref org-config :noweb-sep "\n\n"
+(setq org-agenda-skip-unavailable-files t)
+#+end_src
+
+I'm an American and thus, my brain has learned to associate the beginning on the week with Sunday. I've tried over the years to retrain myself to think of Monday as the first day of the week, but this has always ended up causing issues where I don't realize that I'm thinking of the days wrong. To work with my brain instead of against it, I start my agenda on Sundays.
+
+#+begin_src elisp :tangle no :noweb-ref org-config :noweb-sep "\n\n"
+(setq org-agenda-start-on-weekday 0)
+#+end_src
+
+*** Initialization
+
+#+begin_src elisp :noweb tangle
+(use-package org
+  :hook (org-mode . org-num-mode)
+  :general
+  (org-mode-map
+   [tab] #'org-cycle)
+  :config
+  (setq org-modules '(org-habit))
+
+  <<org-config>>
+
+  <<org-look-and-feel>>
+
+  (setq org-insert-heading-respect-content nil))
+#+end_src
+
+*** org-appear
+
+- links :: [[https://melpa.org/#/org-appear][melpa]], [[https://github.com/awth13/org-appear][source]]
+
+Org mode is for writing (well, and a million other things, but primarily writing). As such, I like to see the prose without markup as much as possible. However, setting =org-hide-emphasis-markers= makes it difficult to /edit/ marked up prose. To remedy the situation, =org-appear= shows markup whenever the cursor is inside some markup. This gives the best of both worlds.
+
+There's one caveat that I have noticed. When moving the cursor into a marked up region, I need to press =h= or =l= an extra time after crossing the border. This can break my concentration because my brain expects it to jump over the symbol. I think I will get used to this, but it might be worth investigating some advice to automatically handle the extra movement.
+
+#+begin_src elisp
+(use-package org-appear
+  :after org
+  :hook (org-mode . org-appear-mode))
+#+end_src
+
+** Programming languages
+*** TODO Emacs Lisp
+
+#+begin_src elisp
+(defvar oik--emacs-lisp-function-face nil
+  "The face to use for enhanced Emacs lisp function highlighting.")
+#+end_src
+
+#+begin_src elisp
+(defun oik-emacs-lisp-highlight-vars-and-faces (end)
+  "Match until END defined variables and functions.
+
+This differentiates functions into special forms: built-in functions and
+user-defined ones.
+
+I lifted this from Doom Emacs because it's helpful to see which types of
+functions are which."
+  (catch 'matcher
+    (while (re-search-forward "\\(?:\\sw\\|\\s_\\)+" end t)
+      (let ((ppss (save-excursion (syntax-ppss))))
+        (cond ((nth 3 ppss) (search-forward "\"" end t))
+              ((nth 4 ppss) (forward-line +1))
+              ((let ((symbol (intern-soft (match-string-no-properties 0))))
+                 (and (cond ((null symbol) nil)
+                            ((eq symbol t) nil)
+                            ((keywordp symbol) nil)
+                            ((special-variable-p symbol)
+                             (setq oik--emacs-lisp-function-face 'font-lock-variable-name-face))
+                            ((and (fboundp symbol)
+                                  (eq (char-before (match-beginning 0)) ?\()
+                                  (not (memq (char-before (1- (match-beginning 0)))
+                                             (list ?\' ?\`))))
+                             (let ((unaliased (indirect-function symbol)))
+                               (unless (or (macrop unaliased)
+                                           (special-form-p unaliased))
+                                 (let (unadvised)
+                                   (while (not (eq (setq unadvised (ad-get-orig-definition unaliased))
+                                                   (setq unaliased (indirect-function unadvised)))))
+                                   unaliased)
+                                 (setq oik--emacs-lisp-function-face
+                                       (if (subrp unaliased)
+                                           'font-lock-constant-face
+                                         'font-lock-function-name-face))))))
+                      (throw 'matcher t)))))))))
+#+end_src
+
+Ensure that Emacs byte-compiles expensive font lock functions so they run as fast as possible. Font locking is already expensive so customizations need to be mindful of that.
+
+#+begin_src elisp
+(dolist (fn '(oik-emacs-lisp-highlight-vars-and-faces))
+  (unless (byte-code-function-p (symbol-function fn))
+    (with-no-warnings (byte-compile fn))))
+#+end_src
+
+Enable highlighting variables and faces by adding the function to font lock.
+
+#+begin_src elisp
+(font-lock-add-keywords
+ 'emacs-lisp-mode
+ `((oik-emacs-lisp-highlight-vars-and-faces . oik--emacs-lisp-function-face)))
+#+end_src
+
+
+I don't deal with a lot of external lisp code, so trusting local variables makes sense to me. Doom logs them when they are set, just in case, but I don't do that for the moment.
+
+#+begin_src elisp
+(setq-default enable-local-variables :safe)
+#+end_src
+
+**** TODO elisp-demos
+
+#+begin_src elisp
+(use-package elisp-demos
+  :defer t
+  :init
+  (general-add-advice 'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
+  (general-add-advice 'helpful-update :after #'elisp-demos-advice-helpful-update))
+#+end_src
+
+**** TODO highlight-quoted
+
+Seeing quoted symbols as different makes it easier to scan through Emacs Lisp code and find what you're looking for. Because of that, I use =highlight-quoted-mode= to help.
+
+#+begin_src elisp
+(use-package highlight-quoted
+  :hook (emacs-lisp-mode . highlight-quoted-mode))
+#+end_src
+
+** TODO To sort
+
+*** tree-sitter
+
+#+begin_src elisp
+(use-package tree-sitter
+  :elpaca '(:build (:not native-compile))
+  :config
+  (global-tree-sitter-mode +1)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs
+  :after tree-sitter
+  :elpaca '(:build (:not native-compile)))
+#+end_src
+
+*** rainbow-mode
+
+- links :: [[https://elpa.gnu.org/packages/rainbow-mode.html][elpa]], [[https://git.savannah.gnu.org/cgit/emacs/elpa.git/?h=externals/rainbow-mode][source]]
+
+#+begin_src elisp
+(use-package rainbow-mode
+  :hook (emacs-lisp-mode org-mode))
+#+end_src
+
+
