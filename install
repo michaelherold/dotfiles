@@ -40,6 +40,7 @@ elif [[ $OSTYPE == darwin* ]]; then
       graphviz \
       htop \
       neovim \
+      overmind \
       pinentry-mac \
       reattach-to-user-namespace \
       rcm \
