@@ -1,8 +1,70 @@
 # frozen_string_literal: true
 
-begin
-  require "pry"
+require "irb/completion"
 
-  Pry.start || exit
-rescue LoadError
+Reline::Face.config(:completion_dialog) do |config|
+  config.define :default, foreground: :white, background: :black
+  config.define :enhanced, foreground: :black, background: :green
+  config.define :scrollbar, foreground: :bright_white, background: :black
 end
+
+module CK
+  def self.prompt
+    if defined? Hanami
+      details Hanami::VERSION, Hanami.app.name.delete_suffix("::App"), Hanami.env
+    elsif defined? Rails
+      details Rails.version, Rails.application.class.module_parent_name, Rails.env
+    else
+      version_with_optional_project
+    end
+  end
+
+  private_class_method def self.details(framework_version, application_name, environment)
+    [
+      RUBY_VERSION,
+      framework_version,
+      application_name.downcase,
+      color_for(environment)
+    ].join("|")
+  end
+
+  private_class_method def self.color_for(environment)
+    case environment
+    when :production, "production" then "\e[31m#{environment}\e[0m"
+    else "\e[32m#{environment}\e[0m"
+    end
+  end
+
+  private_class_method def self.version_with_optional_project
+    File
+      .basename(`git rev-parse --show-toplevel 2>/dev/null`.strip)
+      .downcase
+      .then { |project| [RUBY_VERSION, project].reject(&:empty?).join("|") }
+  end
+end
+
+IRB.conf[:COMMAND_ALIASES].merge!(
+  c: :continue,
+  n: :next,
+  s: :step,
+  w: :whereami,
+)
+IRB.conf[:EVAL_HISTORY] = 1_000
+IRB.conf[:HISTORY_FILE] = "#{ENV.fetch("XDG_STATE_HOME", "#{Dir.home}/.local/state")}/irb/history"
+
+IRB.conf[:PROMPT] ||= {}
+IRB.conf[:PROMPT][:ALCHEMISTS] = CK.prompt.then do |prompt|
+  {
+    PROMPT_I: "[#{prompt}]> ",
+    PROMPT_N: "[#{prompt}]| ",
+    PROMPT_C: "[#{prompt}]| ",
+    PROMPT_S: "[#{prompt}]%l ",
+    RETURN: "=> %s\n"
+  }
+end
+IRB.conf[:PROMPT_MODE] = :ALCHEMISTS
+
+# Local Variables:
+# mode: ruby
+# End:
+# vim: ft=ruby
