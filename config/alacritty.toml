@@ -48,10 +48,10 @@ family = "FiraCode Nerd Font"
 [keyboard]
 bindings = [
   { action = "Copy",             key = "C",      mods = "Control|Shift" },
-  { action = "Copy",             key = "Copy",   mods = "" },
+  { action = "Copy",             key = "Copy",   mods = "None" },
   { action = "DecreaseFontSize", key = "Minus",  mods = "Control|Shift" },
   { action = "IncreaseFontSize", key = "Equals", mods = "Control|Shift" },
-  { action = "Paste",            key = "Paste",  mods = "" },
+  { action = "Paste",            key = "Paste",  mods = "None" },
   { action = "Paste",            key = "V",      mods = "Control|Shift" },
 ]
 
