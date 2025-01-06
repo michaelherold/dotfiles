@@ -1,5 +1,5 @@
 cursor-style-blink = false
-font-family = FuraCode Nerd Font Mono
+font-family = FiraCode Nerd Font
 font-size = 16.0
 shell-integration-features = no-cursor,sudo,title
 theme = "dark:Snazzy Soft,light:Spring"
