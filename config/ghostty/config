@@ -1,0 +1,8 @@
+cursor-style-blink = false
+font-family = FuraCode Nerd Font Mono
+font-size = 16.0
+shell-integration-features = no-cursor,sudo,title
+theme = "dark:Snazzy Soft,light:Spring"
+window-padding-x = 8
+
+macos-titlebar-style = transparent
