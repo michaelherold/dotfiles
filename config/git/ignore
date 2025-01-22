@@ -13,7 +13,12 @@
 .projectile
 .semaphore/*-secret.yml
 .vagrant
-.vscode
+.vscode/*
+!.vscode/*.code-snippets
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
 tags
 !tags/
 tmp/**/*
