@@ -1,0 +1,39 @@
+foreground = #e0e0e0
+background = #424242
+cursor-color = #ffee58
+minimum-contrast = 3
+selection-background = #515151
+
+# black
+palette = 0=#2a2a2a
+palette = 8=#595959
+
+# red
+palette = 1=#e57373
+palette = 9=#ef9a9a
+
+# green
+palette = 2=#f4ff81
+palette = 10=#c5e1a5
+
+# yellow
+palette = 3=#ffee58
+palette = 11=#fff59d
+
+# blue
+palette = 4=#64b5f6
+palette = 12=#42a5f5
+
+# purple
+palette = 5=#9575cd
+palette = 13=#e1bee7
+
+# teal
+palette = 6=#4db6ac
+palette = 14=#80cbc4
+
+# white
+palette = 7=#9e9e9e
+palette = 15=#e0e0e0
+
+# vim:ft=conf:

@@ -32,18 +32,6 @@ hs.spoons.use(
   {
     config = {
       handlers = {
-        function(mode)
-          local theme
-
-          if mode == "light" then theme = "Solarized Light"
-          else theme = "Snazzy"
-          end
-
-          hs.execute("kitty +kitten themes --reload-in=all '" .. theme .. "'", true)
-        end,
-        function(mode)
-          hs.execute("tmux source-file ~/.config/tmux/" .. mode .. ".conf", true)
-        end,
       },
     },
     hotkeys = { toggle = {{}, "f18"}  },
