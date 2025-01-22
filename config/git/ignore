@@ -30,6 +30,7 @@ yarn-error.log
 
 # Python
 .egg[s]
+.mypy_cache
 .tox
 *.pyc
 htmlcov
