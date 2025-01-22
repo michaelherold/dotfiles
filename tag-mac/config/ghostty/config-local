@@ -1,0 +1,4 @@
+# -*- mode: conf -*-
+# vim: ft=conf
+
+macos-titlebar-style = transparent
