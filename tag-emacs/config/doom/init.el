@@ -85,7 +85,7 @@
        (org +dragndrop +hugo +jorunal +noter +pretty +roam2)
        php
        plantuml
-       (python +lsp)
+       (python +lsp +pyenv)
        (ruby +chruby +lsp +rails)
        (rust +lsp)
        sh
