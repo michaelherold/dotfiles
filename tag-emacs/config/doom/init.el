@@ -20,7 +20,11 @@
 (after! core-cli-env
   (add-to-list 'doom-env-allow "^SSH_"))
 
-(doom! :completion
+
+(doom! :app
+       (rss +org +youtube)
+
+       :completion
        (company +childframe)
        vertico
 

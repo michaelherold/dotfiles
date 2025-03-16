@@ -1,0 +1,11 @@
+[Unit]
+Description=An Emacs server for continually updating Elfeed
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/emacs --bg-daemon=elfeed-server --init-directory=%h/.config/emacs/profiles/elfeed
+ExecStop=/usr/bin/emacsclient --socket-name=elfeed-server --eval "(kill-emacs)"
+Restart=always
+
+[Install]
+WantedBy=default.target

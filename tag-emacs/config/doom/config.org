@@ -515,6 +515,17 @@ The automatic pairing for smartparens' =`= pair gets applied within Org mode whe
   (sp-local-pair 'org-mode "'" nil :actions :rem))
 #+end_src
 
+* Elfeed
+
+I'm testing out Elfeed as a replacement for my current RSS reader that is trying way too hard to monetize more.
+
+#+begin_src elisp
+(use-package! elfeed
+  :init
+  (setq elfeed-db-directory (expand-file-name "db/" "~/.local/state/elfeed/")
+        elfeed-enclosure-default-dir (expand-file-name "enclosures/" "~/.local/state/elfeed/")))
+#+end_src
+
 * Miscellaneous
 ** Editing udev rules
 
