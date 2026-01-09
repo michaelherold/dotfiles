@@ -8,6 +8,8 @@
     <array>
       <string>/bin/launchctl</string>
       <string>setenv</string>
+      <string>CHRUBY_DISABLE</string>
+      <string>1</string>
       <string>CHRUBY_DISABLE_AUTO</string>
       <string>1</string>
     </array>

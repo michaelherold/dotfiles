@@ -4,5 +4,5 @@
 
 local rootdir="$ZDOTDIR/share/chruby"
 
-source "$rootdir/chruby.sh"
+[ -z "$CHRUBY_DISABLE" ] && source "$rootdir/chruby.sh"
 [ -z "$CHRUBY_DISABLE_AUTO" ] && source "$rootdir/auto.sh"
