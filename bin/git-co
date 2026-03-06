@@ -1,8 +1,49 @@
 #!/bin/bash
+#
+# git-co: Enhanced git checkout with fzf branch selection
+#
+# Usage:
+#   git-co              - Interactive branch selection with fzf (if installed)
+#   git-co <branch>     - Checkout specified branch
+#   git-co main|master  - Checkout the repository's main branch (via git main-branch)
+#
+# Interactive mode keybindings:
+#   Ctrl-A  - Toggle to show all branches (including remotes)
+#   Ctrl-L  - Toggle back to local branches only
+#   Ctrl-N  - Prompt for a new branch name, create it, and switch to it
+#   Esc     - Cancel and show current git status
+#
+# Dependencies:
+#   - fzf (optional): Enables interactive branch selection
+#   - git main-branch (custom command): Used for main/master argument substitution
 
 set -euo pipefail
 
 if [ "$#" -lt 1 ]; then
+  # When in an interactive terminal, allow for selecting a branch
+  if test -t 1 && command -v fzf >/dev/null 2>&1; then
+    current=$(git branch --show-current)
+    branch=$(git branch --format='%(refname:short)' | grep -v "^${current}$" | \
+      fzf --height=40% --reverse \
+          --header="Current: $current" \
+          --prompt='Branch (^A:all ^L:local ^N:new Esc:cancel): ' \
+          --preview='git log --oneline --graph --color=always -10 {}' \
+          --bind "ctrl-a:reload(git branch --all --format='%(if)%(symref)%(then)%(else)%(refname:short)%(end)' | grep -v '^$' | grep -v '^${current}$' || true)" \
+          --bind "ctrl-l:reload(git branch --format='%(refname:short)' | grep -v '^${current}$' || true)" \
+          --bind 'ctrl-n:become(echo __new_branch__)') || true
+    if [ "$branch" = "__new_branch__" ]; then
+      printf 'New branch name: '
+      read -r new_branch
+      if [ -n "$new_branch" ]; then
+        git checkout -b "$new_branch"
+        exit $?
+      fi
+    elif [ -n "$branch" ]; then
+      git checkout "$branch"
+      exit $?
+    fi
+  fi
+
   git checkout
   exit $?
 fi
