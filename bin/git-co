@@ -25,4 +25,4 @@ while [ "$#" -gt 0 ]; do
 done
 
 
-git checkout "${args[@]-}"
+git checkout "${args[@]}"
